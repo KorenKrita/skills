@@ -1,5 +1,6 @@
 ---
 name: handoff
+disable-model-invocation: true
 description: "Create or resume local project handoff documents for Claude Code. Use when the user invokes `/handoff`, `/handoff off`, or `/handooff on`, or asks to save, resume, continue, or hand off project context. The skill writes new Markdown handoff documents under the current project's `.handoff/` directory, or reads existing handoff documents when starting from little or no context. It is designed for a zero-context future self to continue the work safely without deleting, editing, or archiving previous handoff documents."
 ---
 
@@ -324,6 +325,22 @@ Do not perform broad repository exploration unless it is needed.
 
 Do not require reading `CLAUDE.md`, `AGENTS.md`, `README.md`, or `CONTRIBUTING.md`; assume the surrounding agent environment handles project conventions.
 
+### Deduplication with Existing Artifacts
+
+Do not duplicate content already captured in other artifacts. This includes PRDs, plans, ADRs, issues, commits, diffs, specs, and design documents.
+
+Reference them by file path or URL instead.
+
+Example:
+
+```text
+See architecture decision in `docs/adr/0003-event-sourcing.md`.
+Implementation plan at `.claude/plans/pagination-refactor.md`.
+Related issue: https://github.com/org/repo/issues/42
+```
+
+If a piece of information is already recorded elsewhere and still current, a path reference is sufficient. Only inline context that exists nowhere else or that the next session cannot easily locate.
+
 ### Existing Handoff Documents
 
 If `.handoff/` contains existing handoff documents:
@@ -402,6 +419,9 @@ Adjust section emphasis according to any focus instruction after `/handoff`, but
 
 ## Verification
 <How to confirm the work is correct: tests, lint, build commands, manual checks, or expected behavior.>
+
+## Suggested skills
+<List skills the next session should invoke to continue the work effectively. Include the skill name and a one-line reason.>
 
 ## Current Git state
 <Summarize read-only git status/diff/log information. Do not include full diffs.>
