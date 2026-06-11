@@ -290,7 +290,9 @@ skills:
       path: skills/productivity/teach
       ref: main
     plugin: learning
-    patches: []
+    patches:
+      - type: remove_frontmatter
+        field: disable-model-invocation
 
   # ─── tools plugin (additional) ───────────────────────────────────────────────
 
