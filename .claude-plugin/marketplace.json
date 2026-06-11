@@ -1,0 +1,112 @@
+{
+  "name": "korenkrita-skills",
+  "owner": {
+    "name": "KorenKrita"
+  },
+  "description": "KorenKrita 的 skill 聚合库",
+  "plugins": [
+    {
+      "name": "engineering",
+      "source": "./plugins/engineering",
+      "description": "软件开发全流程：编码、调试、测试、审查、流程管理",
+      "strict": false,
+      "category": "engineering",
+      "keywords": [
+        "tdd",
+        "debug",
+        "diagnosis",
+        "architecture",
+        "review",
+        "workflow"
+      ]
+    },
+    {
+      "name": "thinking",
+      "source": "./plugins/thinking",
+      "description": "通用决策与规划：格局判断、可行性验证、压力测试",
+      "strict": false,
+      "category": "decision",
+      "keywords": [
+        "planning",
+        "decision",
+        "evaluation"
+      ]
+    },
+    {
+      "name": "writing",
+      "source": "./plugins/writing",
+      "description": "写作全流程：构思、成文、润色、去AI味、配图、排版",
+      "strict": false,
+      "category": "content",
+      "keywords": [
+        "writing",
+        "article",
+        "editing"
+      ]
+    },
+    {
+      "name": "design",
+      "source": "./plugins/design",
+      "description": "前端与 UI/UX 设计",
+      "strict": false,
+      "category": "design",
+      "keywords": [
+        "ui",
+        "ux",
+        "frontend"
+      ]
+    },
+    {
+      "name": "learning",
+      "source": "./plugins/learning",
+      "description": "知识获取与理解：搜索、阅读、学习、文档审计",
+      "strict": false,
+      "category": "knowledge",
+      "keywords": [
+        "search",
+        "learn",
+        "audit"
+      ]
+    },
+    {
+      "name": "tools",
+      "source": "./plugins/tools",
+      "description": "通用工具：交接、skill 开发、URL 读取、图像描述",
+      "strict": false,
+      "category": "tooling",
+      "keywords": [
+        "handoff",
+        "plugin",
+        "read",
+        "vision"
+      ]
+    },
+    {
+      "name": "visual",
+      "source": "./plugins/visual",
+      "description": "视觉创作：文档排版、插画配图",
+      "strict": false,
+      "category": "visual",
+      "keywords": [
+        "illustration",
+        "typeset",
+        "document"
+      ]
+    },
+    {
+      "name": "ui-ux-pro-max",
+      "source": {
+        "source": "github",
+        "repo": "nextlevelbuilder/ui-ux-pro-max-skill"
+      },
+      "description": "UI/UX 设计全套：组件、设计系统、品牌、配色、字体、图表",
+      "category": "design",
+      "keywords": [
+        "ui",
+        "ux",
+        "design-system",
+        "components"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "tdd": {
+    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+  },
+  "debug": {
+    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+  },
+  "zoom-out": {
+    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+  },
+  "prototype": {
+    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+  },
+  "improve": {
+    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+  },
+  "to-prd": {
+    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+  },
+  "to-issues": {
+    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+  },
+  "triage": {
+    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+  },
+  "init-codebase": {
+    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+  },
+  "hunt": {
+    "sha": "73ed3fd694deb2b8c7d5b0624cd85cd7838e2be0"
+  },
+  "check": {
+    "sha": "73ed3fd694deb2b8c7d5b0624cd85cd7838e2be0"
+  },
+  "ocr": {
+    "sha": "c323c6b40c72aa95d7cb801bedcb957b52ff9807"
+  },
+  "geju": {
+    "sha": "f9af2306f5bced6a199dc6ba155ea3cd318ee570"
+  },
+  "goudi": {
+    "sha": "f9af2306f5bced6a199dc6ba155ea3cd318ee570"
+  },
+  "idea": {
+    "sha": "f9af2306f5bced6a199dc6ba155ea3cd318ee570"
+  },
+  "razor": {
+    "sha": "f9af2306f5bced6a199dc6ba155ea3cd318ee570"
+  },
+  "grill-me": {
+    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+  },
+  "grill-with-docs": {
+    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+  },
+  "think": {
+    "sha": "73ed3fd694deb2b8c7d5b0624cd85cd7838e2be0"
+  },
+  "core": {
+    "sha": "73ed3fd694deb2b8c7d5b0624cd85cd7838e2be0"
+  },
+  "noai": {
+    "sha": "91f3d394db8419c20d67ebe22a96cf8fee0a404b"
+  },
+  "rewrite": {
+    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+  },
+  "step": {
+    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+  },
+  "collect": {
+    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+  },
+  "build": {
+    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+  },
+  "web": {
+    "sha": "fa2291c4d41f985987ccb48da7924b288f268538"
+  },
+  "ui": {
+    "sha": "73ed3fd694deb2b8c7d5b0624cd85cd7838e2be0"
+  },
+  "learn": {
+    "sha": "73ed3fd694deb2b8c7d5b0624cd85cd7838e2be0"
+  },
+  "teach": {
+    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+  },
+  "read": {
+    "sha": "73ed3fd694deb2b8c7d5b0624cd85cd7838e2be0"
+  },
+  "write-skill": {
+    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+  },
+  "docs-vs-code": {
+    "sha": "f9af2306f5bced6a199dc6ba155ea3cd318ee570"
+  },
+  "docs-vs-docs": {
+    "sha": "f9af2306f5bced6a199dc6ba155ea3cd318ee570"
+  },
+  "nopua": {
+    "sha": "9181a01f9fdf2018060007ac1c5b79bd5f32f333"
+  },
+  "xiaohei": {
+    "sha": "75f1f9d8f12c6cce1b5823dc9da8db1eb5a7d3cb"
+  },
+  "kami": {
+    "sha": "5cd7c8e9d9bca71188a2f72ef42cfbf68b56ba7c"
+  }
+}

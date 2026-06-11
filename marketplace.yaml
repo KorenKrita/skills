@@ -1,0 +1,81 @@
+marketplace:
+  name: korenkrita-skills
+  owner:
+    name: KorenKrita
+  description: "KorenKrita 的 skill 聚合库"
+
+plugins:
+  engineering:
+    description: "软件开发全流程：编码、调试、测试、审查、流程管理"
+    category: engineering
+    keywords:
+      - tdd
+      - debug
+      - diagnosis
+      - architecture
+      - review
+      - workflow
+
+  thinking:
+    description: "通用决策与规划：格局判断、可行性验证、压力测试"
+    category: decision
+    keywords:
+      - planning
+      - decision
+      - evaluation
+
+  writing:
+    description: "写作全流程：构思、成文、润色、去AI味、配图、排版"
+    category: content
+    keywords:
+      - writing
+      - article
+      - editing
+
+  design:
+    description: "前端与 UI/UX 设计"
+    category: design
+    keywords:
+      - ui
+      - ux
+      - frontend
+
+  learning:
+    description: "知识获取与理解：搜索、阅读、学习、文档审计"
+    category: knowledge
+    keywords:
+      - search
+      - learn
+      - audit
+
+  tools:
+    description: "通用工具：交接、skill 开发、URL 读取、图像描述"
+    category: tooling
+    keywords:
+      - handoff
+      - plugin
+      - read
+      - vision
+
+  visual:
+    description: "视觉创作：文档排版、插画配图"
+    category: visual
+    keywords:
+      - illustration
+      - typeset
+      - document
+
+external_plugins:
+  ui-ux-pro-max:
+    source:
+      type: github
+      repo: nextlevelbuilder/ui-ux-pro-max-skill
+    description: "UI/UX 设计全套：组件、设计系统、品牌、配色、字体、图表"
+    category: design
+    keywords:
+      - ui
+      - ux
+      - design-system
+      - components
+
+

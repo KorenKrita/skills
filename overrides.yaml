@@ -1,0 +1,370 @@
+skills:
+  # ─── engineering plugin ────────────────────────────────────────────────────
+
+  tdd:
+    source:
+      repo: mattpocock/skills
+      path: skills/engineering/tdd
+      ref: main
+    plugin: engineering
+    patches: []
+
+  debug:
+    source:
+      repo: mattpocock/skills
+      path: skills/engineering/diagnose
+      ref: main
+    plugin: engineering
+    patches:
+      - type: set_frontmatter
+        field: name
+        value: debug
+
+  zoom-out:
+    source:
+      repo: mattpocock/skills
+      path: skills/engineering/zoom-out
+      ref: main
+    plugin: engineering
+    patches:
+      - type: remove_frontmatter
+        field: disable-model-invocation
+
+  prototype:
+    source:
+      repo: mattpocock/skills
+      path: skills/engineering/prototype
+      ref: main
+    plugin: engineering
+    patches: []
+
+  improve:
+    source:
+      repo: mattpocock/skills
+      path: skills/engineering/improve-codebase-architecture
+      ref: main
+    plugin: engineering
+    patches:
+      - type: set_frontmatter
+        field: name
+        value: improve
+
+  to-prd:
+    source:
+      repo: mattpocock/skills
+      path: skills/engineering/to-prd
+      ref: main
+    plugin: engineering
+    patches: []
+
+  to-issues:
+    source:
+      repo: mattpocock/skills
+      path: skills/engineering/to-issues
+      ref: main
+    plugin: engineering
+    patches: []
+
+  triage:
+    source:
+      repo: mattpocock/skills
+      path: skills/engineering/triage
+      ref: main
+    plugin: engineering
+    patches: []
+
+  init-codebase:
+    source:
+      repo: mattpocock/skills
+      path: skills/engineering/setup-matt-pocock-skills
+      ref: main
+    plugin: engineering
+    patches:
+      - type: set_frontmatter
+        field: name
+        value: init-codebase
+
+  hunt:
+    source:
+      repo: tw93/Waza
+      path: skills/hunt
+      ref: main
+    plugin: engineering
+    patches: []
+
+  check:
+    source:
+      repo: tw93/Waza
+      path: skills/check
+      ref: main
+    plugin: engineering
+    patches: []
+
+  ocr:
+    source:
+      repo: alibaba/open-code-review
+      path: plugins/open-code-review
+      ref: main
+    plugin: engineering
+    patches:
+      - type: set_frontmatter
+        field: name
+        value: ocr
+    extra_mappings:
+      - from: commands/review.md
+        to: commands/review.md
+
+  # ─── thinking plugin ───────────────────────────────────────────────────────
+
+  geju:
+    source:
+      repo: hylarucoder/hai-stack
+      path: skills/geju
+      ref: main
+    plugin: thinking
+    patches: []
+
+  goudi:
+    source:
+      repo: hylarucoder/hai-stack
+      path: skills/goudi
+      ref: main
+    plugin: thinking
+    patches: []
+
+  idea:
+    source:
+      repo: hylarucoder/hai-stack
+      path: skills/hai-idea
+      ref: main
+    plugin: thinking
+    patches:
+      - type: set_frontmatter
+        field: name
+        value: idea
+
+  razor:
+    source:
+      repo: hylarucoder/hai-stack
+      path: skills/hai-razor
+      ref: main
+    plugin: thinking
+    patches:
+      - type: set_frontmatter
+        field: name
+        value: razor
+
+  grill-me:
+    source:
+      repo: mattpocock/skills
+      path: skills/productivity/grill-me
+      ref: main
+    plugin: thinking
+    patches: []
+
+  grill-with-docs:
+    source:
+      repo: mattpocock/skills
+      path: skills/engineering/grill-with-docs
+      ref: main
+    plugin: thinking
+    patches: []
+
+  think:
+    source:
+      repo: tw93/Waza
+      path: skills/think
+      ref: main
+    plugin: thinking
+    patches: []
+
+
+  # ─── writing plugin ────────────────────────────────────────────────────────
+
+  core:
+    source:
+      repo: tw93/Waza
+      path: skills/write
+      ref: main
+    plugin: writing
+    patches:
+      - type: set_frontmatter
+        field: name
+        value: core
+
+  noai:
+    source:
+      repo: op7418/Humanizer-zh
+      path: .
+      ref: main
+    plugin: writing
+    patches:
+      - type: set_frontmatter
+        field: name
+        value: noai
+
+  rewrite:
+    source:
+      repo: mattpocock/skills
+      path: skills/personal/edit-article
+      ref: main
+    plugin: writing
+    patches:
+      - type: set_frontmatter
+        field: name
+        value: rewrite
+
+  step:
+    source:
+      repo: mattpocock/skills
+      path: skills/in-progress/writing-beats
+      ref: main
+    plugin: writing
+    patches:
+      - type: set_frontmatter
+        field: name
+        value: step
+
+  collect:
+    source:
+      repo: mattpocock/skills
+      path: skills/in-progress/writing-fragments
+      ref: main
+    plugin: writing
+    patches:
+      - type: set_frontmatter
+        field: name
+        value: collect
+
+  build:
+    source:
+      repo: mattpocock/skills
+      path: skills/in-progress/writing-shape
+      ref: main
+    plugin: writing
+    patches:
+      - type: set_frontmatter
+        field: name
+        value: build
+
+  # ─── design plugin ─────────────────────────────────────────────────────────
+
+  web:
+    source:
+      repo: KAOPU-XiaoPu/web-design
+      path: .
+      ref: main
+    plugin: design
+    patches:
+      - type: set_frontmatter
+        field: name
+        value: web
+      - type: replace
+        pattern: "# Web Design\n"
+        with: "# Web Design\n\n用户可以在 https://getdesign.md/ 挑选喜欢的 design，或者按照下述流程设计自己的 design。\n"
+
+  ui:
+    source:
+      repo: tw93/Waza
+      path: skills/design
+      ref: main
+    plugin: design
+    patches:
+      - type: set_frontmatter
+        field: name
+        value: ui
+
+  # ─── learning plugin ────────────────────────────────────────────────────────
+
+  learn:
+    source:
+      repo: tw93/Waza
+      path: skills/learn
+      ref: main
+    plugin: learning
+    patches: []
+
+  teach:
+    source:
+      repo: mattpocock/skills
+      path: skills/productivity/teach
+      ref: main
+    plugin: learning
+    patches: []
+
+  # ─── tools plugin (additional) ───────────────────────────────────────────────
+
+  read:
+    source:
+      repo: tw93/Waza
+      path: skills/read
+      ref: main
+    plugin: tools
+    patches: []
+
+  write-skill:
+    source:
+      repo: mattpocock/skills
+      path: skills/productivity/write-a-skill
+      ref: main
+    plugin: tools
+    patches:
+      - type: set_frontmatter
+        field: name
+        value: write-skill
+
+  # double-shot-latte hooks 集成在 plugins/tools/hooks/ 下
+  # 来源: obra/double-shot-latte (hooks/)
+  # 不作为 skill 同步，需手动更新或单独处理 hooks 同步逻辑
+
+  # ─── engineering plugin (additional) ────────────────────────────────────────
+
+  docs-vs-code:
+    source:
+      repo: hylarucoder/hai-stack
+      path: skills/hai-audit-docs-against-code
+      ref: main
+    plugin: engineering
+    patches:
+      - type: set_frontmatter
+        field: name
+        value: docs-vs-code
+
+  docs-vs-docs:
+    source:
+      repo: hylarucoder/hai-stack
+      path: skills/hai-audit-docs-internally
+      ref: main
+    plugin: engineering
+    patches:
+      - type: set_frontmatter
+        field: name
+        value: docs-vs-docs
+
+  # ─── tools plugin (additional 2) ───────────────────────────────────────────
+
+  nopua:
+    source:
+      repo: wuji-labs/nopua
+      path: skills/nopua
+      ref: main
+    plugin: tools
+    patches: []
+
+  # ─── visual plugin ─────────────────────────────────────────────────────────
+
+  xiaohei:
+    source:
+      repo: KorenKrita/skills
+      path: plugins/visual/skills/xiaohei
+      ref: main
+    plugin: visual
+    patches: []
+
+  kami:
+    source:
+      repo: tw93/kami
+      path: .
+      ref: main
+    plugin: visual
+    patches: []
