@@ -262,13 +262,13 @@ const program = Effect.gen(function* () {
       const result = createPr(skillName, source.repo, branch, patchFailed, body)
       if (result === "created") {
         console.log(`  📬 PR 已创建${patchFailed ? " (Draft)" : ""}`)
+        syncState[skillName] = { sha: latestSha }
+        updated = true
       } else if (result === "no-changes") {
         console.log(`  ⏭️  ${skillName}: 文件内容无变化，跳过`)
       } else {
         console.log(`  ⏭️  ${skillName}: 分支已存在，跳过`)
       }
-      syncState[skillName] = { sha: latestSha }
-      updated = true
     } catch (e) {
       console.log(`  ❌ PR 创建失败: ${e}`)
     }
