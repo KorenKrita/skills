@@ -123,13 +123,15 @@ function ensureLabels(labels: string[]): void {
   }
 }
 
+type PrResult = "created" | "no-changes" | "branch-exists"
+
 function createPr(
   skillName: string,
   repo: string,
   branch: string,
   isDraft: boolean,
   body: string,
-): void {
+): PrResult {
   const title = isDraft
     ? `同步：更新 ${skillName}（来自 ${repo}）[补丁失败]`
     : `同步：更新 ${skillName}（来自 ${repo}）`
@@ -138,10 +140,9 @@ function createPr(
 
   try {
     exec(`git ls-remote --exit-code origin refs/heads/${branch}`)
-    exec(`git checkout main`)
-    throw new Error(`分支 ${branch} 已存在于远端，跳过`)
-  } catch (e) {
-    if (e instanceof Error && e.message.includes("已存在于远端")) throw e
+    return "branch-exists"
+  } catch {
+    // branch doesn't exist on remote — proceed
   }
 
   exec(`git checkout -b ${branch}`)
@@ -150,7 +151,7 @@ function createPr(
   const status = exec(`git status --porcelain`)
   if (!status) {
     exec(`git checkout main`)
-    throw new Error("无实际文件变更，跳过")
+    return "no-changes"
   }
 
   exec(`git -c user.name="github-actions" -c user.email="actions@github.com" commit -m "同步：更新 ${skillName}"`)
@@ -167,6 +168,7 @@ function createPr(
 
   rmSync(bodyFile, { force: true })
   exec(`git checkout main`)
+  return "created"
 }
 
 // ─── Main Sync Logic ─────────────────────────────────────────────────────────
@@ -257,8 +259,14 @@ const program = Effect.gen(function* () {
     const branch = `sync/${skillName}-${latestSha.slice(0, 7)}`
 
     try {
-      createPr(skillName, source.repo, branch, patchFailed, body)
-      console.log(`  📬 PR 已创建${patchFailed ? " (Draft)" : ""}`)
+      const result = createPr(skillName, source.repo, branch, patchFailed, body)
+      if (result === "created") {
+        console.log(`  📬 PR 已创建${patchFailed ? " (Draft)" : ""}`)
+      } else if (result === "no-changes") {
+        console.log(`  ⏭️  ${skillName}: 文件内容无变化，跳过`)
+      } else {
+        console.log(`  ⏭️  ${skillName}: 分支已存在，跳过`)
+      }
       syncState[skillName] = { sha: latestSha }
       updated = true
     } catch (e) {
