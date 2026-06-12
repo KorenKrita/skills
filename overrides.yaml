@@ -110,6 +110,9 @@ skills:
       - type: set_frontmatter
         field: name
         value: ocr
+    extra_mappings:
+      - from: plugins/open-code-review/commands/review.md
+        to: plugins/engineering/commands/review.md
 
   # ─── thinking plugin ───────────────────────────────────────────────────────
 

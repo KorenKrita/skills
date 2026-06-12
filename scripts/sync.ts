@@ -11,6 +11,11 @@ interface OverridesConfig {
   skills: Record<string, SkillOverride>
 }
 
+interface ExtraMapping {
+  from: string
+  to: string
+}
+
 interface SkillOverride {
   source: {
     repo: string
@@ -19,6 +24,7 @@ interface SkillOverride {
   }
   plugin: string
   patches: Patch[]
+  extra_mappings?: ExtraMapping[]
 }
 
 interface SyncState {
@@ -62,19 +68,19 @@ function getUpstreamLatestSha(repo: string, ref: string): string | null {
   }
 }
 
-function fetchUpstreamFiles(repo: string, ref: string, path: string, destDir: string): string[] {
+function cloneUpstream(repo: string, ref: string, paths: string[]): string {
   const tempDir = join(ROOT, ".tmp-upstream")
   if (existsSync(tempDir)) rmSync(tempDir, { recursive: true })
 
   exec(`git clone --depth 1 --branch ${ref} --filter=blob:none --sparse https://github.com/${repo}.git ${tempDir}`)
-  exec(`git -C ${tempDir} sparse-checkout set ${path}`)
+  exec(`git -C ${tempDir} sparse-checkout set ${paths.join(" ")}`)
   exec(`git -C ${tempDir} checkout`)
 
-  const srcDir = join(tempDir, path)
-  if (!existsSync(srcDir)) {
-    rmSync(tempDir, { recursive: true })
-    return []
-  }
+  return tempDir
+}
+
+function copyTreeToDir(srcDir: string, destDir: string): string[] {
+  if (!existsSync(srcDir)) return []
 
   const files = collectFiles(srcDir)
   mkdirSync(destDir, { recursive: true })
@@ -82,10 +88,28 @@ function fetchUpstreamFiles(repo: string, ref: string, path: string, destDir: st
   for (const file of files) {
     const srcPath = join(srcDir, file)
     const destPath = join(destDir, file)
-    const destFileDir = join(destPath, "..")
-    mkdirSync(destFileDir, { recursive: true })
-    const content = readFileSync(srcPath)
-    writeFileSync(destPath, content)
+    mkdirSync(join(destPath, ".."), { recursive: true })
+    writeFileSync(destPath, readFileSync(srcPath))
+  }
+
+  return files
+}
+
+function fetchUpstreamFiles(repo: string, ref: string, path: string, destDir: string, extraMappings?: ExtraMapping[]): string[] {
+  const allPaths = [path, ...(extraMappings ?? []).map(m => m.from)]
+  const tempDir = cloneUpstream(repo, ref, allPaths)
+
+  const srcDir = join(tempDir, path)
+  const files = copyTreeToDir(srcDir, destDir)
+
+  if (extraMappings) {
+    for (const mapping of extraMappings) {
+      const src = join(tempDir, mapping.from)
+      if (!existsSync(src)) continue
+      const dest = join(ROOT, "plugins", mapping.to)
+      mkdirSync(join(dest, ".."), { recursive: true })
+      writeFileSync(dest, readFileSync(src))
+    }
   }
 
   rmSync(tempDir, { recursive: true })
@@ -179,7 +203,7 @@ const program = Effect.gen(function* () {
   let updated = false
 
   for (const [skillName, config] of Object.entries(overrides.skills)) {
-    const { source, plugin, patches } = config
+    const { source, plugin, patches, extra_mappings } = config
     const latestSha = getUpstreamLatestSha(source.repo, source.ref)
 
     if (!latestSha) {
@@ -197,7 +221,7 @@ const program = Effect.gen(function* () {
 
     const destDir = join(ROOT, "plugins", plugin, "skills", skillName)
     const existingLocalFiles = getExistingFiles(destDir)
-    const upstreamFiles = fetchUpstreamFiles(source.repo, source.ref, source.path, destDir)
+    const upstreamFiles = fetchUpstreamFiles(source.repo, source.ref, source.path, destDir, extra_mappings)
 
     if (upstreamFiles.length === 0) {
       console.log(`⚠️  ${skillName}: 上游路径为空，跳过`)
