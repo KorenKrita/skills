@@ -1,7 +1,7 @@
 import { Effect } from "effect"
 import { execSync } from "node:child_process"
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync, rmSync } from "node:fs"
-import { join } from "node:path"
+import { join, dirname } from "node:path"
 import { parse as parseYaml } from "yaml"
 import { applyPatches, type Patch } from "./patch-engine.js"
 
@@ -68,12 +68,18 @@ function getUpstreamLatestSha(repo: string, ref: string): string | null {
   }
 }
 
+function toSparseDir(p: string): string {
+  const lastSegment = p.split("/").pop() ?? ""
+  return lastSegment.includes(".") ? dirname(p) : p
+}
+
 function cloneUpstream(repo: string, ref: string, paths: string[]): string {
   const tempDir = join(ROOT, ".tmp-upstream")
   if (existsSync(tempDir)) rmSync(tempDir, { recursive: true })
 
+  const dirs = [...new Set(paths.map(toSparseDir))]
   exec(`git clone --depth 1 --branch ${ref} --filter=blob:none --sparse https://github.com/${repo}.git ${tempDir}`)
-  exec(`git -C ${tempDir} sparse-checkout set ${paths.join(" ")}`)
+  exec(`git -C ${tempDir} sparse-checkout set ${dirs.join(" ")}`)
   exec(`git -C ${tempDir} checkout`)
 
   return tempDir
