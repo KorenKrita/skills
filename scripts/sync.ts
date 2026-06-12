@@ -113,6 +113,16 @@ function getExistingFiles(dir: string): string[] {
 
 // ─── PR Creation ─────────────────────────────────────────────────────────────
 
+function ensureLabels(labels: string[]): void {
+  for (const label of labels) {
+    try {
+      exec(`gh label create "${label}" --force 2>/dev/null || true`)
+    } catch {
+      // already exists
+    }
+  }
+}
+
 function createPr(
   skillName: string,
   repo: string,
@@ -124,18 +134,38 @@ function createPr(
     ? `同步：更新 ${skillName}（来自 ${repo}）[补丁失败]`
     : `同步：更新 ${skillName}（来自 ${repo}）`
 
-  const labels = isDraft ? "自动同步,补丁失败" : "自动同步"
+  const labelList = isDraft ? ["自动同步", "补丁失败"] : ["自动同步"]
+
+  try {
+    exec(`git ls-remote --exit-code origin refs/heads/${branch}`)
+    exec(`git checkout main`)
+    throw new Error(`分支 ${branch} 已存在于远端，跳过`)
+  } catch (e) {
+    if (e instanceof Error && e.message.includes("已存在于远端")) throw e
+  }
 
   exec(`git checkout -b ${branch}`)
   exec(`git add -A`)
+
+  const status = exec(`git status --porcelain`)
+  if (!status) {
+    exec(`git checkout main`)
+    throw new Error("无实际文件变更，跳过")
+  }
+
   exec(`git -c user.name="github-actions" -c user.email="actions@github.com" commit -m "同步：更新 ${skillName}"`)
   exec(`git push -u origin ${branch}`)
 
-  const draftFlag = isDraft ? "--draft" : ""
-  exec(
-    `gh pr create --title "${title}" --body "${body.replace(/"/g, '\\"')}" --label "${labels}" ${draftFlag}`,
-  )
+  const bodyFile = join(ROOT, ".tmp-pr-body.md")
+  writeFileSync(bodyFile, body)
 
+  ensureLabels(labelList)
+
+  const draftFlag = isDraft ? "--draft" : ""
+  const labelFlag = labelList.map(l => `--label "${l}"`).join(" ")
+  exec(`gh pr create --title "${title}" --body-file "${bodyFile}" ${labelFlag} ${draftFlag}`)
+
+  rmSync(bodyFile, { force: true })
   exec(`git checkout main`)
 }
 
@@ -229,13 +259,11 @@ const program = Effect.gen(function* () {
     try {
       createPr(skillName, source.repo, branch, patchFailed, body)
       console.log(`  📬 PR 已创建${patchFailed ? " (Draft)" : ""}`)
+      syncState[skillName] = { sha: latestSha }
+      updated = true
     } catch (e) {
       console.log(`  ❌ PR 创建失败: ${e}`)
     }
-
-    // Update sync state
-    syncState[skillName] = { sha: latestSha }
-    updated = true
   }
 
   if (updated) {
