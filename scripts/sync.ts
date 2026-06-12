@@ -112,7 +112,7 @@ function fetchUpstreamFiles(repo: string, ref: string, path: string, destDir: st
     for (const mapping of extraMappings) {
       const src = join(tempDir, mapping.from)
       if (!existsSync(src)) continue
-      const dest = join(ROOT, "plugins", mapping.to)
+      const dest = join(ROOT, mapping.to)
       mkdirSync(join(dest, ".."), { recursive: true })
       writeFileSync(dest, readFileSync(src))
     }
