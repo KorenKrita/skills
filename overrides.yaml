@@ -103,16 +103,13 @@ skills:
   ocr:
     source:
       repo: alibaba/open-code-review
-      path: plugins/open-code-review
+      path: plugins/open-code-review/skills/open-code-review
       ref: main
     plugin: engineering
     patches:
       - type: set_frontmatter
         field: name
         value: ocr
-    extra_mappings:
-      - from: commands/review.md
-        to: commands/review.md
 
   # ─── thinking plugin ───────────────────────────────────────────────────────
 
@@ -355,13 +352,6 @@ skills:
 
   # ─── visual plugin ─────────────────────────────────────────────────────────
 
-  xiaohei:
-    source:
-      repo: KorenKrita/skills
-      path: plugins/visual/skills/xiaohei
-      ref: main
-    plugin: visual
-    patches: []
 
   kami:
     source:
