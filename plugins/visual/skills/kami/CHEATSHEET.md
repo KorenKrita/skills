@@ -193,6 +193,8 @@ Any font-family that may render Chinese or Japanese must include a CJK fallback,
 }
 ```
 
+Resume exception: `resume*.html` uses a quiet bottom rule instead of the brand left bar. Keep project rows borderless so section titles do not create double rules or lonely page-top lines.
+
 ### Table (kami-table)
 
 Base class works on bare `<table>` or `.kami-table`. Add variant classes for density/alignment:
@@ -337,6 +339,8 @@ Page 1 carries the projects section, which is the densest content. Page 2 carrie
 ```
 
 Page 2 font sizes stay at template defaults. The density variant only tightens page 1 elements. If page 2 has unusually long content, reduce `.os-intro`, `.conv-body`, or `.skill-body` individually, never globally.
+
+Resume visual rule: header and section titles carry the only structural rules. Top metrics stack value over label so labels stay single-line; project rows separate by padding, not borders.
 
 ## Quick decisions
 
