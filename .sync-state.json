@@ -102,6 +102,9 @@
     "sha": "9181a01f9fdf2018060007ac1c5b79bd5f32f333"
   },
   "kami": {
-    "sha": "5cd7c8e9d9bca71188a2f72ef42cfbf68b56ba7c"
+    "sha": "d3975cb8f1308044d30e12005c917def9252a857"
+  },
+  "goal-gen": {
+    "sha": "f29e0189f2ea03392c50b4f1c7230886bd838a13"
   }
 }
