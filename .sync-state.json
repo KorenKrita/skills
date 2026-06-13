@@ -14,22 +14,7 @@
   "improve": {
     "sha": "694fa30311e02c2639942308513555e61ee84a6f"
   },
-  "to-prd": {
-    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
-  },
-  "to-issues": {
-    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
-  },
-  "triage": {
-    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
-  },
-  "init-codebase": {
-    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
-  },
   "hunt": {
-    "sha": "73ed3fd694deb2b8c7d5b0624cd85cd7838e2be0"
-  },
-  "check": {
     "sha": "73ed3fd694deb2b8c7d5b0624cd85cd7838e2be0"
   },
   "ocr": {

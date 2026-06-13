@@ -49,40 +49,6 @@ skills:
         field: name
         value: improve
 
-  to-prd:
-    source:
-      repo: mattpocock/skills
-      path: skills/engineering/to-prd
-      ref: main
-    plugin: engineering
-    patches: []
-
-  to-issues:
-    source:
-      repo: mattpocock/skills
-      path: skills/engineering/to-issues
-      ref: main
-    plugin: engineering
-    patches: []
-
-  triage:
-    source:
-      repo: mattpocock/skills
-      path: skills/engineering/triage
-      ref: main
-    plugin: engineering
-    patches: []
-
-  init-codebase:
-    source:
-      repo: mattpocock/skills
-      path: skills/engineering/setup-matt-pocock-skills
-      ref: main
-    plugin: engineering
-    patches:
-      - type: set_frontmatter
-        field: name
-        value: init-codebase
 
   hunt:
     source:
@@ -92,13 +58,6 @@ skills:
     plugin: engineering
     patches: []
 
-  check:
-    source:
-      repo: tw93/Waza
-      path: skills/check
-      ref: main
-    plugin: engineering
-    patches: []
 
   ocr:
     source:
