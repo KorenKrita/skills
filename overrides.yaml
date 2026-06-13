@@ -356,6 +356,17 @@ skills:
   # ─── visual plugin ─────────────────────────────────────────────────────────
 
 
+  goal-gen:
+    source:
+      repo: joeseesun/qiaomu-goal-meta-skill
+      path: .
+      ref: main
+    plugin: tools
+    patches:
+      - type: set_frontmatter
+        field: name
+        value: goal-gen
+
   kami:
     source:
       repo: tw93/kami
