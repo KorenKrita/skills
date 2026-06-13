@@ -353,6 +353,17 @@ skills:
     plugin: tools
     patches: []
 
+  goal-gen:
+    source:
+      repo: joeseesun/qiaomu-goal-meta-skill
+      path: .
+      ref: main
+    plugin: tools
+    patches:
+      - type: set_frontmatter
+        field: name
+        value: goal-gen
+
   # ─── visual plugin ─────────────────────────────────────────────────────────
 
 
