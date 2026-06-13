@@ -38,7 +38,7 @@ skills:
     plugin: engineering
     patches: []
 
-  improve:
+  deepen:
     source:
       repo: mattpocock/skills
       path: skills/engineering/improve-codebase-architecture
@@ -47,8 +47,15 @@ skills:
     patches:
       - type: set_frontmatter
         field: name
-        value: improve
+        value: deepen
 
+  improve:
+    source:
+      repo: shadcn/improve
+      path: skills/improve
+      ref: main
+    plugin: engineering
+    patches: []
 
   hunt:
     source:
