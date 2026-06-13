@@ -122,9 +122,12 @@ function fetchUpstreamFiles(repo: string, ref: string, path: string, destDir: st
   return files
 }
 
+const SKIP_DIRS = new Set([".git", "node_modules"])
+
 function collectFiles(dir: string, prefix = ""): string[] {
   const result: string[] = []
   for (const entry of readdirSync(dir)) {
+    if (SKIP_DIRS.has(entry)) continue
     const full = join(dir, entry)
     const rel = prefix ? `${prefix}/${entry}` : entry
     if (statSync(full).isDirectory()) {
@@ -161,6 +164,7 @@ function createPr(
   branch: string,
   isDraft: boolean,
   body: string,
+  paths: string[],
 ): PrResult {
   const title = isDraft
     ? `同步：更新 ${skillName}（来自 ${repo}）[补丁失败]`
@@ -176,7 +180,9 @@ function createPr(
   }
 
   exec(`git checkout -b ${branch}`)
-  exec(`git add -A`)
+  for (const p of paths) {
+    exec(`git add "${p}"`)
+  }
 
   const status = exec(`git status --porcelain`)
   if (!status) {
@@ -287,9 +293,13 @@ const program = Effect.gen(function* () {
 
     // Create PR
     const branch = `sync/${skillName}-${latestSha.slice(0, 7)}`
+    const stagePaths = [
+      destDir,
+      ...(extra_mappings ?? []).map(m => join(ROOT, m.to)),
+    ]
 
     try {
-      const result = createPr(skillName, source.repo, branch, patchFailed, body)
+      const result = createPr(skillName, source.repo, branch, patchFailed, body, stagePaths)
       if (result === "created") {
         console.log(`  📬 PR 已创建${patchFailed ? " (Draft)" : ""}`)
         syncState[skillName] = { sha: latestSha }
