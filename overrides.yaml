@@ -330,6 +330,14 @@ skills:
   # ─── visual plugin ─────────────────────────────────────────────────────────
 
 
+  archify:
+    source:
+      repo: tt-a1i/archify
+      path: archify
+      ref: main
+    plugin: visual
+    patches: []
+
   xiaohei2:
     source:
       repo: helloianneo/ian-xiaohei-scenes
