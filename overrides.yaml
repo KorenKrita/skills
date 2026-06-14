@@ -330,6 +330,17 @@ skills:
   # ─── visual plugin ─────────────────────────────────────────────────────────
 
 
+  xiaohei2:
+    source:
+      repo: helloianneo/ian-xiaohei-scenes
+      path: ian-xiaohei-scenes
+      ref: main
+    plugin: visual
+    patches:
+      - type: set_frontmatter
+        field: name
+        value: xiaohei2
+
   kami:
     source:
       repo: tw93/kami
