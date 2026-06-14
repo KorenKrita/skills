@@ -15,7 +15,7 @@
     "sha": "694fa30311e02c2639942308513555e61ee84a6f"
   },
   "hunt": {
-    "sha": "73ed3fd694deb2b8c7d5b0624cd85cd7838e2be0"
+    "sha": "d41e8eecd138cebb7e581b0c57373ba4e2c4f9c0"
   },
   "ocr": {
     "sha": "c323c6b40c72aa95d7cb801bedcb957b52ff9807"
@@ -42,7 +42,7 @@
     "sha": "73ed3fd694deb2b8c7d5b0624cd85cd7838e2be0"
   },
   "core": {
-    "sha": "73ed3fd694deb2b8c7d5b0624cd85cd7838e2be0"
+    "sha": "d41e8eecd138cebb7e581b0c57373ba4e2c4f9c0"
   },
   "noai": {
     "sha": "91f3d394db8419c20d67ebe22a96cf8fee0a404b"
@@ -84,10 +84,10 @@
     "sha": "f9af2306f5bced6a199dc6ba155ea3cd318ee570"
   },
   "nopua": {
-    "sha": "9181a01f9fdf2018060007ac1c5b79bd5f32f333"
+    "sha": "b70ff9f9806dc6a04a8169340829cb75103af0fe"
   },
   "kami": {
-    "sha": "d3975cb8f1308044d30e12005c917def9252a857"
+    "sha": "fb24e634f18704e11840a6cca8571bd96507eaa5"
   },
   "goal-gen": {
     "sha": "f29e0189f2ea03392c50b4f1c7230886bd838a13"
