@@ -83,6 +83,15 @@ Checks:
 - Add test-mode or no-auth guards around real prompts and system changes.
 - Stub external prompt tools through PATH when timeout wrappers exec real binaries.
 
+## Subprocess Pipe Backpressure
+
+Signals: a long-running child process hangs only on large output, small fixtures pass, or the parent waits for exit before reading stdout/stderr. The child may be blocked on a full pipe buffer while the parent is blocked on `wait`.
+
+Checks:
+- Drain stdout and stderr while the process runs, or explicitly inherit/redirect streams when output is not needed.
+- Test with output larger than a typical pipe buffer, not only tiny fixtures.
+- Preserve stderr tails or structured error output for diagnostics without holding the whole stream in memory.
+
 ## Signal Or Partial-Failure Mapping
 
 Signals: cancel, timeout, SIGINT, or SIGTERM is reported as success or as a normal business failure; temp files, locks, or operation logs make retries look complete.
