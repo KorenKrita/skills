@@ -11,6 +11,8 @@ Good content deserves good paper. One design language across eight document type
 
 Part of `Kaku · Waza · Kami` - Kaku writes code, Waza drills habits, **Kami delivers documents**.
 
+**Update check (non-blocking).** At the start of a task, run `bash scripts/check-update.sh`. It does a read-only version check at most once per day and prints one line when a newer kami is available; relay that line to the user, then continue. It sends no data, and fails silently when offline, sandboxed, or without `curl`. Never let it block the work.
+
 ## Step 0 · Load brand profile (if exists)
 
 Check `~/.config/kami/brand.md` (preferred) or `~/.kami/brand.md` (legacy fallback). If found, read `references/brand-profile.md` for the full four-layer application spec (placeholder substitution, session defaults, visual customization, habit notes) and its six guardrails. If no profile exists, continue without interruption.
@@ -456,6 +458,7 @@ python3 scripts/build.py --verify resume-en # single target full verification
 python3 scripts/build.py landing-page        # screen-first static HTML template check
 python3 scripts/build.py --verify slides    # single slide deck verification
 python3 scripts/build.py --check-placeholders path/to/filled.html
+python3 scripts/build.py --check-resume-balance path/to/resume.pdf
 python3 scripts/build.py --check-density              # page whitespace scanner (skips cover)
 python3 scripts/build.py --check            # CSS rule violations only (fast, no build)
 ```
