@@ -63,7 +63,10 @@ skills:
       path: skills/hunt
       ref: main
     plugin: engineering
-    patches: []
+    patches:
+      - type: replace
+        pattern: "**Update check (non-blocking).** Before starting, run `bash ../../scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
+        with: ""
 
 
   ocr:
@@ -139,7 +142,10 @@ skills:
       path: skills/think
       ref: main
     plugin: thinking
-    patches: []
+    patches:
+      - type: replace
+        pattern: "**Update check (non-blocking).** Before starting, run `bash ../../scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
+        with: ""
 
 
   # ─── writing plugin ────────────────────────────────────────────────────────
@@ -154,6 +160,9 @@ skills:
       - type: set_frontmatter
         field: name
         value: core
+      - type: replace
+        pattern: "**Update check (non-blocking).** Before starting, run `bash ../../scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
+        with: ""
 
   noai:
     source:
@@ -265,7 +274,10 @@ skills:
       path: skills/read
       ref: main
     plugin: tools
-    patches: []
+    patches:
+      - type: replace
+        pattern: "**Update check (non-blocking).** Before starting, run `bash ../../scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
+        with: ""
 
   write-skill:
     source:
