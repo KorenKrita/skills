@@ -245,6 +245,9 @@ skills:
       - type: set_frontmatter
         field: name
         value: ui
+      - type: replace
+        pattern: "**Update check (non-blocking).** Before starting, run `bash ../../scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
+        with: ""
 
   # ─── learning plugin ────────────────────────────────────────────────────────
 
@@ -254,7 +257,10 @@ skills:
       path: skills/learn
       ref: main
     plugin: learning
-    patches: []
+    patches:
+      - type: replace
+        pattern: "**Update check (non-blocking).** Before starting, run `bash ../../scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
+        with: ""
 
   teach:
     source:
