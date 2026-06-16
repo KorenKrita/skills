@@ -9,6 +9,8 @@ dispatch_intent: "Error, crash, regression, screenshot-reported defect, test fai
 
 Prefix your first line with 🥷 inline, not as its own paragraph.
 
+**Update check (non-blocking).** Before starting, run `bash ../../scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.
+
 A patch applied to a symptom creates a new bug somewhere else.
 
 ## Outcome Contract
@@ -60,6 +62,7 @@ Activate when: "以前是好的", "之前是好的", "used to work", "上一次�
 
 0. Protect the user's worktree first: run `git status --short --branch -uall`. If modified, staged, or untracked files exist, do not bisect in the current checkout. Create a temporary detached worktree from the same HEAD, run bisect there, then `git bisect reset` and remove the temporary worktree when done. If a temporary worktree is impossible, stop and ask for explicit cleanup/stash approval.
 1. Find candidate good tag: `git tag --sort=-version:refname | head -10` or ask the user for the last known-good commit.
+1b. If the last-good version is only one or a few releases back, `git diff <last-good-tag>..HEAD -- <suspect path>` and read the delta directly first. The regression is usually visible in that diff, and reading it costs far less than driving a full bisect. Fall through to bisect only when the diff is too large or the culprit is not obvious.
 2. Define a non-interactive pass/fail test command before starting bisect. Bisect is worthless without a reproducible check.
 3. Run: `git bisect start && git bisect bad HEAD && git bisect good <tag-or-hash>`
 4. At each step bisect checks out a commit. Run the test command. Mark: `git bisect good` or `git bisect bad`.
