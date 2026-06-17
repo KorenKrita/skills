@@ -113,7 +113,16 @@ npx skills add tw93/kami -a claude-code -g -y
 /plugin install kami@kami
 ```
 
-**Generic agents** (Codex, OpenCode, Pi, and other tools that read from `~/.agents/`)
+**Codex plugin marketplace**
+
+```bash
+codex plugin marketplace add tw93/kami
+codex plugin add kami@kami
+```
+
+This installs Kami as a Codex plugin from the repo marketplace, so future updates can use `codex plugin marketplace upgrade kami` followed by `codex plugin add kami@kami`.
+
+**Generic agents** (OpenCode, Pi, and other tools that read from `~/.agents/`)
 
 ```bash
 npx skills add tw93/kami -a '*' -g -y
@@ -131,7 +140,7 @@ The ZIP is lightweight: large CJK fonts are excluded from the skill package. In 
 npx skills update kami -g -y
 ```
 
-Marketplace installs use `claude plugin update kami`. Claude Desktop: download the latest [kami.zip](https://github.com/tw93/kami/releases/latest/download/kami.zip), click "..." on the skill card, choose Replace, upload. Kami also runs a quiet version check at most once a day and tells you in chat when a newer version is out; it only reads a public version file, sends no data, and is skipped when offline.
+Claude Code marketplace installs use `claude plugin update kami`. Codex plugin installs use `codex plugin marketplace upgrade kami`, then `codex plugin add kami@kami` to refresh the installed plugin snapshot. Claude Desktop: download the latest [kami.zip](https://github.com/tw93/kami/releases/latest/download/kami.zip), click "..." on the skill card, choose Replace, upload. Kami also runs a quiet version check at most once a day and tells you in chat when a newer version is out; it only reads a public version file, sends no data, and is skipped when offline.
 
 The skill auto-triggers from natural requests, no slash command needed. Optimized for English and Chinese; Japanese and Korean are supported via best-effort CJK paths with visual QA before delivery.
 
