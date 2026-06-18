@@ -1,6 +1,6 @@
 {
   "tdd": {
-    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+    "sha": "2454c95dc305c158b21a0cdafeb728879dd0359a"
   },
   "debug": {
     "sha": "694fa30311e02c2639942308513555e61ee84a6f"
@@ -9,7 +9,7 @@
     "sha": "694fa30311e02c2639942308513555e61ee84a6f"
   },
   "prototype": {
-    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+    "sha": "2454c95dc305c158b21a0cdafeb728879dd0359a"
   },
   "improve": {
     "sha": "03369ee6d7cafbfcecc4346539b05b3dc0a603bb"
@@ -33,10 +33,10 @@
     "sha": "f9af2306f5bced6a199dc6ba155ea3cd318ee570"
   },
   "grill-me": {
-    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+    "sha": "2454c95dc305c158b21a0cdafeb728879dd0359a"
   },
   "grill-with-docs": {
-    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+    "sha": "2454c95dc305c158b21a0cdafeb728879dd0359a"
   },
   "think": {
     "sha": "fe38daaa8c7714d4bc4d34bc8fb6298dc94fc39e"
@@ -48,7 +48,7 @@
     "sha": "91f3d394db8419c20d67ebe22a96cf8fee0a404b"
   },
   "rewrite": {
-    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+    "sha": "2454c95dc305c158b21a0cdafeb728879dd0359a"
   },
   "step": {
     "sha": "694fa30311e02c2639942308513555e61ee84a6f"
@@ -69,7 +69,7 @@
     "sha": "fe38daaa8c7714d4bc4d34bc8fb6298dc94fc39e"
   },
   "teach": {
-    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+    "sha": "2454c95dc305c158b21a0cdafeb728879dd0359a"
   },
   "read": {
     "sha": "fe38daaa8c7714d4bc4d34bc8fb6298dc94fc39e"
@@ -94,5 +94,8 @@
   },
   "xiaohei2": {
     "sha": "3555bcb9ecaba284aec77ee492fdfd21c52faae3"
+  },
+  "deepen": {
+    "sha": "2454c95dc305c158b21a0cdafeb728879dd0359a"
   }
 }
