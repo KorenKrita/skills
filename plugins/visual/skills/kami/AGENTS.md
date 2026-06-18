@@ -71,6 +71,8 @@ bash scripts/package-skill.sh
 
 - Style changes must update `references/design.md` and the matching template tokens.
 - Landing or documentation-site work follows `references/design.md` Section 11: «Documentation site» for the doc shell (sidebar rail, on-this-page TOC, borderless prev/next pager, build-time zero-JS code highlighting) and «Responsive screenshot verification» (screenshot at 375px / 1280px per locale, objective line-widow scan) before shipping.
+- For hosted Kami site or public landing changes, first separate generic template work from Kami's own website. Generic behavior lives in `assets/templates/landing-page*` and `references/`; Kami site facts live across `index*.html`, `styles.css`, README, `llms.txt`, `robots.txt`, `sitemap.xml`, and `vercel.json`.
+- Public facts are wider than the hero. Pricing, install path, version, release, support, analytics, FAQ, and positioning claims must move together across pages, metadata, AI files, and download links. Do not leave site-only analytics or tracking changes contradicting "no analytics" or app/package privacy copy.
 - Content changes should avoid CSS churn unless layout behavior is part of the task.
 - For document or template tasks, lock the output contract before editing: language, template, output format, page or length target, visual acceptance check, and verification command.
 - Prefer the nearest existing template and deterministic verifier. Do not add a template, shared CSS layer, dependency, script flag, or optional mode unless the current request cannot be satisfied without it.
@@ -91,6 +93,7 @@ bash scripts/package-skill.sh
 - When refactoring `scripts/build.py` or package helpers into new modules, confirm every new helper file is tracked by Git. `scripts/package-skill.sh` packages from `git ls-files`, so untracked modules pass local imports but disappear from `dist/kami.zip`.
 - Any source change that adds scripts, templates, reference JSON, workflows, or package inputs must refresh and inspect `dist/kami.zip`; package freshness is part of release readiness, not a later cleanup step.
 - Changes to `SKILL.md`, templates, scripts, references, or package inputs must decide explicitly whether `dist/kami.zip` needs refresh. If the behavior is shipped through the skill package, rebuild and inspect the ZIP before handoff.
+- Marketplace, plugin path, version, or generated mirror changes require runtime installation proof, not metadata proof only. For Codex changes, use an isolated `CODEX_HOME=/tmp/...` smoke with `codex plugin marketplace add <path>`, `codex plugin add kami@kami`, and `codex plugin list`; keep the generator, mirror tree, package audit, and install path aligned.
 - If `python3 scripts/build.py --verify` fails only because the host Python lacks PPTX fallback dependencies such as `python-pptx`, verify `slides` and `slides-en` from a temporary venv instead of treating the environment miss as a source regression.
 - Do not commit one-off review reports or diagnostic snapshots as durable docs. Extract stable rules into `AGENTS.md`, `CLAUDE.md`, `SKILL.md`, or `references/` and discard the stale report.
 
@@ -109,6 +112,16 @@ bash scripts/package-skill.sh
 - `scripts/shared.py` centralizes constants used by the build scripts; keep paths and target names in sync before adding templates or diagrams.
 - `dist/kami.zip` is a tracked release archive. Packaging changes must update and inspect it deliberately.
 - Codex plugin files are generated artifacts. Do not edit `plugins/kami/` or `.agents/plugins/marketplace.json` directly; regenerate from the root source files and let `python3 scripts/build_metadata.py --check` catch drift.
+
+## Hotspot Ownership
+
+- `references/design.md` and `plugins/kami/skills/kami/references/design.md` own the Kami visual system, including large landing-page and documentation-site rules. Boundary: edit only the root source, and use the plugin path only as a generated mirror. Verification: `python3 scripts/build.py --check` plus screenshots for screen surfaces, then `python3 scripts/build_metadata.py --check`.
+- `styles.css` owns the hosted Kami public site shell, language switcher, gallery, and shared responsive behavior. Boundary: do not move generic template rules here. Verification: serve the site and screenshot 375px / 1280px per locale touched.
+- `assets/templates/landing-page.html`, `assets/templates/landing-page-en.html`, `assets/templates/landing-page-ko.html`, `plugins/kami/skills/kami/assets/templates/landing-page.html`, `plugins/kami/skills/kami/assets/templates/landing-page-en.html`, and `plugins/kami/skills/kami/assets/templates/landing-page-ko.html` own the generic screen-first template shipped to users. Boundary: edit root templates, keep real product-site facts in filled sites, and treat plugin paths as generated mirrors. Verification: `python3 scripts/build.py landing-page`, browser screenshots for changed breakpoints, and `python3 scripts/build_metadata.py --check`.
+- `references/production.md` and `plugins/kami/skills/kami/references/production.md` own production troubleshooting, pre-ship review, and known render pitfalls. Boundary: add stable invariants only, not dated review notes. Verification: `python3 scripts/build.py --check`, `python3 scripts/build_metadata.py --check`, and the relevant render command named by the rule.
+- `assets/templates/resume.html`, `assets/templates/resume-ko.html`, `plugins/kami/skills/kami/assets/templates/resume.html`, and `plugins/kami/skills/kami/assets/templates/resume-ko.html` own high-density resume layout. Boundary: preserve the two-page contract and do not fix overflow by generic shrinking first. Verification: `python3 scripts/build.py --verify resume` and `python3 scripts/build.py --verify resume-ko`.
+- `assets/demos/demo-resume-ko.html` owns the Korean resume demo content, not the template contract. Boundary: regenerate demo outputs when the demo changes, but put durable resume rules in templates or references. Verification: build the affected demo and confirm page count plus rendered screenshot.
+- `scripts/tests/test_build.py` and `plugins/kami/skills/kami/scripts/tests/test_build.py` own the zero-dependency test suite. Boundary: edit the root test file and regenerate the plugin mirror. Verification: `python3 scripts/tests/test_build.py` and `python3 scripts/build_metadata.py --check`.
 
 ## High-Risk Pitfalls
 
@@ -157,9 +170,9 @@ magick /tmp/stacked.png -gravity Center -background '#f5f4ed' -extent 1241x1754 
 - Demo changes: regenerate the affected demo outputs and confirm page counts stay in range.
 - Font issues: run `bash scripts/ensure-fonts.sh`, then rebuild the affected target.
 - Slide rhythm or deck changes: run `python3 scripts/build.py --check-rhythm slides slides-en` plus the affected render command.
-- Public site or AI visibility changes: check `index*.html`, `llms.txt`, `robots.txt`, `sitemap.xml`, and README links together.
-- Packaging changes: run `bash scripts/package-skill.sh` and confirm `dist/kami.zip` stays small enough for release upload.
-- Codex marketplace changes: run `python3 scripts/build_metadata.py --check` and confirm `plugins/kami/.codex-plugin/plugin.json` plus `.agents/plugins/marketplace.json` stay generated.
+- Public site or AI visibility changes: check `index*.html`, README, `llms.txt`, `robots.txt`, `sitemap.xml`, JSON-LD, FAQ, install links, and release/download links together. Serve the page and screenshot 375px / 1280px per locale, plus 320px when CTA width or mobile nav changes.
+- Packaging changes: run `bash scripts/package-skill.sh` and confirm `dist/kami.zip` stays small enough for release upload. Inspect `unzip -l dist/kami.zip` for accidental large fonts, showcase screenshots, cache files, or missing new helper files.
+- Codex marketplace changes: run `python3 scripts/build_metadata.py --check` and confirm `plugins/kami/.codex-plugin/plugin.json` plus `.agents/plugins/marketplace.json` stay generated. If install behavior, version selection, or source path changed, also run an isolated Codex install smoke.
 - Documentation-only changes: check links and references.
 
 ## Release Notes
@@ -172,6 +185,7 @@ magick /tmp/stacked.png -gravity Center -background '#f5f4ed' -extent 1241x1754 
 
 - `bash scripts/package-skill.sh` writes the tracked `dist/kami.zip` release archive and excludes large TsangerJinKai / Source Han Serif K font files plus README/public-site-only showcase screenshots.
 - `dist/kami.zip` should be committed with release changes and uploaded to the latest GitHub release asset when refreshing the Claude Desktop package.
+- When refreshing a GitHub release asset, download the uploaded `kami.zip` and compare ZIP entry names plus per-entry SHA-256 digests against local `dist/kami.zip`; do not rely on release-page text, file size, or container SHA alone.
 - README and public site download links use `https://github.com/tw93/kami/releases/latest/download/kami.zip`; prefer refreshing that asset for small packaging or documentation fixes instead of creating a new tag.
 - Create a new version tag only when the maintainer explicitly wants a versioned release. Tag the commit that already contains the final refreshed `dist/kami.zip`; do not tag a source-only commit and refresh the archive afterward.
 - On tag push, `.github/workflows/release.yml` builds and attaches `dist/kami.zip`, creates the release if missing, and adds the house-style reactions (`+1 eyes heart hooray laugh rocket`, one each). Do not `gh release create` by hand; let CI create the placeholder, then set the real title and notes with `gh release edit V<x> --title "V<x> <Codename>" --notes-file <file>`.

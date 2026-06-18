@@ -14,6 +14,7 @@ Document-generation skill and template system. Editorial HTML templates + PDF/PP
 python3 scripts/build.py                   # 构建所有目标
 python3 scripts/build.py --check           # 快速校验
 python3 scripts/build.py --verify          # 完整验证
+python3 scripts/build_metadata.py --check  # Codex 插件镜像和 marketplace 漂移检查
 python3 scripts/tests/test_build.py        # 测试套件
 bash scripts/ensure-fonts.sh               # 字体恢复（缺字体或字体被截断时）
 bash scripts/package-skill.sh              # 构建 release 压缩包
@@ -29,4 +30,7 @@ bash scripts/package-skill.sh              # 构建 release 压缩包
 - 不打包大体积商业字体到 `dist/kami.zip`，但模板要保留稳定的本机预览路径。
 - `dist/kami.zip` 是 tracked release 制品。小修通常刷 latest release 资源即可，不必新 tag。
 - 改 build / packaging 相关代码后，刷新并检查 `dist/kami.zip`；新增 helper/module/reference JSON 后，确认文件已被 Git 跟踪并进入 package。
+- 官网 / AI 可见性改动不只看首页：同步 `index*.html`、README、`llms.txt`、`robots.txt`、`sitemap.xml`、JSON-LD、FAQ、安装 / 版本 / 支持链接，并看 375px / 1280px 真实截图。
+- 改 Codex / Claude 插件 marketplace、版本或安装路径后，不只看 metadata；跑 `python3 scripts/build_metadata.py --check`，必要时用隔离 `CODEX_HOME=/tmp/...` 或对应 Claude 插件安装路径做真实冒烟。
+- 刷新 release 包或 latest 资源前后，不只看页面大小；下载 `kami.zip`，对比 ZIP entry 列表和每个 entry 的 SHA-256。
 - 不提交一次性的 review 报告或诊断快照；只把稳定规则沉淀到 `AGENTS.md`、`SKILL.md` 或 `references/`。
