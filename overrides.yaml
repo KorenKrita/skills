@@ -12,23 +12,13 @@ skills:
   debug:
     source:
       repo: mattpocock/skills
-      path: skills/engineering/diagnose
+      path: skills/engineering/diagnosing-bugs
       ref: main
     plugin: engineering
     patches:
       - type: set_frontmatter
         field: name
         value: debug
-
-  zoom-out:
-    source:
-      repo: mattpocock/skills
-      path: skills/engineering/zoom-out
-      ref: main
-    plugin: engineering
-    patches:
-      - type: remove_frontmatter
-        field: disable-model-invocation
 
   prototype:
     source:
@@ -48,6 +38,54 @@ skills:
       - type: set_frontmatter
         field: name
         value: deepen
+
+  grill-with-docs:
+    source:
+      repo: mattpocock/skills
+      path: skills/engineering/grill-with-docs
+      ref: main
+    plugin: engineering
+    patches: []
+
+  codebase-design:
+    source:
+      repo: mattpocock/skills
+      path: skills/engineering/codebase-design
+      ref: main
+    plugin: engineering
+    patches: []
+
+  domain-modeling:
+    source:
+      repo: mattpocock/skills
+      path: skills/engineering/domain-modeling
+      ref: main
+    plugin: engineering
+    patches: []
+
+  grilling:
+    source:
+      repo: mattpocock/skills
+      path: skills/productivity/grilling
+      ref: main
+    plugin: engineering
+    patches: []
+
+  resolving-merge-conflicts:
+    source:
+      repo: mattpocock/skills
+      path: skills/engineering/resolving-merge-conflicts
+      ref: main
+    plugin: engineering
+    patches: []
+
+  decision-mapping:
+    source:
+      repo: mattpocock/skills
+      path: skills/in-progress/decision-mapping
+      ref: main
+    plugin: engineering
+    patches: []
 
   improve:
     source:
@@ -124,14 +162,6 @@ skills:
     source:
       repo: mattpocock/skills
       path: skills/productivity/grill-me
-      ref: main
-    plugin: thinking
-    patches: []
-
-  grill-with-docs:
-    source:
-      repo: mattpocock/skills
-      path: skills/engineering/grill-with-docs
       ref: main
     plugin: thinking
     patches: []
@@ -288,7 +318,7 @@ skills:
   write-skill:
     source:
       repo: mattpocock/skills
-      path: skills/productivity/write-a-skill
+      path: skills/productivity/writing-great-skills
       ref: main
     plugin: tools
     patches:
