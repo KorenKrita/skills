@@ -19,6 +19,8 @@ Kami is a document-generation skill and template system. It ships editorial HTML
 - `references/checks_thresholds.json` - rhythm / density / orphan check thresholds (loaded by `scripts/checks.py`).
 - `references/brand-profile.md` and `references/brand.example.md` - optional brand profile behavior and public example.
 - `.claude-plugin/marketplace.json` - Claude Code plugin marketplace metadata.
+- `.agents/plugins/marketplace.json` - **generated** Codex repo marketplace. Points Codex at `plugins/kami`; never hand-edit.
+- `plugins/kami/` - **generated** Codex plugin tree. Mirrors the lightweight skill package under `plugins/kami/skills/kami/`; edit source files and run `python3 scripts/build_metadata.py`.
 - `assets/templates/` - document templates including browser-only landing page variants.
 - `scripts/highlight.py` - Pygments-based syntax highlighting for code blocks at build time.
 - `assets/demos/` - README showcase demos.
@@ -38,6 +40,7 @@ Kami is a document-generation skill and template system. It ships editorial HTML
 - `scripts/shared.py` - shared constants and the canonical `HTML_TEMPLATES` registry used by the build scripts.
 - `scripts/ensure-fonts.sh` - verified font recovery helper (portable across bash 3.2+).
 - `scripts/package-skill.sh` - package builder for the release archive.
+- `scripts/build_metadata.py` - codegen for Codex marketplace metadata and plugin mirror files. Run after changing `SKILL.md`, `CHEATSHEET.md`, `VERSION`, `references/`, `scripts/`, or shipped lightweight assets.
 - `scripts/draft-release-notes.py` - bilingual release notes scaffold from `git log`.
 - `scripts/tests/test_build.py` - zero-dependency test suite for build and shared helpers.
 - `.github/workflows/check.yml` - PR/push CI that runs `--check` and the test suite.
@@ -56,6 +59,8 @@ python3 scripts/build.py --check-placeholders path/to/filled.html
 python3 scripts/build.py --check-orphans path/to/doc.pdf
 python3 scripts/build.py --check-density path/to/doc.pdf
 python3 scripts/build.py --check-rhythm slides slides-en
+python3 scripts/build_metadata.py
+python3 scripts/build_metadata.py --check
 python3 scripts/tests/test_build.py
 python3 scripts/draft-release-notes.py V1.4.0..HEAD --version V1.4.1 --title "Steadier Hand"
 bash scripts/ensure-fonts.sh
@@ -103,6 +108,7 @@ bash scripts/package-skill.sh
 - AI/public visibility spans `index*.html`, `llms.txt`, `robots.txt`, `sitemap.xml`, FAQ JSON-LD, README install text, diagram counts, and release archive links.
 - `scripts/shared.py` centralizes constants used by the build scripts; keep paths and target names in sync before adding templates or diagrams.
 - `dist/kami.zip` is a tracked release archive. Packaging changes must update and inspect it deliberately.
+- Codex plugin files are generated artifacts. Do not edit `plugins/kami/` or `.agents/plugins/marketplace.json` directly; regenerate from the root source files and let `python3 scripts/build_metadata.py --check` catch drift.
 
 ## High-Risk Pitfalls
 
@@ -153,6 +159,7 @@ magick /tmp/stacked.png -gravity Center -background '#f5f4ed' -extent 1241x1754 
 - Slide rhythm or deck changes: run `python3 scripts/build.py --check-rhythm slides slides-en` plus the affected render command.
 - Public site or AI visibility changes: check `index*.html`, `llms.txt`, `robots.txt`, `sitemap.xml`, and README links together.
 - Packaging changes: run `bash scripts/package-skill.sh` and confirm `dist/kami.zip` stays small enough for release upload.
+- Codex marketplace changes: run `python3 scripts/build_metadata.py --check` and confirm `plugins/kami/.codex-plugin/plugin.json` plus `.agents/plugins/marketplace.json` stay generated.
 - Documentation-only changes: check links and references.
 
 ## Release Notes
