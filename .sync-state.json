@@ -15,7 +15,7 @@
     "sha": "03369ee6d7cafbfcecc4346539b05b3dc0a603bb"
   },
   "hunt": {
-    "sha": "fe38daaa8c7714d4bc4d34bc8fb6298dc94fc39e"
+    "sha": "1bc6113180ec7a1b56f3e9027a404a29bafade27"
   },
   "ocr": {
     "sha": "c323c6b40c72aa95d7cb801bedcb957b52ff9807"
@@ -39,10 +39,10 @@
     "sha": "2454c95dc305c158b21a0cdafeb728879dd0359a"
   },
   "think": {
-    "sha": "fe38daaa8c7714d4bc4d34bc8fb6298dc94fc39e"
+    "sha": "1bc6113180ec7a1b56f3e9027a404a29bafade27"
   },
   "core": {
-    "sha": "fe38daaa8c7714d4bc4d34bc8fb6298dc94fc39e"
+    "sha": "1bc6113180ec7a1b56f3e9027a404a29bafade27"
   },
   "noai": {
     "sha": "91f3d394db8419c20d67ebe22a96cf8fee0a404b"
@@ -63,16 +63,16 @@
     "sha": "fa2291c4d41f985987ccb48da7924b288f268538"
   },
   "ui": {
-    "sha": "fe38daaa8c7714d4bc4d34bc8fb6298dc94fc39e"
+    "sha": "1bc6113180ec7a1b56f3e9027a404a29bafade27"
   },
   "learn": {
-    "sha": "fe38daaa8c7714d4bc4d34bc8fb6298dc94fc39e"
+    "sha": "1bc6113180ec7a1b56f3e9027a404a29bafade27"
   },
   "teach": {
     "sha": "2454c95dc305c158b21a0cdafeb728879dd0359a"
   },
   "read": {
-    "sha": "fe38daaa8c7714d4bc4d34bc8fb6298dc94fc39e"
+    "sha": "1bc6113180ec7a1b56f3e9027a404a29bafade27"
   },
   "write-skill": {
     "sha": "694fa30311e02c2639942308513555e61ee84a6f"
