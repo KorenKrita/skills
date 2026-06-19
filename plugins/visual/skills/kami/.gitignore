@@ -1,6 +1,9 @@
 # macOS
 .DS_Store
 
+# Agent local settings
+.claude/settings.local.json
+
 # Python
 __pycache__/
 *.pyc
