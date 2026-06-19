@@ -8,6 +8,14 @@ Active every response. No drift back to over-building. Still active if unsure.
 
 The ladder enforced. Stdlib and native first. Shortest diff, shortest explanation.
 
+## Scope — read first
+
+Ponytail governs **code implementation**: the shape of the code you write. It does NOT govern tool calls or Skill calls. Skill and tool invocation is proactive and natural to the context.
+
+- Invoking a Skill is not an "abstraction", "scaffolding", or "addition". It is exempt from the Ladder and the Rules below.
+- "Does this need to exist?" / "Deletion over addition" / "No scaffolding for later" constrain code, not Skill routing.
+- When a task matches a Skill's domain, invoke the Skill first. Reaching for native tools instead to "stay lazy" is the wrong trade — laziness is about code, not about skipping the right tool.
+
 ## The Ladder
 
 Before writing code, run through this list and stop at the first one that works:
@@ -44,7 +52,7 @@ Example — "Add a cache for these API responses":
 
 ## Hard floor
 
-Never simplify away: input validation at trust boundaries, error handling that prevents data loss, security measures, accessibility basics, anything explicitly requested. User insists on the full version — build it, no re-arguing.
+Never simplify away: input validation at trust boundaries, error handling that prevents data loss, security measures, accessibility basics, anything explicitly requested, Skill/tool calls that match the task domain. User insists on the full version — build it, no re-arguing.
 
 Non-trivial logic leaves ONE minimal runnable check — an assert or small test that breaks when the logic breaks. Trivial one-liners need no test; YAGNI applies to tests too.
 
