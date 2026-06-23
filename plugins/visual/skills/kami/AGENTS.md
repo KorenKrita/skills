@@ -15,6 +15,8 @@ Kami is a document-generation skill and template system. It ships editorial HTML
 - `references/design.md`, `writing.md`, `production.md`, `diagrams.md` - full specs.
 - `references/resume-writing.md` - resume-specific bullet/project framing rules.
 - `references/anti-patterns.md` - six-category checklist for reviewing drafts.
+- `references/mermaid.md` - Mermaid diagram support: the two render paths (PDF vs browser) and the authoring pipeline.
+- `references/mermaid-theme.json` - canonical Kami↔beautiful-mermaid color/font theme (kept in sync with `tokens.json`).
 - `references/tokens.json` - canonical color tokens (drift-checked by `scripts/tokens.py`).
 - `references/checks_thresholds.json` - rhythm / density / orphan check thresholds (loaded by `scripts/checks.py`).
 - `references/brand-profile.md` and `references/brand.example.md` - optional brand profile behavior and public example.
@@ -25,7 +27,8 @@ Kami is a document-generation skill and template system. It ships editorial HTML
 - `scripts/highlight.py` - Pygments-based syntax highlighting for code blocks at build time.
 - `assets/demos/` - README showcase demos.
 - `assets/showcase/` - README and public-site-only screenshots; excluded from `dist/kami.zip`.
-- `assets/diagrams/` - diagram prototypes and generated diagram assets.
+- `assets/diagrams/` - diagram prototypes and generated diagram assets; `src/*.mmd` records the Mermaid source of the `sequence` / `class` / `er` diagrams.
+- `scripts/mermaid_normalize.py` - re-themes any beautiful-mermaid SVG to the Kami palette and makes it WeasyPrint-safe (resolves `color-mix()`/`var()` to static hex, rewrites fonts). Pure Python, no Node; ships in the package.
 - `assets/fonts/` and `assets/illustrations/` - bundled visual assets.
 - `styles.css` - shared web-facing styles.
 - `index.html`, `index-zh.html`, `index-en.html`, `index-ja.html`, `index-ko.html`, `index-tw.html` - public site entrypoints.
@@ -62,6 +65,8 @@ python3 scripts/build.py --check-rhythm slides slides-en
 python3 scripts/build_metadata.py
 python3 scripts/build_metadata.py --check
 python3 scripts/tests/test_build.py
+# Re-theme + WeasyPrint-safe a beautiful-mermaid SVG (no Node), then embed in a diagram shell:
+python3 scripts/mermaid_normalize.py raw.svg -o clean.svg
 python3 scripts/draft-release-notes.py V1.4.0..HEAD --version V1.4.1 --title "Steadier Hand"
 bash scripts/ensure-fonts.sh
 bash scripts/package-skill.sh
@@ -86,7 +91,8 @@ bash scripts/package-skill.sh
 - Brand profile support is optional context. Keep public examples in `references/`; do not hard-code a maintainer's private local profile content.
 - Slides default to WeasyPrint HTML-to-PDF templates unless the user explicitly needs editable PPTX output.
 - Templates intentionally inline their CSS rather than share a `_kami.css` partial: each template must remain a single self-contained HTML file so users can copy-paste it without a build step. When fixing CSS drift, apply the same change across affected templates rather than introducing a build-time include.
-- The canonical `HTML_TEMPLATES` registry lives in `scripts/shared.py`; `build.py` derives its target dicts from it. Update the registry, not the per-script dicts, when adding or removing templates.
+- All template registries live in `scripts/shared.py`: `HTML_TEMPLATES` (PDF docs), `SCREEN_TEMPLATES` (browser-only), and `DIAGRAM_TEMPLATES` (assets/diagrams). `build.py` derives its target dicts from them via `build_targets()` / `screen_targets()` / `diagram_targets()`. Update the registry, not the per-script dicts, when adding or removing a template or diagram.
+- Mermaid diagrams: never embed raw beautiful-mermaid SVG into a PDF-bound template. WeasyPrint cannot resolve `color-mix()`, render `<foreignObject>`, or fetch a runtime web font, so always pipe through `scripts/mermaid_normalize.py` first (`--check` lint enforces this). It is pure Python, no Node bundled. `xychart-beta` is browser-only (it styles via `<style>` class selectors); use the hand-drawn chart diagrams for PDF. Full flow in `references/mermaid.md`.
 
 ## Refactor And Packaging Hard Stops
 
