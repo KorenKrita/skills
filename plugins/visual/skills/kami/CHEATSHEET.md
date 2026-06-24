@@ -247,7 +247,7 @@ Combine freely: `<table class="kami-table financial striped">`.
 
 ## Diagram components
 
-Fourteen built-in diagram types. Extract the `<svg>` block and embed in a `<figure>` in long-doc / portfolio:
+Seventeen built-in diagram types (incl. Mermaid-sourced sequence / class / ER; see `references/mermaid.md`). Extract the `<svg>` block and embed in a `<figure>` in long-doc / portfolio:
 
 
 | Type          | File                                 | Use                                             |

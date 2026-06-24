@@ -42,7 +42,7 @@ Nine real PDFs across templates and languages. Click any preview to open it.
   <td align="center" width="33%">
     <a href="assets/demos/demo-agent-slides.pdf"><img src="assets/demos/demo-agent-slides.png" alt="Agent keynote slides" /></a>
     <br><b>Slides</b> · English
-    <br><sub>Agent keynote, 6 slides</sub>
+    <br><sub>Agent keynote, 8 slides</sub>
   </td>
   <td align="center" width="33%">
     <a href="assets/demos/demo-mole.pdf"><img src="assets/demos/demo-mole.png" alt="Mole product brief"></a>
@@ -161,7 +161,7 @@ The file has YAML frontmatter (structured fields: name, role, email, website, Gi
 
 Warm parchment canvas, ink blue as the sole accent, serif carries hierarchy, no hard shadows or flashy palettes. Not a UI framework; a constraint system for printed matter. Documents should read as composed pages, not dashboards.
 
-Nine template types: One-Pager, Long Doc, Letter, Portfolio, Resume, Slides, Equity Report, Changelog, and Landing Page in EN, CN, and KO. Fourteen inline SVG diagram types included. Slides ship in three rendering paths: WeasyPrint HTML to PDF (default), python-pptx (editable PPTX, on request), and a Marp variant in `assets/templates/marp/` for Markdown-first decks. Code blocks support Pygments-based syntax highlighting when `Pygments` is installed; without it, PDFs still render and code stays monochrome. Kami picks the right variant based on the language you write in.
+Nine template types: One-Pager, Long Doc, Letter, Portfolio, Resume, Slides, Equity Report, Changelog, and Landing Page in EN, CN, and KO. Seventeen inline SVG diagram types included; sequence, class, and ER diagrams can be authored from Mermaid text, with [beautiful-mermaid](https://github.com/lukilabs/beautiful-mermaid) rendering the SVG and `scripts/mermaid_normalize.py` re-theming it to the Kami palette and making it WeasyPrint-safe (no Node bundled). Slides ship in three rendering paths: WeasyPrint HTML to PDF (default), python-pptx (editable PPTX, on request), and a Marp variant in `assets/templates/marp/` for Markdown-first decks. Code blocks support Pygments-based syntax highlighting when `Pygments` is installed; without it, PDFs still render and code stays monochrome. Kami picks the right variant based on the language you write in.
 
 | Element | Rule |
 |---|---|
