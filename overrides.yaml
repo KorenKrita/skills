@@ -118,6 +118,16 @@ skills:
         field: name
         value: ocr
 
+  # agent 文件 (plugins/engineering/agents/thermo-nuclear-code-quality-review.md)
+  # 来自同一上游 cursor-team-kit，sync.ts 暂不支持 agent 同步，手动维护
+  thermo-nuclear-code-quality-review:
+    source:
+      repo: cursor/plugins
+      path: cursor-team-kit/skills/thermo-nuclear-code-quality-review
+      ref: main
+    plugin: engineering
+    patches: []
+
   # ─── thinking plugin ───────────────────────────────────────────────────────
 
   geju:
