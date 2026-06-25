@@ -18,7 +18,7 @@
     "sha": "1bc6113180ec7a1b56f3e9027a404a29bafade27"
   },
   "ocr": {
-    "sha": "c323c6b40c72aa95d7cb801bedcb957b52ff9807"
+    "sha": "63b0f02d2715e183e0405bfef12b0f18e51b86de"
   },
   "geju": {
     "sha": "f9af2306f5bced6a199dc6ba155ea3cd318ee570"
@@ -60,7 +60,7 @@
     "sha": "694fa30311e02c2639942308513555e61ee84a6f"
   },
   "web": {
-    "sha": "fa2291c4d41f985987ccb48da7924b288f268538"
+    "sha": "22a4f482cc4caa2394391c0c31ff0aefd1908774"
   },
   "ui": {
     "sha": "1bc6113180ec7a1b56f3e9027a404a29bafade27"
@@ -75,7 +75,7 @@
     "sha": "1bc6113180ec7a1b56f3e9027a404a29bafade27"
   },
   "write-skill": {
-    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
+    "sha": "8370e760d0251a3738e006aeacec6d1cb31dd208"
   },
   "docs-vs-code": {
     "sha": "f9af2306f5bced6a199dc6ba155ea3cd318ee570"
@@ -97,5 +97,8 @@
   },
   "deepen": {
     "sha": "2454c95dc305c158b21a0cdafeb728879dd0359a"
+  },
+  "decision-mapping": {
+    "sha": "8370e760d0251a3738e006aeacec6d1cb31dd208"
   }
 }
