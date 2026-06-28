@@ -61,12 +61,12 @@
       {
         "@type": "Question",
         "name": "Kami 能生成什麼？",
-        "acceptedAnswer": { "@type": "Answer", "text": "九種範本：一頁紙、長文件、信件、作品集、履歷、簡報、個股研報、更新日誌、落地頁（中、英、韓文）。外加 14 種內聯 SVG 圖表。輸出為 HTML，可匯出為 PDF、PNG 或可編輯的 PPTX 簡報。" }
+        "acceptedAnswer": { "@type": "Answer", "text": "九種範本：一頁紙、長文件、信件、作品集、履歷、簡報、個股研報、更新日誌、落地頁（中、英、韓文）。外加 17 種內聯 SVG 圖表。輸出為 HTML，可匯出為 PDF、PNG 或可編輯的 PPTX 簡報。" }
       },
       {
         "@type": "Question",
         "name": "怎麼安裝 Kami？",
-        "acceptedAnswer": { "@type": "Answer", "text": "Claude Code: npx skills add tw93/kami -a claude-code -g -y。Claude Code 外掛市場（v2.1.142+）：/plugin marketplace add tw93/kami && /plugin install kami@kami。Codex 外掛市場：codex plugin marketplace add tw93/kami && codex plugin add kami@kami。通用 agent：npx skills add tw93/kami -a '*' -g -y。Claude Desktop：從 GitHub Releases 下載 kami.zip，在 Skills 設定中上傳即可。" }
+        "acceptedAnswer": { "@type": "Answer", "text": "Claude Code（v2.1.142+）：/plugin marketplace add tw93/kami && /plugin install kami@kami。Codex 外掛市場：codex plugin marketplace add tw93/kami && codex plugin add kami@kami。通用 agent（OpenCode、Pi）：npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y。Claude Desktop：從 GitHub Releases 下載 kami.zip，在 Skills 設定中上傳即可。" }
       },
       {
         "@type": "Question",
@@ -83,7 +83,7 @@
   <!-- ============ HERO ============ -->
   <header class="hero">
     <div class="eyebrow">
-      <span>Design System · v1.7.1<span class="eyebrow-date"> · 2026.06</span></span>
+      <span>Design System · v1.9.0<span class="eyebrow-date"> · 2026.06</span></span>
       <span class="hero-links">
         <nav class="lang-switch" aria-label="Language" data-lang-switch>
           <button class="lang-trigger" type="button" aria-expanded="false" data-lang-trigger>繁體中文</button>
@@ -122,7 +122,7 @@
     <div class="section-head">
       <p class="section-num">00 · See it</p>
       <h2 class="section-title">輸出樣本</h2>
-      <p class="section-lede">把文件需求交給 Claude。無論是一頁紙、長文、正式信件、作品集、履歷還是簡報，Kami 都用少量清晰規則，把提示詞變成可交付的排版。同一份 brief 也能 <a href="https://github.com/tw93/kami#travel" style="color:var(--brand); text-decoration:none; font-weight:500;">交給繪圖模型</a>，README 裡附了樣圖和可複製的提示詞。</p>
+      <p class="section-lede">把文件需求交給 Claude。無論是一頁紙、長文、正式信件、作品集、履歷還是簡報，Kami 都用少量清晰規則，把提示詞變成可交付的排版。同一份 brief 也能 <a href="https://github.com/tw93/kami#beyond-documents" style="color:var(--brand); text-decoration:none; font-weight:500;">交給繪圖模型</a>，README 裡附了樣圖和可複製的提示詞。</p>
     </div>
     <div class="demo-grid">
       <div class="demo-card">
@@ -181,13 +181,14 @@
       <h2 class="section-title">安裝與調用</h2>
       <p class="section-lede">直接告訴 Claude 你要什麼，比如「幫我排版一份白皮書」「做一份履歷」「幫我做一份作品集」，skill 會自動觸發，無需斜線命令。</p>
     </div>
-<pre class="code"><span class="c"># Claude Code</span>
-npx skills add tw93/kami -a claude-code -g -y
+<pre class="code"><span class="c"># Claude Code (v2.1.142+)</span>
+/plugin marketplace add tw93/kami
+/plugin install kami@kami
 
 <span class="c"># Codex plugin marketplace</span>
 codex plugin marketplace add tw93/kami
 codex plugin add kami@kami</pre>
-    <p class="section-lede" style="font-size:14px;">Claude Code 外掛市場在 v2.1.142+ 可用：先執行 <code>/plugin marketplace add tw93/kami</code>，再執行 <code>/plugin install kami@kami</code>。Codex 安裝使用 <code>codex plugin marketplace add tw93/kami</code>，然後執行 <code>codex plugin add kami@kami</code>。</p>
+    <p class="section-lede" style="font-size:14px;">通用 agent（OpenCode、Pi 等讀取 <code>~/.agents/</code> 的工具）：<code>npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y</code>。子路徑指向自包含的 skill 套件；直接用 <code>tw93/kami</code> 只會裝到 SKILL.md。</p>
     <p class="section-lede" style="font-size:14px;">Claude Desktop：下載 <a href="https://github.com/tw93/kami/releases/latest/download/kami.zip" style="color:var(--brand); text-decoration:none; font-weight:500;">kami.zip</a>，在 Customize &gt; Skills &gt; "+" &gt; Create skill 中直接上傳。</p>
   </section>
 
@@ -321,7 +322,7 @@ codex plugin add kami@kami</pre>
       </div>
       <div class="type-row">
         <div class="type-label">Label</div>
-        <div class="type-sample label">Design System · v1.7.1</div>
+        <div class="type-sample label">Design System · v1.9.0</div>
         <div class="type-specs"><b>7.5-8 pt</b><br>weight 600<br>line 1.35</div>
       </div>
 
@@ -474,7 +475,7 @@ beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
     <div class="section-head">
       <p class="section-num">07 · Diagrams</p>
       <h2 class="section-title">內聯圖表</h2>
-      <p class="section-lede">十四種內聯 SVG 圖表，覆蓋架構、流程、資料三大場景。直接告訴 Claude 需要哪種圖，會自動嵌入文件，配色與字體沿用 Kami 設計語言。</p>
+      <p class="section-lede">十七種內聯 SVG 圖表，覆蓋架構、流程、資料三大場景。直接告訴 Claude 需要哪種圖，會自動嵌入文件，配色與字體沿用 Kami 設計語言。</p>
     </div>
     <div class="chart-showcase">
       <!-- Architecture mini -->
@@ -666,11 +667,11 @@ beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
       </div>
       <div class="faq-pair">
         <dt>能生成什麼？</dt>
-        <dd>九種範本類型：一頁紙、長文件、信件、作品集、履歷、簡報、個股研報、更新日誌、落地頁（中、英、韓文）。外加 14 種內聯 SVG 圖表用於視覺化說明。輸出為 HTML，可匯出為 PDF、PNG 或可編輯的 PPTX 簡報。</dd>
+        <dd>九種範本類型：一頁紙、長文件、信件、作品集、履歷、簡報、個股研報、更新日誌、落地頁（中、英、韓文）。外加 17 種內聯 SVG 圖表用於視覺化說明。輸出為 HTML，可匯出為 PDF、PNG 或可編輯的 PPTX 簡報。</dd>
       </div>
       <div class="faq-pair">
         <dt>怎麼安裝？</dt>
-        <dd>Claude Code：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami -a claude-code -g -y</code>。Claude Code v2.1.142+ 也可走外掛市場：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin marketplace add tw93/kami</code>，然後 <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin install kami@kami</code>。Codex：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin marketplace add tw93/kami</code>，然後 <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin add kami@kami</code>。通用 agent：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami -a '*' -g -y</code>。Claude Desktop：從 GitHub Releases 下載 kami.zip，在自訂 &gt; Skills 中上傳即可。</dd>
+        <dd>Claude Code（v2.1.142+）：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin marketplace add tw93/kami</code>，然後 <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin install kami@kami</code>。Codex：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin marketplace add tw93/kami</code>，然後 <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin add kami@kami</code>。通用 agent：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y</code>。Claude Desktop：從 GitHub Releases 下載 kami.zip，在自訂 &gt; Skills 中上傳即可。</dd>
       </div>
       <div class="faq-pair">
         <dt>支援哪些語言？</dt>

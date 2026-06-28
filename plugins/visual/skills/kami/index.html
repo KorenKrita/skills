@@ -76,7 +76,7 @@
         "name": "What can Kami produce?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Nine template types: one-pagers, long documents, letters, portfolios, resumes, slides, equity reports, changelogs, and landing pages (EN + CN + KO). Plus 14 inline SVG diagram types. Outputs are HTML exportable to PDF, PNG, or editable PPTX slide decks."
+          "text": "Nine template types: one-pagers, long documents, letters, portfolios, resumes, slides, equity reports, changelogs, and landing pages (EN + CN + KO). Plus 17 inline SVG diagram types. Outputs are HTML exportable to PDF, PNG, or editable PPTX slide decks."
         }
       },
       {
@@ -84,7 +84,7 @@
         "name": "How do I set up Kami?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Claude Code: npx skills add tw93/kami -a claude-code -g -y. Claude Code plugin marketplace (v2.1.142+): /plugin marketplace add tw93/kami && /plugin install kami@kami. Codex plugin marketplace: codex plugin marketplace add tw93/kami && codex plugin add kami@kami. Generic agents: npx skills add tw93/kami -a '*'. Claude Desktop: download kami.zip from GitHub Releases and upload it in Skills settings."
+          "text": "Claude Code (v2.1.142+): /plugin marketplace add tw93/kami && /plugin install kami@kami. Codex plugin marketplace: codex plugin marketplace add tw93/kami && codex plugin add kami@kami. Generic agents (OpenCode, Pi): npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y. Claude Desktop: download kami.zip from GitHub Releases and upload it in Skills settings."
         }
       },
       {
@@ -105,7 +105,7 @@
   <!-- ============ HERO ============ -->
   <header class="hero">
     <div class="eyebrow">
-      <span>Design System · v1.7.1<span class="eyebrow-date"> · 2026.06</span></span>
+      <span>Design System · v1.9.0<span class="eyebrow-date"> · 2026.06</span></span>
       <span class="hero-links">
         <nav class="lang-switch" aria-label="Language" data-lang-switch>
           <button class="lang-trigger" type="button" aria-expanded="false" data-lang-trigger>English</button>
@@ -144,7 +144,7 @@
     <div class="section-head">
       <p class="section-num">00 · See it</p>
       <h2 class="section-title">Output Samples</h2>
-      <p class="section-lede">Give Claude the brief: one-pagers, long docs, letters, portfolios, resumes, slides all become polished layouts from one small, reliable rule set. The same brief also <a href="https://github.com/tw93/kami#travel" style="color:var(--brand); text-decoration:none; font-weight:500;">travels to image renderers</a>, with the copy-paste prompt and sample outputs in the README.</p>
+      <p class="section-lede">Give Claude the brief: one-pagers, long docs, letters, portfolios, resumes, slides all become polished layouts from one small, reliable rule set. The same brief also <a href="https://github.com/tw93/kami#beyond-documents" style="color:var(--brand); text-decoration:none; font-weight:500;">travels to image renderers</a>, with the copy-paste prompt and sample outputs in the README.</p>
     </div>
     <div class="demo-grid">
       <div class="demo-card">
@@ -203,13 +203,14 @@
       <h2 class="section-title">Install &amp; Invoke</h2>
       <p class="section-lede">Tell Claude what you need, for example "build me a resume", "make a one-pager for my startup", or "design a slide deck for my talk". The skill auto-triggers, no slash command needed.</p>
     </div>
-<pre class="code"><span class="c"># Claude Code</span>
-npx skills add tw93/kami -a claude-code -g -y
+<pre class="code"><span class="c"># Claude Code (v2.1.142+)</span>
+/plugin marketplace add tw93/kami
+/plugin install kami@kami
 
 <span class="c"># Codex plugin marketplace</span>
 codex plugin marketplace add tw93/kami
 codex plugin add kami@kami</pre>
-    <p class="section-lede" style="font-size:14px;">Claude Code plugin marketplace also works on v2.1.142+: <code>/plugin marketplace add tw93/kami</code> then <code>/plugin install kami@kami</code>. Codex installs use <code>codex plugin marketplace add tw93/kami</code> then <code>codex plugin add kami@kami</code>.</p>
+    <p class="section-lede" style="font-size:14px;">Generic agents (OpenCode, Pi, and others reading from <code>~/.agents/</code>): <code>npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y</code>. The subpath points at the self-contained skill package; a bare <code>tw93/kami</code> installs only SKILL.md.</p>
     <p class="section-lede" style="font-size:14px;">Claude Desktop: download <a href="https://github.com/tw93/kami/releases/latest/download/kami.zip" style="color:var(--brand); text-decoration:none; font-weight:500;">kami.zip</a>, then upload it in Customize &gt; Skills &gt; "+" &gt; Create skill.</p>
   </section>
 
@@ -332,7 +333,7 @@ codex plugin add kami@kami</pre>
       </div>
       <div class="type-row">
         <div class="type-label">Label</div>
-        <div class="type-sample label">Design System · v1.7.1</div>
+        <div class="type-sample label">Design System · v1.9.0</div>
         <div class="type-specs"><b>7.5-8 pt</b><br>weight 600<br>line 1.35</div>
       </div>
     </div>
@@ -473,7 +474,7 @@ beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
     <div class="section-head">
       <p class="section-num">07 · Diagrams</p>
       <h2 class="section-title">Inline Charts</h2>
-      <p class="section-lede">Fourteen inline SVG diagram types covering architecture, process, and data chart scenarios. Tell Claude which type you need and it embeds directly into the document, colors and fonts following the Kami design language.</p>
+      <p class="section-lede">Seventeen inline SVG diagram types covering architecture, process, and data chart scenarios. Tell Claude which type you need and it embeds directly into the document, colors and fonts following the Kami design language.</p>
     </div>
     <div class="chart-showcase">
       <!-- Architecture mini -->
@@ -658,11 +659,11 @@ beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
       </div>
       <div class="faq-pair">
         <dt>What can it produce?</dt>
-        <dd>Nine template types: one-pagers, long documents, letters, portfolios, resumes, slides, equity reports, changelogs, and landing pages (EN + CN + KO). Plus 14 inline SVG diagram types for visual explanations. Outputs are HTML that can be exported to PDF, PNG, or editable PPTX slide decks.</dd>
+        <dd>Nine template types: one-pagers, long documents, letters, portfolios, resumes, slides, equity reports, changelogs, and landing pages (EN + CN + KO). Plus 17 inline SVG diagram types for visual explanations. Outputs are HTML that can be exported to PDF, PNG, or editable PPTX slide decks.</dd>
       </div>
       <div class="faq-pair">
         <dt>How do I set it up?</dt>
-        <dd>Claude Code: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami -a claude-code -g -y</code>. Plugin marketplace on Claude Code v2.1.142+: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin marketplace add tw93/kami</code> then <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin install kami@kami</code>. Codex: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin marketplace add tw93/kami</code> then <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin add kami@kami</code>. Generic agents like OpenCode: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami -a '*' -g -y</code>. Claude Desktop: download kami.zip from GitHub Releases and upload it in Customize &gt; Skills. No slash command needed, the skill auto-triggers from natural requests.</dd>
+        <dd>Claude Code (v2.1.142+): <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin marketplace add tw93/kami</code> then <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin install kami@kami</code>. Codex: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin marketplace add tw93/kami</code> then <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin add kami@kami</code>. Generic agents like OpenCode: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y</code>. Claude Desktop: download kami.zip from GitHub Releases and upload it in Customize &gt; Skills. No slash command needed, the skill auto-triggers from natural requests.</dd>
       </div>
       <div class="faq-pair">
         <dt>What languages does it support?</dt>
