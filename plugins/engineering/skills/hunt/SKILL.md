@@ -82,7 +82,7 @@ Treat the reference as evidence, not decoration:
 4. Compare current vs. reference and name the exact delta. Do not generalize a visual defect into "style polish" when the evidence points to a broken render, race, font pipeline, or state path.
 5. If the same symptom remains after one attempted fix, stop and rebuild the hypothesis from the evidence. Do not stack more patches onto a disproven explanation.
 
-If the issue is purely subjective UI taste, route to `/design`. If it is rendering, state, timing, build output, font generation, or a regression from a known-good version, stay in `/hunt`.
+If the issue is purely subjective UI taste, route to `/ui`. If it is rendering, state, timing, build output, font generation, or a regression from a known-good version, stay in `/hunt`.
 
 ## Scope Blast Mode
 

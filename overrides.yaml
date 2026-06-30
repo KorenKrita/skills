@@ -103,7 +103,7 @@ skills:
     plugin: engineering
     patches:
       - type: replace
-        pattern: "**Update check (non-blocking).** Before starting, run `bash ../../scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
+        pattern: "**Update check (non-blocking).** Before starting, run `bash scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
         with: ""
 
 
@@ -184,7 +184,7 @@ skills:
     plugin: thinking
     patches:
       - type: replace
-        pattern: "**Update check (non-blocking).** Before starting, run `bash ../../scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
+        pattern: "**Update check (non-blocking).** Before starting, run `bash scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
         with: ""
 
 
@@ -201,7 +201,7 @@ skills:
         field: name
         value: core
       - type: replace
-        pattern: "**Update check (non-blocking).** Before starting, run `bash ../../scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
+        pattern: "**Update check (non-blocking).** Before starting, run `bash scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
         with: ""
 
   noai:
@@ -286,7 +286,7 @@ skills:
         field: name
         value: ui
       - type: replace
-        pattern: "**Update check (non-blocking).** Before starting, run `bash ../../scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
+        pattern: "**Update check (non-blocking).** Before starting, run `bash scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
         with: ""
 
   # ─── learning plugin ────────────────────────────────────────────────────────
@@ -299,7 +299,7 @@ skills:
     plugin: learning
     patches:
       - type: replace
-        pattern: "**Update check (non-blocking).** Before starting, run `bash ../../scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
+        pattern: "**Update check (non-blocking).** Before starting, run `bash scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
         with: ""
 
   teach:
@@ -322,7 +322,7 @@ skills:
     plugin: tools
     patches:
       - type: replace
-        pattern: "**Update check (non-blocking).** Before starting, run `bash ../../scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
+        pattern: "**Update check (non-blocking).** Before starting, run `bash scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
         with: ""
 
   write-skill:
