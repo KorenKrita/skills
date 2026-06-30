@@ -4,7 +4,7 @@ description: Turn a loose idea into a sequenced map of investigation tickets, th
 disable-model-invocation: true
 ---
 
-This skill is invoked when a loose idea requires more than one agent session to turn into a plan. It creates a stateful decision map in a markdown file, and drives the user through a sequence of tickets to resolve the open questions - which may require either prototyping, research or discussion.
+This skill is invoked when a loose idea requires more than one agent session to turn into a plan. It creates a stateful decision map in a markdown file, and drives the user through a sequence of tickets to resolve the open questions - which may require either prototyping, research or grilling.
 
 ## The Decision Map
 
@@ -14,12 +14,15 @@ Assets created during tickets should be linked to from the map, not duplicated w
 
 ### Structure
 
-Numbered entries ("tickets"), each its own section keyed by its number:
+Entries ("tickets"), each its own section keyed by a short dash-case slug that
+reads as a mini-title (e.g. `relational-db`, `auth-strategy`, `cache-layer`) —
+terse enough to stay token-efficient, and unique within the map.
 
 ```markdown
-## #1: Relational Or Non-Relational Database?
+## relational-db: Relational Or Non-Relational Database?
 
-Blocked by: #<ticket-number>, #<ticket-number>
+Blocked by: <slug>, <slug>
+Status: open | in-progress | resolved
 Type: Research | Prototype | Grilling
 
 ### Question
@@ -30,6 +33,12 @@ Type: Research | Prototype | Grilling
 
 <answer-here>
 ```
+
+The slug is the canonical id, used in every `Blocked by` edge and prose
+reference; the title after the colon is optional. A ticket
+is **unblocked** when every ticket in its `Blocked by` list is `resolved`. A
+session **claims** its ticket by setting `Status: in-progress` and saving the map
+before any work, so concurrent sessions skip it.
 
 Each ticket must be sized to one 100K token agent session.
 
@@ -43,42 +52,52 @@ There are three types of tickets:
 
 ## Fog of war
 
-The map is _deliberately_ incomplete beyond the frontier. Your job is to investigate the frontier, and to resolve tickets in order to push the frontier forward. Push back the fog of war, one node at a time.
-
-At some point, the fog of war should have been pushed back far enough that the path to the finish line is clear. At that point, no more tickets will be required and the decision map can be considered 'done'.
+The map is _deliberately_ incomplete beyond the frontier. Your job is to investigate the frontier, and to resolve tickets in order to push the frontier forward. Push back the fog of war, one node at a time — until the path to the finish line is clear and no tickets remain.
 
 ## Invocation
 
-There are two ways this skill can be invoked: **bootstrap** and **resume**.
+Two branches. Either way, **every session ends with a [Handoff](#handoff)** — never resolve more than one ticket per session.
 
-### Bootstrap
+### Create the map
 
 User invokes with a loose idea.
 
-1. Run a /grilling + /domain-modeling session to surface the open decisions. Ask one question at a time.
+1. Run a `/grilling` and `/domain-modeling` session to surface the open decisions. Ask one question at a time.
 2. Write a new decision map — mostly fog, frontier identified, trivially-decidable entries resolved inline.
-3. Stop. Map-building is one session's work; do not also resolve tickets.
+3. Handoff. Map-building is one session's work; do not also resolve tickets.
 
-### Resume
+### Work through the map
 
-User invokes with a path to an existing map and a ticket number.
+User invokes with a path to an existing map. A ticket slug is **optional** — without one, you pick the next decision, not the user.
 
 1. Load the **whole map** as context.
-2. Run a session to resolve the ticket, invoking skills as needed. If in doubt, use `/grilling` and `/domain-modeling`.
-3. Record what the session resolved in the ticket's body.
-4. Add newly-discovered tickets (with correct `blocked_by` edges).
-5. Stop.
+2. Choose the ticket. If the user named one, use it. Otherwise pick the first `open` ticket in document order that is [unblocked](#structure). [Claim it](#structure): set `Status: in-progress` and save before any work.
+3. Resolve it, invoking skills as needed. If in doubt, use `/grilling` and `/domain-modeling`.
+4. Record the answer in the ticket's body and set `Status: resolved`.
+5. Add newly-discovered tickets with correct `Blocked by` edges. If the decisions made invalidate other parts of the map, update or delete those nodes.
+6. Handoff.
 
-If the decisions made invalidate other parts of the map, update or delete those nodes.
+The user may run unblocked tickets in parallel, so expect other agents to be editing the map in their own sessions.
 
-## Parallelism
+## Handoff
 
-The user may choose to run tickets in parallel, so expect other agents to make changes to the map.
+End every session by clearing the context and opening one or more fresh sessions. Close with a **Next steps** block the user can copy-paste. Two cases:
 
-## Skipping The Decision Map
+**Open tickets remain.** List the currently-unblocked tickets, then give two copy-paste options: a bare command for one session (you pick the next ticket), and one pinned command per unblocked ticket for running them in parallel. Paste one line per fresh window — opening one, some, or all of them.
 
-Many times, the initial grilling will result in no fog of war. No unresolved tickets. Nothing to do, except implement.
+> **Next steps** — 3 tickets unblocked: `auth-strategy`, `cache-layer`, `rate-limits`.
+> Clear the context, then open fresh sessions.
+>
+> **One session** — resolves the next unblocked ticket:
+> ```
+> Invoke /decision-mapping with the map at <path>.
+> ```
+>
+> **Parallel** — paste one line per window, up to all 3:
+> ```
+> Invoke /decision-mapping with the map at <path>, ticket auth-strategy.
+> Invoke /decision-mapping with the map at <path>, ticket cache-layer.
+> Invoke /decision-mapping with the map at <path>, ticket rate-limits.
+> ```
 
-In those situations, you should offer the user the chance to skip the decision map - since the decision map is only needed if multi-session decisions need to be made.
-
-If they skip it, you should recommend either implementing directly or using `/to-prd` to schedule a multi-session implementation.
+**No open tickets remain.** The fog is pushed back far enough that the path to the finish line is clear — the map is done. (The initial grilling may also surface no fog at all, in which case there was never a map to build.) Recommend implementing directly, or using `/to-prd` to schedule a multi-session implementation.
