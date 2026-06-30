@@ -36,7 +36,7 @@ One-page quick reference. Scan before filling a template or tweaking a detail. F
 | Warm Sand    | `#e8e6dc`     | Button / interactive surface                        |
 | Dark Surface | `#30302e`     | Dark container                                      |
 | Deep Dark    | `#141413`     | Dark page background                                |
-| **Brand**    | `**#1B365D`** | **Accent · CTA · title left bar (≤ 5% of surface)** |
+| **Brand**    | **`#1B365D`** | **Accent · CTA · title left bar (≤ 5% of surface)** |
 | Ink Light    | `#2D5A8A`     | Links on dark surfaces                              |
 | Near Black   | `#141413`     | Primary text                                        |
 | Dark Warm    | `#3d3d3a`     | Secondary text · table headers · links              |
@@ -53,7 +53,7 @@ One-page quick reference. Scan before filling a template or tweaking a detail. F
 | -------- | --------------------------- |
 | 0.08     | `#EEF2F7`                   |
 | 0.14     | `#E4ECF5`                   |
-| **0.18** | `**#E4ECF5`** ← default tag |
+| **0.18** | **`#E4ECF5`** ← default tag |
 | 0.22     | `#D0DCE9`                   |
 | 0.30     | `#D6E1EE`                   |
 

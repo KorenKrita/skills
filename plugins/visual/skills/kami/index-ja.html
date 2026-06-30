@@ -61,12 +61,12 @@
       {
         "@type": "Question",
         "name": "どんなドキュメントを作れますか？",
-        "acceptedAnswer": { "@type": "Answer", "text": "9種類：ワンページャー、長文ドキュメント、レター、ポートフォリオ、履歴書、スライド、個別株レポート、変更履歴、ランディングページ（EN + CN + KO）。加えて14種のインラインSVG図表。HTML出力でPDF、PNG、編集可能なPPTXスライドに変換可能です。" }
+        "acceptedAnswer": { "@type": "Answer", "text": "9種類：ワンページャー、長文ドキュメント、レター、ポートフォリオ、履歴書、スライド、個別株レポート、変更履歴、ランディングページ（EN + CN + KO）。加えて17種のインラインSVG図表。HTML出力でPDF、PNG、編集可能なPPTXスライドに変換可能です。" }
       },
       {
         "@type": "Question",
         "name": "セットアップ方法は？",
-        "acceptedAnswer": { "@type": "Answer", "text": "Claude Code: npx skills add tw93/kami -a claude-code -g -y。Claude Code プラグインマーケットプレイス（v2.1.142+）：/plugin marketplace add tw93/kami && /plugin install kami@kami。Codex plugin marketplace：codex plugin marketplace add tw93/kami && codex plugin add kami@kami。汎用エージェント：npx skills add tw93/kami -a '*' -g -y。Claude Desktop：GitHub Releases から kami.zip をダウンロードし、Skills 設定でアップロード。" }
+        "acceptedAnswer": { "@type": "Answer", "text": "Claude Code（v2.1.142+）：/plugin marketplace add tw93/kami && /plugin install kami@kami。Codex plugin marketplace：codex plugin marketplace add tw93/kami && codex plugin add kami@kami。汎用エージェント（OpenCode、Pi）：npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y。Claude Desktop：GitHub Releases から kami.zip をダウンロードし、Skills 設定でアップロード。" }
       },
       {
         "@type": "Question",
@@ -83,7 +83,7 @@
   <!-- ============ HERO ============ -->
   <header class="hero">
     <div class="eyebrow">
-      <span>Design System · v1.7.1<span class="eyebrow-date"> · 2026.06</span></span>
+      <span>Design System · v1.9.1<span class="eyebrow-date"> · 2026.06</span></span>
       <span class="hero-links">
         <nav class="lang-switch" aria-label="Language" data-lang-switch>
           <button class="lang-trigger" type="button" aria-expanded="false" data-lang-trigger>日本語</button>
@@ -123,7 +123,7 @@
       <p class="section-num">00 · See it</p>
       <h2 class="section-title">出力サンプル</h2>
       <p class="section-lede section-lede-nowrap">Claude に要件を渡すだけで、一枚資料、長文、正式書簡、ポートフォリオ、履歴書、スライドまで、少数の明確なルールで整った版面に仕上がります。</p>
-      <p class="section-lede" style="margin-top:6px;">同じ brief は <a href="https://github.com/tw93/kami#travel" style="color:var(--brand); text-decoration:none; font-weight:500;">画像生成モデル</a> にも渡せます。サンプル画像とコピペできるプロンプトは README に置いています。</p>
+      <p class="section-lede" style="margin-top:6px;">同じ brief は <a href="https://github.com/tw93/kami#beyond-documents" style="color:var(--brand); text-decoration:none; font-weight:500;">画像生成モデル</a> にも渡せます。サンプル画像とコピペできるプロンプトは README に置いています。</p>
     </div>
     <div class="demo-grid">
       <div class="demo-card">
@@ -182,13 +182,14 @@
       <h2 class="section-title">インストールと呼び出し</h2>
       <p class="section-lede">「履歴書を作って」「スタートアップ紹介の一枚資料を作って」「登壇用スライドを作って」のように要件を伝えるだけで、skill が自動起動します。スラッシュコマンドは不要です。</p>
     </div>
-<pre class="code"><span class="c"># Claude Code</span>
-npx skills add tw93/kami -a claude-code -g -y
+<pre class="code"><span class="c"># Claude Code (v2.1.142+)</span>
+/plugin marketplace add tw93/kami
+/plugin install kami@kami
 
 <span class="c"># Codex plugin marketplace</span>
 codex plugin marketplace add tw93/kami
 codex plugin add kami@kami</pre>
-    <p class="section-lede" style="font-size:14px;">Claude Code プラグインマーケットプレイスは v2.1.142+ で利用できます：<code>/plugin marketplace add tw93/kami</code> の後に <code>/plugin install kami@kami</code> を実行してください。Codex は <code>codex plugin marketplace add tw93/kami</code> の後に <code>codex plugin add kami@kami</code> でインストールします。</p>
+    <p class="section-lede" style="font-size:14px;">汎用エージェント（OpenCode、Pi など <code>~/.agents/</code> を読むツール）：<code>npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y</code>。サブパスは自己完結型の skill パッケージを指します。単に <code>tw93/kami</code> を指定すると SKILL.md しかインストールされません。</p>
     <p class="section-lede" style="font-size:14px;">Claude Desktop の場合は <a href="https://github.com/tw93/kami/releases/latest/download/kami.zip" style="color:var(--brand); text-decoration:none; font-weight:500;">kami.zip</a> をダウンロードし、Customize &gt; Skills &gt; "+" &gt; Create skill からそのままアップロードします。</p>
   </section>
 
@@ -198,7 +199,7 @@ codex plugin add kami@kami</pre>
       <p class="section-num">02 · Manifesto</p>
       <h2 class="section-title">設計原則</h2>
     </div>
-    <p class="manifesto">暖かい紙色を土台に、強調色は <em>ink blue</em> のみ。階層は serif で作り、強い影や派手な配色は退かせます。印刷文書に向けて、安定し、明快で、読みやすい紙面を保つための設計です。</p>
+    <p class="manifesto">暖かい紙色を土台に、強調色は <em>ink blue</em> のみ。階層は serif で作り、強い影や派手な配色は退かせます。印刷文書に向けて、安定し、明快で、読みやすい紙面を保つための設計です。既定は紙色ですが、オプションの白地バリアントを使えば、家庭やオフィスのプリンター向けにあらゆる文書を白い背景で印刷でき、温かみはカードや表に残ります。</p>
     <ol class="rules">
       <li><span class="n">1</span><p>ページ背景は parchment <code>#f5f4ed</code>、純白は使わない</p></li>
       <li><span class="n">2</span><p>強調色は ink blue <code>#1B365D</code> のみ、第二の彩色は入れない</p></li>
@@ -311,7 +312,7 @@ codex plugin add kami@kami</pre>
       </div>
       <div class="type-row">
         <div class="type-label">Label</div>
-        <div class="type-sample label">Design System · v1.7.1</div>
+        <div class="type-sample label">Design System · v1.9.1</div>
         <div class="type-specs"><b>7.5-8 pt</b><br>weight 600<br>line 1.35</div>
       </div>
     </div>
@@ -452,7 +453,7 @@ beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
     <div class="section-head">
       <p class="section-num">07 · Diagrams</p>
       <h2 class="section-title">インライン図表</h2>
-      <p class="section-lede">アーキテクチャ、フロー、データ可視化をカバーする 14 種の SVG 図表を用意。必要な種類を Claude に伝えると、Kami の色と書体規則に沿って文書へ直接埋め込みます。</p>
+      <p class="section-lede">アーキテクチャ、フロー、データ可視化をカバーする 17 種の SVG 図表を用意。必要な種類を Claude に伝えると、Kami の色と書体規則に沿って文書へ直接埋め込みます。</p>
     </div>
     <div class="chart-showcase">
       <!-- Architecture mini -->
@@ -637,11 +638,11 @@ beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
       </div>
       <div class="faq-pair">
         <dt>どんなドキュメントを作れますか？</dt>
-        <dd>9種類のテンプレート：ワンページャー、長文ドキュメント、レター、ポートフォリオ、履歴書、スライド、個別株レポート、変更履歴、ランディングページ（EN + CN + KO）。加えて14種のインラインSVG図表で視覚的な説明も可能です。出力はHTMLで、PDF、PNG、編集可能なPPTXスライドに変換できます。</dd>
+        <dd>9種類のテンプレート：ワンページャー、長文ドキュメント、レター、ポートフォリオ、履歴書、スライド、個別株レポート、変更履歴、ランディングページ（EN + CN + KO）。加えて17種のインラインSVG図表で視覚的な説明も可能です。出力はHTMLで、PDF、PNG、編集可能なPPTXスライドに変換できます。</dd>
       </div>
       <div class="faq-pair">
         <dt>セットアップ方法は？</dt>
-        <dd>Claude Code：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami -a claude-code -g -y</code>。Claude Code v2.1.142+ ではプラグインマーケットプレイスも使えます：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin marketplace add tw93/kami</code> の後に <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin install kami@kami</code>。Codex：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin marketplace add tw93/kami</code> の後に <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin add kami@kami</code>。汎用エージェント：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami -a '*' -g -y</code>。Claude Desktop：GitHub Releasesからkami.zipをダウンロードし、カスタマイズ &gt; スキルでアップロード。</dd>
+        <dd>Claude Code（v2.1.142+）：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin marketplace add tw93/kami</code> の後に <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin install kami@kami</code>。Codex：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin marketplace add tw93/kami</code> の後に <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin add kami@kami</code>。汎用エージェント：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y</code>。Claude Desktop：GitHub Releasesからkami.zipをダウンロードし、カスタマイズ &gt; スキルでアップロード。</dd>
       </div>
       <div class="faq-pair">
         <dt>対応言語は？</dt>

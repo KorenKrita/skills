@@ -66,7 +66,7 @@
         "name": "Kami로 무엇을 만들 수 있나요?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "9가지 템플릿 유형: 원페이저, 긴 문서, 레터, 포트폴리오, 이력서, 슬라이드, 주식 리포트, 변경 로그, 랜딩 페이지(영문 + 중문 + 한국어). 14가지 인라인 SVG 다이어그램 유형 포함. HTML 출력물을 PDF, PNG 또는 편집 가능한 PPTX 슬라이드 덱으로 내보낼 수 있습니다."
+          "text": "9가지 템플릿 유형: 원페이저, 긴 문서, 레터, 포트폴리오, 이력서, 슬라이드, 주식 리포트, 변경 로그, 랜딩 페이지(영문 + 중문 + 한국어). 17가지 인라인 SVG 다이어그램 유형 포함. HTML 출력물을 PDF, PNG 또는 편집 가능한 PPTX 슬라이드 덱으로 내보낼 수 있습니다."
         }
       },
       {
@@ -74,7 +74,7 @@
         "name": "Kami는 어떻게 설정하나요?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Claude Code: npx skills add tw93/kami -a claude-code -g -y. Claude Code 플러그인 마켓플레이스(v2.1.142+): /plugin marketplace add tw93/kami && /plugin install kami@kami. Codex plugin marketplace: codex plugin marketplace add tw93/kami && codex plugin add kami@kami. 범용 에이전트: npx skills add tw93/kami -a '*'. Claude Desktop: GitHub Releases에서 kami.zip을 다운로드하여 Skills 설정에서 업로드하세요."
+          "text": "Claude Code(v2.1.142+): /plugin marketplace add tw93/kami && /plugin install kami@kami. Codex plugin marketplace: codex plugin marketplace add tw93/kami && codex plugin add kami@kami. 범용 에이전트(OpenCode, Pi): npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y. Claude Desktop: GitHub Releases에서 kami.zip을 다운로드하여 Skills 설정에서 업로드하세요."
         }
       },
       {
@@ -95,7 +95,7 @@
   <!-- ============ HERO ============ -->
   <header class="hero">
     <div class="eyebrow">
-      <span>Design System · v1.7.1<span class="eyebrow-date"> · 2026.06</span></span>
+      <span>Design System · v1.9.1<span class="eyebrow-date"> · 2026.06</span></span>
       <span class="hero-links">
         <nav class="lang-switch" aria-label="Language" data-lang-switch>
           <button class="lang-trigger" type="button" aria-expanded="false" data-lang-trigger>한국어</button>
@@ -134,7 +134,7 @@
     <div class="section-head">
       <p class="section-num">00 · See it</p>
       <h2 class="section-title">출력 샘플</h2>
-      <p class="section-lede">Claude에게 브리프를 전달하세요: 원페이저, 긴 문서, 레터, 포트폴리오, 이력서, 슬라이드 모두 하나의 작고 신뢰할 수 있는 규칙 세트에서 정돈된 레이아웃으로 완성됩니다. 동일한 브리프는 <a href="https://github.com/tw93/kami#travel" style="color:var(--brand); text-decoration:none; font-weight:500;">이미지 렌더러에도 적용</a>할 수 있으며, README에 복사-붙여넣기 프롬프트와 샘플 출력물이 포함되어 있습니다.</p>
+      <p class="section-lede">Claude에게 브리프를 전달하세요: 원페이저, 긴 문서, 레터, 포트폴리오, 이력서, 슬라이드 모두 하나의 작고 신뢰할 수 있는 규칙 세트에서 정돈된 레이아웃으로 완성됩니다. 동일한 브리프는 <a href="https://github.com/tw93/kami#beyond-documents" style="color:var(--brand); text-decoration:none; font-weight:500;">이미지 렌더러에도 적용</a>할 수 있으며, README에 복사-붙여넣기 프롬프트와 샘플 출력물이 포함되어 있습니다.</p>
     </div>
     <div class="demo-grid">
       <div class="demo-card">
@@ -193,13 +193,14 @@
       <h2 class="section-title">설치 및 사용</h2>
       <p class="section-lede">Claude에게 필요한 것을 말하세요. 예를 들어 "이력서 만들어 줘", "스타트업 원페이저 만들어 줘", "발표용 슬라이드 디자인해 줘". 스킬이 자동으로 실행되며, 슬래시 명령어가 필요 없습니다.</p>
     </div>
-<pre class="code"><span class="c"># Claude Code</span>
-npx skills add tw93/kami -a claude-code -g -y
+<pre class="code"><span class="c"># Claude Code (v2.1.142+)</span>
+/plugin marketplace add tw93/kami
+/plugin install kami@kami
 
 <span class="c"># Codex plugin marketplace</span>
 codex plugin marketplace add tw93/kami
 codex plugin add kami@kami</pre>
-    <p class="section-lede" style="font-size:14px;">Claude Code 플러그인 마켓플레이스는 v2.1.142+에서 사용할 수 있습니다. <code>/plugin marketplace add tw93/kami</code>를 실행한 뒤 <code>/plugin install kami@kami</code>를 실행하세요. Codex는 <code>codex plugin marketplace add tw93/kami</code> 실행 후 <code>codex plugin add kami@kami</code>로 설치합니다.</p>
+    <p class="section-lede" style="font-size:14px;">범용 에이전트(OpenCode, Pi 등 <code>~/.agents/</code>를 읽는 도구): <code>npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y</code>. 서브 경로는 자체 완결형 스킬 패키지를 가리킵니다. 그냥 <code>tw93/kami</code>를 쓰면 SKILL.md만 설치됩니다.</p>
     <p class="section-lede" style="font-size:14px;">Claude Desktop: <a href="https://github.com/tw93/kami/releases/latest/download/kami.zip" style="color:var(--brand); text-decoration:none; font-weight:500;">kami.zip</a>을 다운로드한 후, Customize &gt; Skills &gt; "+" &gt; Create skill에서 업로드하세요.</p>
   </section>
 
@@ -209,7 +210,7 @@ codex plugin add kami@kami</pre>
       <p class="section-num">02 · Manifesto</p>
       <h2 class="section-title">디자인 원칙</h2>
     </div>
-    <p class="manifesto">따뜻한 양피지 캔버스, <em>잉크 블루</em>를 유일한 강조색으로, 세리프가 계층 구조를 담당하며, 하드 섀도우와 화려한 팔레트는 배제합니다. 이 시스템은 인쇄물을 위해 만들어졌습니다: 안정적이고, 명확하며, 절제되어 있습니다.</p>
+    <p class="manifesto">따뜻한 양피지 캔버스, <em>잉크 블루</em>를 유일한 강조색으로, 세리프가 계층 구조를 담당하며, 하드 섀도우와 화려한 팔레트는 배제합니다. 이 시스템은 인쇄물을 위해 만들어졌습니다: 안정적이고, 명확하며, 절제되어 있습니다. 양피지가 기본이며, 선택형 흰 종이 변형을 사용하면 가정용이나 사무용 프린터를 위해 어떤 문서든 흰 배경으로 인쇄하면서도 카드와 표에 따뜻함을 남깁니다.</p>
     <ol class="rules">
       <li><span class="n">1</span><p>페이지 배경은 양피지 <code>#f5f4ed</code>, 순백은 절대 사용하지 않음</p></li>
       <li><span class="n">2</span><p>강조색은 잉크 블루 <code>#1B365D</code> 하나만; 두 번째 유채색 없음</p></li>
@@ -322,7 +323,7 @@ codex plugin add kami@kami</pre>
       </div>
       <div class="type-row">
         <div class="type-label">Label</div>
-        <div class="type-sample label">Design System · v1.7.1</div>
+        <div class="type-sample label">Design System · v1.9.1</div>
         <div class="type-specs"><b>7.5-8 pt</b><br>weight 600<br>line 1.35</div>
       </div>
     </div>
@@ -463,7 +464,7 @@ beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
     <div class="section-head">
       <p class="section-num">07 · Diagrams</p>
       <h2 class="section-title">인라인 차트</h2>
-      <p class="section-lede">아키텍처, 프로세스, 데이터 차트 시나리오를 아우르는 14가지 인라인 SVG 다이어그램 유형. Claude에게 필요한 유형을 말하면 문서에 직접 삽입되며, 색상과 폰트는 Kami 디자인 언어를 따릅니다.</p>
+      <p class="section-lede">아키텍처, 프로세스, 데이터 차트 시나리오를 아우르는 17가지 인라인 SVG 다이어그램 유형. Claude에게 필요한 유형을 말하면 문서에 직접 삽입되며, 색상과 폰트는 Kami 디자인 언어를 따릅니다.</p>
     </div>
     <div class="chart-showcase">
       <!-- Architecture mini -->
@@ -648,11 +649,11 @@ beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
       </div>
       <div class="faq-pair">
         <dt>무엇을 만들 수 있나요?</dt>
-        <dd>9가지 템플릿 유형: 원페이저, 긴 문서, 레터, 포트폴리오, 이력서, 슬라이드, 주식 리포트, 변경 로그, 랜딩 페이지(영문 + 중문 + 한국어). 비주얼 설명을 위한 14가지 인라인 SVG 다이어그램 유형 포함. HTML 출력물을 PDF, PNG 또는 편집 가능한 PPTX 슬라이드 덱으로 내보낼 수 있습니다.</dd>
+        <dd>9가지 템플릿 유형: 원페이저, 긴 문서, 레터, 포트폴리오, 이력서, 슬라이드, 주식 리포트, 변경 로그, 랜딩 페이지(영문 + 중문 + 한국어). 비주얼 설명을 위한 17가지 인라인 SVG 다이어그램 유형 포함. HTML 출력물을 PDF, PNG 또는 편집 가능한 PPTX 슬라이드 덱으로 내보낼 수 있습니다.</dd>
       </div>
       <div class="faq-pair">
         <dt>어떻게 설정하나요?</dt>
-        <dd>Claude Code: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami -a claude-code -g -y</code>. Claude Code v2.1.142+에서는 플러그인 마켓플레이스도 사용할 수 있습니다: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin marketplace add tw93/kami</code> 실행 후 <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin install kami@kami</code>. Codex: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin marketplace add tw93/kami</code> 실행 후 <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin add kami@kami</code>. OpenCode 같은 범용 에이전트: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami -a '*' -g -y</code>. Claude Desktop: GitHub Releases에서 kami.zip을 다운로드하여 Customize &gt; Skills에서 업로드하세요. 슬래시 명령어가 필요 없으며, 자연어 요청으로 스킬이 자동 실행됩니다.</dd>
+        <dd>Claude Code(v2.1.142+): <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin marketplace add tw93/kami</code> 실행 후 <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin install kami@kami</code>. Codex: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin marketplace add tw93/kami</code> 실행 후 <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin add kami@kami</code>. OpenCode 같은 범용 에이전트: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y</code>. Claude Desktop: GitHub Releases에서 kami.zip을 다운로드하여 Customize &gt; Skills에서 업로드하세요. 슬래시 명령어가 필요 없으며, 자연어 요청으로 스킬이 자동 실행됩니다.</dd>
       </div>
       <div class="faq-pair">
         <dt>어떤 언어를 지원하나요?</dt>
