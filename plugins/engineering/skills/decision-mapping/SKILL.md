@@ -4,7 +4,7 @@ description: Turn a loose idea into a sequenced map of investigation tickets, th
 disable-model-invocation: true
 ---
 
-This skill is invoked when a loose idea requires more than one agent session to turn into a plan. It creates a stateful decision map in a markdown file, and drives the user through a sequence of tickets to resolve the open questions - which may require either prototyping, research or grilling.
+This skill is invoked when a loose idea requires more than one agent session to turn into a plan. It creates a stateful decision map in a markdown file, and drives the user through a sequence of tickets to resolve the open questions - which may require either prototyping, research or grilling. The map is domain-agnostic: it plans engineering work, course content, or anything else that fits the same shape.
 
 ## The Decision Map
 
@@ -47,8 +47,10 @@ Each ticket must be sized to one 100K token agent session.
 There are three types of tickets:
 
 - **Research**: Reading documentation, third-party API's, or local resources like knowledge bases. Creates a markdown summary as an asset. Use this when knowledge outside the current working directory is required.
-- **Prototype**: Writing UI or logic code to test a hypothesis, or to explore a design space. Uses the /prototype skill. Creates a prototype as an asset. Use this when "how should it look" or "how should it behave" is the key question.
+- **Prototype**: Raise the fidelity of the discussion by making a cheap, rough, concrete artifact to react to — an outline, a rough take, a stub, or UI/logic code via the /prototype skill. Creates the prototype as an asset. Use this when "how should it look" or "how should it behave" is the key question.
 - **Grilling**: Conversation with the agent. Uses the /grilling and /domain-modeling skills. Asks one question at a time. The default case.
+
+Validation isn't a fourth type — it's the thread running through all three.
 
 ## Fog of war
 
@@ -72,7 +74,7 @@ User invokes with a path to an existing map. A ticket slug is **optional** — w
 
 1. Load the **whole map** as context.
 2. Choose the ticket. If the user named one, use it. Otherwise pick the first `open` ticket in document order that is [unblocked](#structure). [Claim it](#structure): set `Status: in-progress` and save before any work.
-3. Resolve it, invoking skills as needed. If in doubt, use `/grilling` and `/domain-modeling`.
+3. Resolve it, invoking skills as needed — including any the `## Notes` block names. If in doubt, use `/grilling` and `/domain-modeling`.
 4. Record the answer in the ticket's body and set `Status: resolved`.
 5. Add newly-discovered tickets with correct `Blocked by` edges. If the decisions made invalidate other parts of the map, update or delete those nodes.
 6. Handoff.
@@ -101,3 +103,7 @@ End every session by clearing the context and opening one or more fresh sessions
 > ```
 
 **No open tickets remain.** The fog is pushed back far enough that the path to the finish line is clear — the map is done. (The initial grilling may also surface no fog at all, in which case there was never a map to build.) Recommend implementing directly, or using `/to-prd` to schedule a multi-session implementation.
+
+## Notes
+
+An optional block declaring the **domain**, any skills every session should `consult`, and freeform standing preferences the planning surfaces.
