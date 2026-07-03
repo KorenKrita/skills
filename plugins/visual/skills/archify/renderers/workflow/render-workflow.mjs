@@ -97,6 +97,15 @@ function validateWorkflow() {
   if (!Array.isArray(workflow.edges)) {
     problems.push('Workflow files must include an edges array.');
   }
+  if (workflow.phases !== undefined && !Array.isArray(workflow.phases)) {
+    problems.push('Workflow "phases" must be an array.');
+  }
+  if (workflow.groups !== undefined && !Array.isArray(workflow.groups)) {
+    problems.push('Workflow "groups" must be an array.');
+  }
+  if (workflow.mainPath !== undefined && !Array.isArray(workflow.mainPath)) {
+    problems.push('Workflow "mainPath" must be an array of node ids.');
+  }
   if (workflow.cards !== undefined && !Array.isArray(workflow.cards)) {
     problems.push('Workflow "cards" must be an array.');
   }
@@ -110,6 +119,14 @@ function validateWorkflow() {
   }
   if (nodes.size !== workflow.nodes.length) {
     problems.push('Node ids must be unique.');
+  }
+  const phaseIds = new Set(asArray(workflow.phases).map((phase) => phase.id));
+  if (phaseIds.size !== asArray(workflow.phases).length) {
+    problems.push('Phase ids must be unique.');
+  }
+  const groupIds = new Set(asArray(workflow.groups).map((group) => group.id));
+  if (groupIds.size !== asArray(workflow.groups).length) {
+    problems.push('Group ids must be unique.');
   }
 
   for (const node of nodes.values()) {
@@ -141,6 +158,39 @@ function validateWorkflow() {
     }
   }
 
+  for (const phase of asArray(workflow.phases)) {
+    if (!Number.isInteger(phase.fromCol) || !Number.isInteger(phase.toCol)) {
+      problems.push(`Phase "${phase.id}" must use integer fromCol/toCol values.`);
+      continue;
+    }
+    if (phase.fromCol < 0 || phase.toCol >= layout.colXs.length || phase.fromCol > phase.toCol) {
+      problems.push(`Phase "${phase.id}" uses invalid columns ${phase.fromCol}..${phase.toCol}; use an ordered range within 0..${layout.colXs.length - 1}.`);
+    }
+    const estLabelW = textUnits(phase.label) * 5.6;
+    const width = spanForCols(phase.fromCol, phase.toCol).width;
+    if (estLabelW > width + 8) {
+      problems.push(`Phase label "${phase.label}" (~${Math.round(estLabelW)}px) is wider than its ${Math.round(width)}px span — shorten the label or widen the phase range.`);
+    }
+  }
+
+  for (const group of asArray(workflow.groups)) {
+    if (!laneIds.has(group.lane)) {
+      problems.push(`Group "${group.id}" uses unknown lane "${group.lane}".`);
+      continue;
+    }
+    if (!Number.isInteger(group.fromCol) || !Number.isInteger(group.toCol)) {
+      problems.push(`Group "${group.id}" must use integer fromCol/toCol values.`);
+      continue;
+    }
+    if (group.fromCol < 0 || group.toCol >= layout.colXs.length || group.fromCol > group.toCol) {
+      problems.push(`Group "${group.id}" uses invalid columns ${group.fromCol}..${group.toCol}; use an ordered range within 0..${layout.colXs.length - 1}.`);
+    }
+    const contained = [...nodes.values()].some((node) => node.lane === group.lane && node.col >= group.fromCol && node.col <= group.toCol);
+    if (!contained) {
+      problems.push(`Group "${group.id}" does not contain any nodes — align its lane/columns with the parallel or branch work it frames.`);
+    }
+  }
+
   const byLane = new Map();
   for (const node of nodes.values()) {
     byLane.set(node.lane, [...(byLane.get(node.lane) || []), node]);
@@ -166,6 +216,28 @@ function validateWorkflow() {
         if (segmentLength < 28) {
           problems.push(`Edge "${edge.from}" -> "${edge.to}" is too short (${Math.round(segmentLength)}px; minimum 28px) — drop its label or route it through a channel.`);
         }
+      }
+    }
+  }
+
+  if (Array.isArray(workflow.mainPath)) {
+    for (const id of workflow.mainPath) {
+      if (!nodes.has(id)) {
+        problems.push(`mainPath references unknown node "${id}".`);
+      }
+    }
+    for (let i = 0; i < workflow.mainPath.length - 1; i += 1) {
+      const fromId = workflow.mainPath[i];
+      const toId = workflow.mainPath[i + 1];
+      const from = nodes.get(fromId);
+      const to = nodes.get(toId);
+      if (!from || !to) continue;
+      const linked = workflow.edges.some((edge) => edge.from === fromId && edge.to === toId);
+      if (!linked) {
+        problems.push(`mainPath step "${fromId}" -> "${toId}" has no matching edge — add the edge or remove the pair from mainPath.`);
+      }
+      if (to.col < from.col) {
+        problems.push(`mainPath step "${fromId}" -> "${toId}" moves backward from col ${from.col} to ${to.col} — use a return edge outside mainPath for loops.`);
       }
     }
   }
@@ -210,6 +282,18 @@ function gapYBetween(fromLane, toLane, bias = 0.5) {
   return a + (b - a) * bias;
 }
 
+function spanForCols(fromCol, toCol, pad = 46) {
+  const start = layout.colXs[fromCol] - pad;
+  const end = layout.colXs[toCol] + pad;
+  return { x: start, width: end - start, cx: (start + end) / 2 };
+}
+
+function sameLaneAutoVia(start, end) {
+  if (start[0] === end[0] || start[1] === end[1]) return [];
+  const midX = (start[0] + end[0]) / 2;
+  return [[midX, start[1]], [midX, end[1]]];
+}
+
 function routeVia(edge, from, to, start, end) {
   if (edge.via) return edge.via;
   switch (edge.route || 'auto') {
@@ -237,7 +321,7 @@ function routeVia(edge, from, to, start, end) {
     }
     case 'auto':
     default: {
-      if (from.lane === to.lane) return [];
+      if (from.lane === to.lane) return sameLaneAutoVia(start, end);
       const y = gapYBetween(from.lane, to.lane, edge.bias ?? 0.5);
       return [[start[0], y], [end[0], y]];
     }
@@ -260,8 +344,32 @@ function pathFor(edge) {
 
 function renderLane(lane, index) {
   const y = layout.laneY + index * (layout.laneH + layout.laneGap);
-  return `        <rect x="${layout.laneX}" y="${y}" width="${layout.laneW}" height="${layout.laneH}" rx="10" class="c-lane" stroke-width="1"/>
-        <text x="${layout.laneX + 14}" y="${y + 22}" class="t-dim" font-size="10" font-weight="600">${String(index + 1).padStart(2, '0')} / ${esc(lane.label)}</text>`;
+  const exception = lane.variant === 'exception'
+    ? `\n        <rect x="${layout.laneX + 6}" y="${y + 6}" width="${layout.laneW - 12}" height="${layout.laneH - 12}" rx="8" class="c-security-group" stroke-width="1"/>`
+    : '';
+  const labelClass = lane.variant === 'exception' ? 't-security' : 't-dim';
+  const prefix = lane.variant === 'exception' ? 'EX' : String(index + 1).padStart(2, '0');
+  return `        <rect x="${layout.laneX}" y="${y}" width="${layout.laneW}" height="${layout.laneH}" rx="10" class="c-lane" stroke-width="1"/>${exception}
+        <text x="${layout.laneX + 14}" y="${y + 22}" class="${labelClass}" font-size="10" font-weight="600">${prefix} / ${esc(lane.label)}</text>`;
+}
+
+function renderPhase(phase) {
+  const span = spanForCols(phase.fromCol, phase.toCol, 46);
+  const accent = variantAccent(phase.variant);
+  const [lineClass] = arrowClassMap[phase.variant || 'default'] || arrowClassMap.default;
+  return `        <line x1="${span.x}" y1="35" x2="${span.x + span.width}" y2="35" class="${lineClass}" stroke-width="1.1"/>
+        <rect x="${span.x}" y="27" width="${span.width}" height="16" rx="4" class="c-mask"/>
+        <text x="${span.cx}" y="39" class="${accent}" font-size="8" font-weight="600" text-anchor="middle">${esc(phase.label)}</text>`;
+}
+
+function renderGroup(group) {
+  const span = spanForCols(group.fromCol, group.toCol, 50);
+  const y = laneTop(group.lane) + layout.laneTitleH + 8;
+  const height = layout.laneH - layout.laneTitleH - 16;
+  const cls = group.variant === 'security' ? 'c-security-group' : 'c-lane';
+  const textClass = variantAccent(group.variant);
+  return `        <rect x="${span.x}" y="${y}" width="${span.width}" height="${height}" rx="9" class="${cls}" stroke-width="1"/>
+        <text x="${span.x + 10}" y="${y + 14}" class="${textClass}" font-size="7" font-weight="600">${esc(group.label)}</text>`;
 }
 
 function renderNode(node) {
@@ -316,6 +424,12 @@ ${renderDefinitions()}
 
         <!-- Swimlanes -->
 ${workflow.lanes.map(renderLane).join('\n\n')}
+
+        <!-- Phase headers -->
+${asArray(workflow.phases).map(renderPhase).join('\n')}
+
+        <!-- Workflow groups -->
+${asArray(workflow.groups).map(renderGroup).join('\n')}
 
         <!-- Edge paths -->
 ${workflow.edges.map(renderEdgePath).join('\n')}

@@ -1,9 +1,9 @@
 {
   "name": "archify",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "private": true,
   "type": "module",
-  "description": "JSON-IR diagram renderers (workflow / sequence / dataflow / lifecycle).",
+  "description": "JSON-IR diagram renderers (architecture / workflow / sequence / dataflow / lifecycle).",
   "license": "MIT",
   "engines": {
     "node": ">=18"

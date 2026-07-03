@@ -37,16 +37,17 @@ function load(mode) {
 // Returns { code, stderr }. Never throws on non-zero exit.
 function render(mode, doc) {
   const input = path.join(tmp, `${mode}-${Math.abs(hash(JSON.stringify(doc)))}.json`);
+  const outPath = path.join(tmp, `${mode}-${Math.abs(hash(JSON.stringify(doc)))}.html`);
   fs.writeFileSync(input, JSON.stringify(doc));
   try {
     execFileSync('node', [
       path.join(skillRoot, `renderers/${mode}/render-${mode}.mjs`),
       input,
-      path.join(tmp, 'out.html'),
+      outPath,
     ], { stdio: ['ignore', 'ignore', 'pipe'] });
-    return { code: 0, stderr: '' };
+    return { code: 0, stderr: '', outPath };
   } catch (err) {
-    return { code: err.status ?? 1, stderr: String(err.stderr || '') };
+    return { code: err.status ?? 1, stderr: String(err.stderr || ''), outPath };
   }
 }
 
@@ -67,6 +68,12 @@ const CASES = [
     (d) => { d.meta.viewBox = [699, 900]; }, ['700']],
   ['workflow: nodes too close in a lane', 'workflow',
     (d) => { d.nodes.push({ ...d.nodes[0], id: 'dupe', col: d.nodes[0].col }); }, ['less than 8px apart']],
+  ['workflow: empty group', 'workflow',
+    (d) => { d.groups = [{ id: 'empty', label: 'Empty group', lane: 'ui', fromCol: 3, toCol: 4 }]; }, ['does not contain any nodes']],
+  ['workflow: mainPath missing edge', 'workflow',
+    (d) => { d.mainPath = ['user', 'planner']; }, ['mainPath step "user" -> "planner" has no matching edge']],
+  ['workflow: mainPath moves backward', 'workflow',
+    (d) => { d.mainPath = ['external', 'trace']; }, ['moves backward from col']],
 
   // ---- sequence layout rules ----
   ['sequence: message references unknown participant', 'sequence',
@@ -141,6 +148,25 @@ test('contract: ajv path errors are annotated with the element id', () => {
   // Only meaningful when ajv is installed; skip the assertion in degraded mode.
   if (!/schema validation failed/.test(stderr)) return;
   assert.match(stderr, /id\/label:/);
+});
+
+test('workflow: same-lane offset auto edge stays orthogonal', () => {
+  const d = {
+    schema_version: 1,
+    diagram_type: 'workflow',
+    meta: { title: 'Same-lane offset route' },
+    lanes: [{ id: 'main', label: 'Main lane' }],
+    nodes: [
+      { id: 'left', lane: 'main', col: 1, type: 'backend', label: 'A', width: 32, height: 38, yOffset: -14 },
+      { id: 'right', lane: 'main', col: 2, type: 'backend', label: 'B', width: 32, height: 38, yOffset: 14 },
+    ],
+    edges: [{ from: 'left', to: 'right' }],
+  };
+  const { code, stderr, outPath } = render('workflow', d);
+  assert.equal(code, 0, stderr);
+  const html = fs.readFileSync(outPath, 'utf8');
+  assert.doesNotMatch(html, /M 236 105 L 284 133/);
+  assert.match(html, /M 236 105 L 260 105 L 260 133 L 284 133/);
 });
 
 process.on('exit', () => fs.rmSync(tmp, { recursive: true, force: true }));

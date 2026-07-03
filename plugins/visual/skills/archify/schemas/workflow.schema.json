@@ -71,8 +71,105 @@
           "label": {
             "type": "string",
             "minLength": 1
+          },
+          "variant": {
+            "enum": [
+              "normal",
+              "exception"
+            ]
           }
         }
+      }
+    },
+    "phases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label",
+          "fromCol",
+          "toCol"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "common.schema.json#/$defs/id"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fromCol": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5
+          },
+          "toCol": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5
+          },
+          "variant": {
+            "enum": [
+              "default",
+              "emphasis",
+              "security",
+              "dashed"
+            ]
+          }
+        }
+      }
+    },
+    "groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label",
+          "lane",
+          "fromCol",
+          "toCol"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "common.schema.json#/$defs/id"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "lane": {
+            "$ref": "common.schema.json#/$defs/id"
+          },
+          "fromCol": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5
+          },
+          "toCol": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5
+          },
+          "variant": {
+            "enum": [
+              "default",
+              "emphasis",
+              "security",
+              "dashed"
+            ]
+          }
+        }
+      }
+    },
+    "mainPath": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "$ref": "common.schema.json#/$defs/id"
       }
     },
     "nodes": {
@@ -148,6 +245,15 @@
           },
           "variant": {
             "$ref": "common.schema.json#/$defs/variant"
+          },
+          "role": {
+            "enum": [
+              "main",
+              "branch",
+              "async",
+              "return",
+              "error"
+            ]
           },
           "fromSide": {
             "$ref": "#/$defs/side"
