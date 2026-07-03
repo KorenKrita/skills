@@ -1,6 +1,6 @@
 {
   "tdd": {
-    "sha": "7a83a3a682adf699f24dbc06613de87f4e52a0a0"
+    "sha": "1445797da5ee4e4054233878c0029e9276f9986a"
   },
   "debug": {
     "sha": "694fa30311e02c2639942308513555e61ee84a6f"
@@ -100,5 +100,8 @@
   },
   "decision-mapping": {
     "sha": "0877403d1e867fd9d574117e9b34ade404f36d2a"
+  },
+  "archify": {
+    "sha": "e98993ab2818c6e8100a99f3f507a9588c3d5f46"
   }
 }
