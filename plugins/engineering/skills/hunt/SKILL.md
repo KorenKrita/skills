@@ -9,6 +9,8 @@ dispatch_intent: "Error, crash, regression, screenshot-reported defect, test fai
 
 Prefix your first line with 🥷 inline, not as its own paragraph.
 
+**Update check (non-blocking).** Once per conversation, run `bash <skill-base-dir>/scripts/check-update.sh` with `<skill-base-dir>` replaced by this skill's base directory; if it prints a line, relay it to the user, then continue. If it already ran in this conversation, or the script is missing or errors, skip silently without retrying or mentioning it. It checks at most once a day, only reads a public version file, and sends no data.
+
 A patch applied to a symptom creates a new bug somewhere else.
 
 ## Outcome Contract
@@ -33,7 +35,7 @@ Rationalization warning: "I'll just try this" means no hypothesis, write it firs
 
 ## Durable Context Preflight
 
-See [rules/durable-context.md](../../rules/durable-context.md) for when to read durable context, the read-order budget, and the memory-type mapping.
+See [references/durable-context.md](references/durable-context.md) for when to read durable context, the read-order budget, and the memory-type mapping.
 
 For `/hunt`, diagnostic constraints are `decision`, `preference`, and `principle` entries; `pattern` and `learning` can seed hypotheses. Current code, logs, repro steps, tests, environment versions, and remote state override memory. Durable context is hypothesis fuel only. It never replaces a fresh root-cause sentence, a reproducible symptom list, or evidence from the current state.
 
@@ -91,7 +93,7 @@ Activate after fixing a root-cause pattern, before declaring the bug done; also 
 1. Extract the pattern signature: the specific function name, regex, API call, CSS selector, lock acquisition, validation skip, or input boundary that produced the bug.
 2. `grep -rn <pattern>` across the repo (exclude generated dirs, build output, vendored deps). For class-of-bug patterns (e.g. "any handler missing the lock"), grep for the surrounding shape, not just the literal text.
 3. List every match. For each one, answer in writing: same bug here? Pick fix / leave (explain why it is safe) / unsure (ask the user). Do not silently skip a match.
-4. Do not claim "fixed" until the blast report is in the Outcome block.
+4. Do not claim "fixed" until the blast report is in the Output block.
 
 Common triggers:
 - Visual bug fixed on one page: check every other page using the same component, layout, or media-query breakpoint.
@@ -103,7 +105,7 @@ If the blast surfaces unrelated bugs, list them but do not fix in this PR unless
 
 ## Confirm or Discard
 
-The instrument-first rule lives in Hard Rules (behavioral/async bugs) above; this is what to do with its result. Run the one probe that would fail if the hypothesis were wrong, then read it. If the evidence contradicts the hypothesis, discard it completely and re-orient on what the probe just showed. Do not stack a fix onto a disproven hypothesis, and do not keep one just because the code "looks like" the cause.
+Run the one probe that would fail if the hypothesis were wrong, then read it. If the evidence contradicts the hypothesis, discard it completely and re-orient on what the probe just showed. Do not stack a fix onto a disproven hypothesis, and do not keep one just because the code "looks like" the cause.
 
 ## Runtime Evidence Ladder
 
@@ -169,7 +171,17 @@ If adding logs changes the behavior, treat that as evidence of a timing, lifecyc
 | Worked when launched from app, broke when opened via file association / drag-drop / deep link / external proxy | Reproduce using the exact entry point the user described. App-internal init differs from cold-launch-with-file init; state may not be ready when the document arrives. |
 | Build passed but UI still looked wrong | Move up the Runtime Evidence Ladder and verify the real rendered surface or artifact. |
 
-## Outcome
+## Rendering Bug Mode
+
+Activate when: "PDF looks wrong", "page break issue", "font not rendering", broken PDF output, or print layout wrong.
+
+Load `references/rendering-debug.md` for the full diagnosis checklist (WeasyPrint quirks, font loading, page overflow, browser print CSS). Static analysis first, then reproduce if needed.
+
+## IME / Unicode Issues
+
+For input method, character rendering, or text encoding bugs (IME state, cursor drift, emoji splitting, composition events), check `references/ime-unicode.md` first before forming a hypothesis.
+
+## Output
 
 ### Success Format
 
@@ -218,13 +230,3 @@ Suggested Next Steps:
 ```
 
 Status: **blocked**
-
-## Rendering Bug Mode
-
-Activate when: "PDF looks wrong", "page break issue", "font not rendering", broken PDF output, or print layout wrong.
-
-Load `references/rendering-debug.md` for the full diagnosis checklist (WeasyPrint quirks, font loading, page overflow, browser print CSS). Static analysis first, then reproduce if needed.
-
-## IME / Unicode Issues
-
-For input method, character rendering, or text encoding bugs (IME state, cursor drift, emoji splitting, composition events), check `references/ime-unicode.md` first before forming a hypothesis.
