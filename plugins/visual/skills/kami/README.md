@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://gw.alipayobjects.com/zos/k/vl/logo.svg" width="120" />
+  <img src="assets/images/logo.svg" width="120" />
   <h1>Kami</h1>
   <p><b>Good content deserves good paper.</b></p>
   <a href="https://github.com/tw93/kami/stargazers"><img src="https://img.shields.io/github/stars/tw93/kami?style=flat-square" alt="Stars"></a>
@@ -76,6 +76,8 @@ Real PDFs from one constraint set, across templates and languages. Click any pre
 /plugin install kami@kami
 ```
 
+The marketplace points Claude Code at the generated lightweight plugin bundle, not the whole website and release archive tree.
+
 **Codex plugin marketplace**
 
 ```bash
@@ -85,26 +87,26 @@ codex plugin add kami@kami
 
 This installs Kami as a Codex plugin from the repo marketplace, so future updates can use `codex plugin marketplace upgrade kami` followed by `codex plugin add kami@kami`.
 
-**Generic agents** for OpenCode, Pi, and other tools that read from `~/.agents/`
+**Generic agents** for tools that read from `~/.agents/`
 
 ```bash
-npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y
+npx skills add tw93/kami/plugins/kami -a universal -g -y
 ```
 
-The subpath points at the self-contained skill package. A bare `tw93/kami` would install only `SKILL.md`, because the repo root doubles as the website source and the `skills` CLI treats a root-level skill as a single file.
+The plugin path exposes the generated lightweight skill bundle. A bare `tw93/kami` would install only `SKILL.md`, because the repo root doubles as the website source and the `skills` CLI treats a root-level skill as a single file.
 
 **Claude Desktop**
 
-Download [kami.zip](https://github.com/tw93/kami/releases/latest/download/kami.zip), open Customize > Skills > "+" > Create skill, and upload the ZIP directly, no need to unzip.
+Download the release asset [kami.zip](https://github.com/tw93/kami/releases/latest/download/kami.zip), not GitHub's source-code ZIP. Open Customize > Skills > "+" > Create skill, and upload the ZIP directly, no need to unzip.
 
-The ZIP is lightweight: large CJK fonts are excluded from the skill package. In a repo checkout they load from local font files first, then jsDelivr CDN; in an installed skill, `scripts/ensure-fonts.sh` recovers missing Chinese or Korean fonts into the user font directory.
+The ZIP is lightweight and contains a `kami/` skill folder. Large CJK fonts are excluded from the package: in a repo checkout they load from local font files first, then jsDelivr CDN; in an installed skill, `scripts/ensure-fonts.sh` recovers missing Chinese or Korean fonts into the user font directory.
 
 **Update**
 
 - Claude Code: `claude plugin update kami`
 - Codex: `codex plugin marketplace upgrade kami`, then `codex plugin add kami@kami` to refresh the installed snapshot
 - Claude Desktop: download the latest [kami.zip](https://github.com/tw93/kami/releases/latest/download/kami.zip), click "..." on the skill card, choose Replace, upload
-- Generic agents: re-run the `npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y` command, which overwrites the existing copy. Avoid `npx skills update` for now: it collapses a repo-root skill down to a single `SKILL.md` (vercel-labs/skills#1517).
+- Generic agents: re-run the `npx skills add tw93/kami/plugins/kami -a universal -g -y` command, which overwrites the existing copy. Avoid `npx skills update` for now: it can mis-detect repo subpath installs while the repo root also has `SKILL.md` (vercel-labs/skills#1517).
 
 Kami also runs a quiet version check at most once a day and tells you in chat when a newer version is out; it only reads a public version file, sends no data, and is skipped when offline.
 
@@ -130,7 +132,7 @@ The file has YAML frontmatter for structured fields like name, role, email, bran
 Warm parchment canvas `#f5f4ed`, ink blue `#1B365D` as the sole accent, serif carries hierarchy, no hard shadows or flashy palettes. Not a UI framework; a constraint system for printed matter. Documents should read as composed pages, not dashboards.
 
 - **Templates.** Eight document templates: One-Pager, Long Doc, Letter, Portfolio, Resume, Slides, Equity Report, and Changelog, plus a Landing Page system, in EN, CN, and KO.
-- **Diagrams.** Seventeen inline SVG types. Sequence, class, and ER can be authored from Mermaid text: [beautiful-mermaid](https://github.com/lukilabs/beautiful-mermaid) renders the SVG and `scripts/mermaid_normalize.py` re-themes it to the Kami palette and makes it WeasyPrint-safe, no Node bundled.
+- **Diagrams.** Eighteen inline SVG types, including a report-scale architecture board. Sequence, class, and ER can be authored from Mermaid text: [beautiful-mermaid](https://github.com/lukilabs/beautiful-mermaid) renders the SVG and `scripts/mermaid_normalize.py` re-themes it to the Kami palette and makes it WeasyPrint-safe, no Node bundled.
 - **Slides.** Three rendering paths: WeasyPrint HTML to PDF by default, python-pptx for editable PPTX on request, and a Marp variant in `assets/templates/marp/` for Markdown-first decks.
 - **Code.** Pygments-based syntax highlighting when `Pygments` is installed; without it, PDFs still render and code stays monochrome.
 - **Print.** Parchment is the default canvas; an opt-in white-paper variant flips any document to a white background for home or office printers, sinking the warmth into cards and tables so the hierarchy still reads. The [one-page Kami intro](assets/demos/demo-kami-print.pdf) (Chinese) is rendered with this variant; recipe in [production.md](references/production.md).

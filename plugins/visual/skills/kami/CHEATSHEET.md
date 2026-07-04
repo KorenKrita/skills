@@ -247,12 +247,13 @@ Combine freely: `<table class="kami-table financial striped">`.
 
 ## Diagram components
 
-Seventeen built-in diagram types (incl. Mermaid-sourced sequence / class / ER; see `references/mermaid.md`). Extract the `<svg>` block and embed in a `<figure>` in long-doc / portfolio:
+Eighteen built-in diagram types (incl. Mermaid-sourced sequence / class / ER; see `references/mermaid.md`). Extract the `<svg>` block and embed in a `<figure>` in long-doc / portfolio:
 
 
 | Type          | File                                 | Use                                             |
 | ------------- | ------------------------------------ | ----------------------------------------------- |
 | Architecture  | `assets/diagrams/architecture.html`  | System components and connections               |
+| Architecture Board | `assets/diagrams/architecture-board.html` | Report-scale five-layer system board (standalone page) |
 | Flowchart     | `assets/diagrams/flowchart.html`     | Decision branches and flows                     |
 | Quadrant      | `assets/diagrams/quadrant.html`      | 2×2 positioning                                 |
 | Bar Chart     | `assets/diagrams/bar-chart.html`     | Category comparison (up to 8 groups × 3 series) |

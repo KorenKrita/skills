@@ -705,7 +705,7 @@
   .comp:hover {
     box-shadow: 0 4px 24px rgba(0,0,0,0.05);
   }
-  .comp h4 {
+  .comp h3 {
     font-family: var(--serif);
     font-weight: 500;
     font-size: 16px;
@@ -1123,7 +1123,7 @@
     border: 1px solid var(--border);
     border-left: 3px solid var(--brand);
   }
-  .anti h5 {
+  .anti h3 {
     font-family: var(--sans);
     font-size: 12px;
     font-weight: 500;
@@ -1132,7 +1132,7 @@
     margin: 0 0 8px;
     color: var(--stone);
   }
-  .anti .yes h5 { color: var(--brand); }
+  .anti .yes h3 { color: var(--brand); }
   .anti p {
     margin: 0;
     color: var(--dark-warm);

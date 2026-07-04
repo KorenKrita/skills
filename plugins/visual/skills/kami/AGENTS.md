@@ -20,9 +20,9 @@ Kami is a document-generation skill and template system. It ships editorial HTML
 - `references/tokens.json` - canonical color tokens (drift-checked by `scripts/tokens.py`).
 - `references/checks_thresholds.json` - rhythm / density / orphan check thresholds (loaded by `scripts/checks.py`).
 - `references/brand-profile.md` and `references/brand.example.md` - optional brand profile behavior and public example.
-- `.claude-plugin/marketplace.json` - Claude Code plugin marketplace metadata.
+- `.claude-plugin/marketplace.json` - **generated** Claude Code plugin marketplace metadata. Points Claude Code at `plugins/kami`.
 - `.agents/plugins/marketplace.json` - **generated** Codex repo marketplace. Points Codex at `plugins/kami`; never hand-edit.
-- `plugins/kami/` - **generated** Codex plugin tree. Mirrors the lightweight skill package under `plugins/kami/skills/kami/`; edit source files and run `python3 scripts/build_metadata.py`.
+- `plugins/kami/` - **generated** Claude Code / Codex plugin tree. Mirrors the lightweight skill package under `plugins/kami/skills/kami/`; edit source files and run `python3 scripts/build_metadata.py`.
 - `assets/templates/` - document templates including browser-only landing page variants.
 - `scripts/highlight.py` - Pygments-based syntax highlighting for code blocks at build time.
 - `assets/demos/` - README showcase demos.
@@ -43,7 +43,7 @@ Kami is a document-generation skill and template system. It ships editorial HTML
 - `scripts/shared.py` - shared constants and the canonical `HTML_TEMPLATES` registry used by the build scripts.
 - `scripts/ensure-fonts.sh` - verified font recovery helper (portable across bash 3.2+).
 - `scripts/package-skill.sh` - package builder for the release archive.
-- `scripts/build_metadata.py` - codegen for Codex marketplace metadata and plugin mirror files. Run after changing `SKILL.md`, `CHEATSHEET.md`, `VERSION`, `references/`, `scripts/`, or shipped lightweight assets.
+- `scripts/build_metadata.py` - codegen for Claude Code / Codex marketplace metadata and plugin mirror files. Run after changing `SKILL.md`, `CHEATSHEET.md`, `VERSION`, `references/`, `scripts/`, or shipped lightweight assets.
 - `scripts/draft-release-notes.py` - bilingual release notes scaffold from `git log`.
 - `scripts/tests/test_build.py` - zero-dependency test suite for build and shared helpers.
 - `.github/workflows/check.yml` - PR/push CI that runs `--check` and the test suite.
@@ -85,7 +85,7 @@ bash scripts/package-skill.sh
 - Do not use graphic emoticons in docs, template comments, or script output.
 - Use `OK:` and `ERROR:` for status text in scripts.
 - Use `scripts/ensure-fonts.sh` to recover required fonts with retry and size validation when local font files are missing or truncated. It downloads to the XDG user font dir (`${XDG_DATA_HOME:-~/.local/share}/fonts/kami`), never into the skill's `assets/fonts`, so an installed Claude Desktop skill stays small; inside a repo checkout it is a no-op because the committed large fonts already satisfy the templates' relative path.
-- Do not bundle large CJK font files into `dist/kami.zip`; package scripts should exclude them while templates keep stable local-preview paths. The skill ZIP uploaded to Claude Desktop must be the `scripts/package-skill.sh` output under the 6MB package ceiling; a hand-zipped checkout includes the tracked large fonts and Claude Desktop rejects it.
+- Do not bundle large CJK font files into `dist/kami.zip`; package scripts should exclude them while templates keep stable local-preview paths. The skill ZIP uploaded to Claude Desktop must be the `scripts/package-skill.sh` output under the 6MB package ceiling and must contain a top-level `kami/` skill folder; a hand-zipped checkout includes the tracked large fonts and Claude Desktop rejects it.
 - Do not bundle README/public-site-only showcase screenshots into `dist/kami.zip`; keep them under `assets/showcase/` and exclude that directory in `scripts/package-skill.sh`.
 - Keep multilingual public pages, `llms.txt`, `robots.txt`, sitemap, JSON-LD, and FAQ content aligned when changing public positioning or install instructions.
 - Brand profile support is optional context. Keep public examples in `references/`; do not hard-code a maintainer's private local profile content.
@@ -99,7 +99,7 @@ bash scripts/package-skill.sh
 - When refactoring `scripts/build.py` or package helpers into new modules, confirm every new helper file is tracked by Git. `scripts/package-skill.sh` packages from `git ls-files`, so untracked modules pass local imports but disappear from `dist/kami.zip`.
 - Any source change that adds scripts, templates, reference JSON, workflows, or package inputs must refresh and inspect `dist/kami.zip`; package freshness is part of release readiness, not a later cleanup step.
 - Changes to `SKILL.md`, templates, scripts, references, or package inputs must decide explicitly whether `dist/kami.zip` needs refresh. If the behavior is shipped through the skill package, rebuild and inspect the ZIP before handoff.
-- Marketplace, plugin path, version, or generated mirror changes require runtime installation proof, not metadata proof only. For Codex changes, use an isolated `CODEX_HOME=/tmp/...` smoke with `codex plugin marketplace add <path>`, `codex plugin add kami@kami`, and `codex plugin list`; keep the generator, mirror tree, package audit, and install path aligned.
+- Marketplace, plugin path, version, or generated mirror changes require runtime installation proof, not metadata proof only. For Claude Code changes, use an isolated `HOME=/tmp/...` smoke with `claude plugin marketplace add <path>`, `claude plugin install kami@kami`, `claude plugin details kami@kami`, and confirm the installed cache is the lightweight `plugins/kami` tree. For Codex changes, use an isolated `CODEX_HOME=/tmp/...` smoke with `codex plugin marketplace add <path>`, `codex plugin add kami@kami`, and `codex plugin list`; keep the generator, mirror tree, package audit, and install path aligned.
 - If `python3 scripts/build.py --verify` fails only because the host Python lacks PPTX fallback dependencies such as `python-pptx`, verify `slides` and `slides-en` from a temporary venv instead of treating the environment miss as a source regression.
 - Do not commit one-off review reports or diagnostic snapshots as durable docs. Extract stable rules into `AGENTS.md`, `CLAUDE.md`, `SKILL.md`, or `references/` and discard the stale report.
 
@@ -117,7 +117,7 @@ bash scripts/package-skill.sh
 - AI/public visibility spans `index*.html`, `llms.txt`, `robots.txt`, `sitemap.xml`, FAQ JSON-LD, README install text, diagram counts, and release archive links.
 - `scripts/shared.py` centralizes constants used by the build scripts; keep paths and target names in sync before adding templates or diagrams.
 - `dist/kami.zip` is a tracked release archive. Packaging changes must update and inspect it deliberately.
-- Codex plugin files are generated artifacts. Do not edit `plugins/kami/` or `.agents/plugins/marketplace.json` directly; regenerate from the root source files and let `python3 scripts/build_metadata.py --check` catch drift.
+- Claude Code / Codex plugin files are generated artifacts. Do not edit `plugins/kami/`, `.claude-plugin/marketplace.json`, or `.agents/plugins/marketplace.json` directly; regenerate from the root source files and let `python3 scripts/build_metadata.py --check` catch drift.
 
 ## Hotspot Ownership
 
@@ -178,7 +178,7 @@ magick /tmp/stacked.png -gravity Center -background '#f5f4ed' -extent 1241x1754 
 - Slide rhythm or deck changes: run `python3 scripts/build.py --check-rhythm slides slides-en` plus the affected render command.
 - Public site or AI visibility changes: check `index*.html`, README, `llms.txt`, `robots.txt`, `sitemap.xml`, JSON-LD, FAQ, install links, and release/download links together. Serve the page and screenshot 375px / 1280px per locale, plus 320px when CTA width or mobile nav changes.
 - Packaging changes: run `bash scripts/package-skill.sh` and confirm `dist/kami.zip` stays small enough for release upload. Inspect `unzip -l dist/kami.zip` for accidental large fonts, showcase screenshots, cache files, or missing new helper files.
-- Codex marketplace changes: run `python3 scripts/build_metadata.py --check` and confirm `plugins/kami/.codex-plugin/plugin.json` plus `.agents/plugins/marketplace.json` stay generated. If install behavior, version selection, or source path changed, also run an isolated Codex install smoke.
+- Claude Code / Codex marketplace changes: run `python3 scripts/build_metadata.py --check` and confirm `plugins/kami/.claude-plugin/plugin.json`, `plugins/kami/.codex-plugin/plugin.json`, `.claude-plugin/marketplace.json`, and `.agents/plugins/marketplace.json` stay generated. If install behavior, version selection, or source path changed, also run the matching isolated install smoke.
 - Documentation-only changes: check links and references.
 
 ## Release Notes
@@ -189,7 +189,7 @@ magick /tmp/stacked.png -gravity Center -background '#f5f4ed' -extent 1241x1754 
 
 ## Release Flow
 
-- `bash scripts/package-skill.sh` writes the tracked `dist/kami.zip` release archive and excludes large TsangerJinKai / Source Han Serif K font files plus README/public-site-only showcase screenshots.
+- `bash scripts/package-skill.sh` writes the tracked `dist/kami.zip` release archive with a top-level `kami/` skill folder and excludes large TsangerJinKai / Source Han Serif K font files plus README/public-site-only showcase screenshots.
 - `dist/kami.zip` should be committed with release changes and uploaded to the latest GitHub release asset when refreshing the Claude Desktop package.
 - When refreshing a GitHub release asset, download the uploaded `kami.zip` and compare ZIP entry names plus per-entry SHA-256 digests against local `dist/kami.zip`; do not rely on release-page text, file size, or container SHA alone.
 - README and public site download links use `https://github.com/tw93/kami/releases/latest/download/kami.zip`; prefer refreshing that asset for small packaging or documentation fixes instead of creating a new tag.
