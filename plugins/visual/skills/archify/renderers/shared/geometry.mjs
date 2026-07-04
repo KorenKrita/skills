@@ -24,6 +24,56 @@ export function rectsOverlap(a, b, gap = 0) {
   );
 }
 
+export function segmentIntersectsRect(segment, rect, gap = 0) {
+  const box = {
+    x1: rect.x - gap,
+    y1: rect.y - gap,
+    x2: rect.x + rect.width + gap,
+    y2: rect.y + rect.height + gap
+  };
+  const [a, b] = [segment.start, segment.end];
+  if (pointInBox(a, box) || pointInBox(b, box)) return true;
+  return (
+    segmentsIntersect(a, b, [box.x1, box.y1], [box.x2, box.y1]) ||
+    segmentsIntersect(a, b, [box.x2, box.y1], [box.x2, box.y2]) ||
+    segmentsIntersect(a, b, [box.x2, box.y2], [box.x1, box.y2]) ||
+    segmentsIntersect(a, b, [box.x1, box.y2], [box.x1, box.y1])
+  );
+}
+
+function pointInBox(point, box) {
+  return point[0] >= box.x1 && point[0] <= box.x2 && point[1] >= box.y1 && point[1] <= box.y2;
+}
+
+function segmentsIntersect(a, b, c, d) {
+  const o1 = orientation(a, b, c);
+  const o2 = orientation(a, b, d);
+  const o3 = orientation(c, d, a);
+  const o4 = orientation(c, d, b);
+
+  if (o1 === 0 && onSegment(a, c, b)) return true;
+  if (o2 === 0 && onSegment(a, d, b)) return true;
+  if (o3 === 0 && onSegment(c, a, d)) return true;
+  if (o4 === 0 && onSegment(c, b, d)) return true;
+
+  return o1 !== o2 && o3 !== o4;
+}
+
+function orientation(a, b, c) {
+  const value = (b[1] - a[1]) * (c[0] - b[0]) - (b[0] - a[0]) * (c[1] - b[1]);
+  if (Math.abs(value) < 0.0001) return 0;
+  return value > 0 ? 1 : 2;
+}
+
+function onSegment(a, b, c) {
+  return (
+    b[0] <= Math.max(a[0], c[0]) &&
+    b[0] >= Math.min(a[0], c[0]) &&
+    b[1] <= Math.max(a[1], c[1]) &&
+    b[1] >= Math.min(a[1], c[1])
+  );
+}
+
 export function anchor(rect, side) {
   switch (side) {
     case 'left': return [rect.x, rect.cy];

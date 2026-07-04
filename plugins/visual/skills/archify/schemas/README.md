@@ -7,7 +7,7 @@ against one of the schemas in this folder before any layout work happens.
 
 | Schema | Governs | Structural arrays |
 |--------|---------|-------------------|
-| `workflow.schema.json` | `diagram_type: "workflow"` | `lanes`, `nodes`, `edges` |
+| `workflow.schema.json` | `diagram_type: "workflow"` | `lanes`, `phases`, `groups`, `mainPath`, `nodes`, `edges` |
 | `sequence.schema.json` | `diagram_type: "sequence"` | `participants`, `segments`, `messages`, `activations` |
 | `dataflow.schema.json` | `diagram_type: "dataflow"` | `stages`, `nodes`, `flows` |
 | `lifecycle.schema.json` | `diagram_type: "lifecycle"` | `lanes`, `states`, `transitions` |
@@ -18,6 +18,9 @@ Every diagram schema requires `schema_version`, `diagram_type`, `meta` (with
 `title`), and its structural arrays — except `segments`, `activations`, and
 `cards`, which are optional — and sets `additionalProperties: false` at every
 level, so unknown fields are rejected rather than silently ignored.
+
+Every `meta` object also accepts `animation: "trace"` for opt-in SVG/CSS motion
+in generated HTML. Omit it, or set `"none"`, for the default static output.
 
 ## schema_version policy
 

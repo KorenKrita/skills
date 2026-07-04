@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { esc, renderDefinitions, textUnits } from '../shared/utils.mjs';
-import { loadDiagram, writeDiagram, svgRootAttrs } from '../shared/cli.mjs';
+import { animateAttr, loadDiagram, writeDiagram, svgRootAttrs } from '../shared/cli.mjs';
 import {
   asArray,
   isFinitePoint,
@@ -60,6 +60,14 @@ function measureNode(node) {
 }
 
 const nodes = new Map(asArray(dataflow.nodes).map((node) => [node.id, measureNode(node)]));
+const nodeSteps = new Map();
+for (const [index, flow] of asArray(dataflow.flows).entries()) {
+  if (!nodeSteps.has(flow.from)) nodeSteps.set(flow.from, index);
+  if (!nodeSteps.has(flow.to)) nodeSteps.set(flow.to, index + 1);
+}
+for (const [index, node] of asArray(dataflow.nodes).entries()) {
+  if (!nodeSteps.has(node.id)) nodeSteps.set(node.id, index);
+}
 
 function validateDataflow() {
   const problems = [];
@@ -212,16 +220,16 @@ function renderNode(node) {
     ? `\n        <text x="${node.cx}" y="${node.y + node.height - 11}" class="${accent}" font-size="7" text-anchor="middle">${esc(node.tag)}</text>`
     : '';
   return `        <rect x="${node.x}" y="${node.y}" width="${node.width}" height="${node.height}" rx="6" class="c-mask"/>
-        <rect x="${node.x}" y="${node.y}" width="${node.width}" height="${node.height}" rx="6" class="${fill}" stroke-width="1.5"/>
+        <rect x="${node.x}" y="${node.y}" width="${node.width}" height="${node.height}" rx="6" class="${fill}"${animateAttr(dataflow.meta, 'node', nodeSteps.get(node.id))} stroke-width="1.5"/>
         <text x="${node.cx}" y="${node.y + 21}" class="t-primary" font-size="10" font-weight="600" text-anchor="middle">${esc(node.label)}</text>
         <text x="${node.cx}" y="${node.y + 37}" class="t-muted" font-size="7" text-anchor="middle">${esc(node.sublabel || '')}</text>${tag}`;
 }
 
-function renderFlowPath(flow) {
+function renderFlowPath(flow, index) {
   const [cls, marker] = arrowClassMap[flow.variant || 'default'] || arrowClassMap.default;
   const routed = pathFor(flow);
   const strokeWidth = flow.width || (flow.variant === 'emphasis' ? 1.8 : 1.4);
-  return `        <path d="${routed.d}" class="${cls}" stroke-width="${strokeWidth}" marker-end="url(#${marker})"/>`;
+  return `        <path d="${routed.d}" class="${cls}"${animateAttr(dataflow.meta, 'edge', index)} stroke-width="${strokeWidth}" marker-end="url(#${marker})"/>`;
 }
 
 function renderFlowLabel(flow) {

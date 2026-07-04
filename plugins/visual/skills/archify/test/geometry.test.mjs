@@ -9,6 +9,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   rectsOverlap,
+  segmentIntersectsRect,
   asArray,
   isFinitePoint,
   anchor,
@@ -47,6 +48,11 @@ test('rectsOverlap: negative gap shrinks the hit box (label-collision convention
   // does not. This is the sign convention the label checks rely on.
   assert.equal(rectsOverlap(rect(0, 0, 10, 10), rect(9, 0, 10, 10), -2), false);
   assert.equal(rectsOverlap(rect(0, 0, 10, 10), rect(7, 0, 10, 10), -2), true);
+});
+
+test('segmentIntersectsRect: detects an edge crossing a node box', () => {
+  assert.equal(segmentIntersectsRect({ start: [0, 5], end: [20, 5] }, rect(8, 0, 4, 10)), true);
+  assert.equal(segmentIntersectsRect({ start: [0, 20], end: [20, 20] }, rect(8, 0, 4, 10)), false);
 });
 
 test('asArray coerces non-arrays to [] (degraded-mode guard)', () => {
