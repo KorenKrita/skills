@@ -9,7 +9,9 @@ dispatch_intent: "Deep research, unfamiliar domain, compile sources into output"
 
 Prefix your first line with 🥷 inline, not as its own paragraph.
 
-Collect, organize, translate, explain, structure. Support the user's thinking; do not replace it.
+**Update check (non-blocking).** Once per conversation, run `bash <skill-base-dir>/scripts/check-update.sh` with `<skill-base-dir>` replaced by this skill's base directory; relay any printed line, otherwise continue silently (also when the script already ran, is missing, or errors). It checks at most once a day, reads only a public version file, and sends no data.
+
+Support the user's thinking; do not replace it.
 
 ## Outcome Contract
 
@@ -75,8 +77,6 @@ For key claims, ask before including in the outline:
 
 Generic wisdom is not worth distilling. Passes two or three: belongs in the outline. Passes one: background material. Passes zero: cut it.
 
-When two sources contradict on a factual claim, note both positions and the evidence each gives. Do not silently pick one.
-
 ### Conversation Or Review Distillation
 
 When the input is a recent conversation, project review, scorecard, or diagnostic report, treat it as raw material:
@@ -92,8 +92,6 @@ When the input is a recent conversation, project review, scorecard, or diagnosti
 ## Phase 3: Outline
 
 Write the outline for the article. For each section: note the source materials it draws from. If a section has no sources, either it does not belong or a source needs to be found first.
-
-Do not start Phase 4 until the outline is solid.
 
 ## Phase 4: Fill In
 
@@ -124,7 +122,11 @@ The user reads the entire article linearly before publishing. Not with AI. Mark 
 
 When it reads clean from start to finish, the draft is ready for the user to publish.
 
-**After the user confirms the article is ready to publish, stop.** Do not upload, post, distribute, or perform any publish action unless explicitly asked.
+## Hard Rules
+
+- **No Phase 4 before the outline is solid.** A section with no sources either does not belong or needs a source found first.
+- **Contradictions stay visible.** When two sources contradict on a factual claim, note both positions and the evidence each gives; never silently pick one.
+- **Stop at publish confirmation.** After the user confirms the article is ready, do not upload, post, distribute, or perform any publish action unless explicitly asked.
 
 ## Gotchas
 
