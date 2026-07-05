@@ -103,7 +103,7 @@ skills:
     plugin: engineering
     patches:
       - type: replace
-        pattern: "**Update check (non-blocking).** Before starting, run `bash scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
+        pattern: "**Update check (non-blocking).** Once per conversation, run `bash <skill-base-dir>/scripts/check-update.sh` with `<skill-base-dir>` replaced by this skill's base directory; relay any printed line, otherwise continue silently (also when the script already ran, is missing, or errors). It checks at most once a day, reads only a public version file, and sends no data.\n\n"
         with: ""
 
 
@@ -184,7 +184,7 @@ skills:
     plugin: thinking
     patches:
       - type: replace
-        pattern: "**Update check (non-blocking).** Before starting, run `bash scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
+        pattern: "**Update check (non-blocking).** Once per conversation, run `bash <skill-base-dir>/scripts/check-update.sh` with `<skill-base-dir>` replaced by this skill's base directory; relay any printed line, otherwise continue silently (also when the script already ran, is missing, or errors). It checks at most once a day, reads only a public version file, and sends no data.\n\n"
         with: ""
 
 
@@ -201,7 +201,7 @@ skills:
         field: name
         value: core
       - type: replace
-        pattern: "**Update check (non-blocking).** Before starting, run `bash scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
+        pattern: "**Update check (non-blocking).** Once per conversation, run `bash <skill-base-dir>/scripts/check-update.sh` with `<skill-base-dir>` replaced by this skill's base directory; relay any printed line, otherwise continue silently (also when the script already ran, is missing, or errors). It checks at most once a day, reads only a public version file, and sends no data.\n\n"
         with: ""
 
   noai:
@@ -278,7 +278,7 @@ skills:
   ui:
     source:
       repo: tw93/Waza
-      path: skills/design
+      path: skills/ui
       ref: main
     plugin: design
     patches:
@@ -286,7 +286,7 @@ skills:
         field: name
         value: ui
       - type: replace
-        pattern: "**Update check (non-blocking).** Before starting, run `bash scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
+        pattern: "**Update check (non-blocking).** Once per conversation, run `bash <skill-base-dir>/scripts/check-update.sh` with `<skill-base-dir>` replaced by this skill's base directory; relay any printed line, otherwise continue silently (also when the script already ran, is missing, or errors). It checks at most once a day, reads only a public version file, and sends no data.\n\n"
         with: ""
 
   # ─── learning plugin ────────────────────────────────────────────────────────
@@ -299,7 +299,7 @@ skills:
     plugin: learning
     patches:
       - type: replace
-        pattern: "**Update check (non-blocking).** Before starting, run `bash scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
+        pattern: "**Update check (non-blocking).** Once per conversation, run `bash <skill-base-dir>/scripts/check-update.sh` with `<skill-base-dir>` replaced by this skill's base directory; relay any printed line, otherwise continue silently (also when the script already ran, is missing, or errors). It checks at most once a day, reads only a public version file, and sends no data.\n\n"
         with: ""
 
   teach:
@@ -322,7 +322,7 @@ skills:
     plugin: tools
     patches:
       - type: replace
-        pattern: "**Update check (non-blocking).** Before starting, run `bash scripts/check-update.sh` once; if it prints a line, relay it to the user, then continue. It runs at most once a day, only reads a public version file, sends no data, and fails silently.\n\n"
+        pattern: "**Update check (non-blocking).** Once per conversation, run `bash <skill-base-dir>/scripts/check-update.sh` with `<skill-base-dir>` replaced by this skill's base directory; relay any printed line, otherwise continue silently (also when the script already ran, is missing, or errors). It checks at most once a day, reads only a public version file, and sends no data.\n\n"
         with: ""
 
   write-skill:
