@@ -9,6 +9,8 @@ dispatch_intent: "Error, crash, regression, screenshot-reported defect, test fai
 
 Prefix your first line with 🥷 inline, not as its own paragraph.
 
+**Update check (non-blocking).** Once per conversation, run `bash <skill-base-dir>/scripts/check-update.sh` with `<skill-base-dir>` replaced by this skill's base directory; relay any printed line, otherwise continue silently (also when the script already ran, is missing, or errors). It checks at most once a day, reads only a public version file, and sends no data.
+
 A patch applied to a symptom creates a new bug somewhere else.
 
 ## Outcome Contract
@@ -33,9 +35,9 @@ Rationalization warning: "I'll just try this" means no hypothesis, write it firs
 
 ## Durable Context Preflight
 
-See [rules/durable-context.md](../../rules/durable-context.md) for when to read durable context, the read-order budget, and the memory-type mapping.
+See [references/durable-context.md](references/durable-context.md) for when to read durable context, the read-order budget, and the memory-type mapping.
 
-For `/hunt`, diagnostic constraints are `decision`, `preference`, and `principle` entries; `pattern` and `learning` can seed hypotheses. Current code, logs, repro steps, tests, environment versions, and remote state override memory. Durable context is hypothesis fuel only. It never replaces a fresh root-cause sentence, a reproducible symptom list, or evidence from the current state.
+For `/hunt`: durable context is hypothesis fuel only, and current code, logs, and repro evidence override memory. It never replaces a fresh root-cause sentence or a reproducible symptom list.
 
 ## Hard Rules
 
@@ -48,6 +50,7 @@ For `/hunt`, diagnostic constraints are `decision`, `preference`, and `principle
 - **Visual/rendering bugs: static analysis first.** Trace paint layers, stacking contexts, and layer order in DevTools before adding console.log or visual debug overlays. Logs cannot capture what the compositor does. Only add instrumentation after static analysis fails.
 - **Behavioral / lifecycle / async bugs: instrument first, not after failure.** Window lifecycle, event delivery, navigation, focus, timer, state-machine, and async-ordering bugs almost never yield to static reading alone. Do not wait for a failed fix to add logs. The moment your hypothesis involves "this callback fires before/after that one", "this state should be X when Y runs", or "this object should still be alive here", **add the log immediately as part of forming the hypothesis**, before writing any fix. A hypothesis without runtime evidence is a guess; two guesses in a row is the hard-stop signal. Distinguish from visual-rendering bugs (compositor behavior needs DevTools, not logs) and pure-logic bugs (wrong formula, off-by-one) where static analysis is sufficient.
 - **Tuning magic numbers past round three: stop, unify.** When a spacing / sizing / threshold value has been adjusted three times and still looks wrong, the bug is structural, not numeric. Replace the N independent values with one named token (`Spacing.s4`, `--gap-content`, etc.) and verify the asymmetry was hiding a missing constraint. Asymmetry that survives tuning is structural; more tuning will not converge.
+- **Performance complaints need numbers.** For "slow", "laggy", or memory-growth reports outside Native App Freeze Mode, measure the baseline first (wall-clock time, profile sample, memory footprint), fix, then re-measure and report before/after numbers. "Feels faster" is not evidence.
 - **Fix the cause, not the symptom.** If the fix touches more than 5 files, pause and confirm scope with the user.
 
 ## Fix Scope Discipline
@@ -91,7 +94,7 @@ Activate after fixing a root-cause pattern, before declaring the bug done; also 
 1. Extract the pattern signature: the specific function name, regex, API call, CSS selector, lock acquisition, validation skip, or input boundary that produced the bug.
 2. `grep -rn <pattern>` across the repo (exclude generated dirs, build output, vendored deps). For class-of-bug patterns (e.g. "any handler missing the lock"), grep for the surrounding shape, not just the literal text.
 3. List every match. For each one, answer in writing: same bug here? Pick fix / leave (explain why it is safe) / unsure (ask the user). Do not silently skip a match.
-4. Do not claim "fixed" until the blast report is in the Outcome block.
+4. Do not claim "fixed" until the blast report is in the Output block.
 
 Common triggers:
 - Visual bug fixed on one page: check every other page using the same component, layout, or media-query breakpoint.
@@ -103,7 +106,7 @@ If the blast surfaces unrelated bugs, list them but do not fix in this PR unless
 
 ## Confirm or Discard
 
-The instrument-first rule lives in Hard Rules (behavioral/async bugs) above; this is what to do with its result. Run the one probe that would fail if the hypothesis were wrong, then read it. If the evidence contradicts the hypothesis, discard it completely and re-orient on what the probe just showed. Do not stack a fix onto a disproven hypothesis, and do not keep one just because the code "looks like" the cause.
+Run the one probe that would fail if the hypothesis were wrong, then read it. If the evidence contradicts the hypothesis, discard it completely and re-orient on what the probe just showed. Do not stack a fix onto a disproven hypothesis, and do not keep one just because the code "looks like" the cause.
 
 ## Runtime Evidence Ladder
 
@@ -168,14 +171,28 @@ If adding logs changes the behavior, treat that as evidence of a timing, lifecyc
 | Stack trace points deep into a library | Walk back 3 frames into your own code; the bug is almost always there, not in the dependency |
 | Worked when launched from app, broke when opened via file association / drag-drop / deep link / external proxy | Reproduce using the exact entry point the user described. App-internal init differs from cold-launch-with-file init; state may not be ready when the document arrives. |
 | Build passed but UI still looked wrong | Move up the Runtime Evidence Ladder and verify the real rendered surface or artifact. |
+| Fix matched the reporter's setup but changed nothing for everyone else, or regressed the default | A defect report is evidence, not the full scope. State whether the fix changes the default experience for all users or only the reporter's configuration, and prefer fixing the default path. |
 
-## Outcome
+## Rendering Bug Mode
+
+Activate when: "PDF looks wrong", "page break issue", "font not rendering", broken PDF output, or print layout wrong.
+
+Load `references/rendering-debug.md` for the full diagnosis checklist (WeasyPrint quirks, font loading, page overflow, browser print CSS). Static analysis first, then reproduce if needed.
+
+## IME / Unicode Issues
+
+For input method, character rendering, or text encoding bugs (IME state, cursor drift, emoji splitting, composition events), check `references/ime-unicode.md` first before forming a hypothesis.
+
+## Output
 
 ### Success Format
+
+Open the wrap-up with one plain line stating the outcome and whether the changes are committed; the block below supports that line, it does not replace it.
 
 ```
 Root cause:        [what was wrong, file:line]
 Fix:               [what changed, file:line]
+Sibling sweep:     [N same-shape sites checked, N fixed / none found / not run, why]
 Confirmed:         [evidence or test that proves the fix]
 Tests:             [pass/fail count, regression test location]
 Regression guard:  [test file:line] or [none, reason]
@@ -218,13 +235,3 @@ Suggested Next Steps:
 ```
 
 Status: **blocked**
-
-## Rendering Bug Mode
-
-Activate when: "PDF looks wrong", "page break issue", "font not rendering", broken PDF output, or print layout wrong.
-
-Load `references/rendering-debug.md` for the full diagnosis checklist (WeasyPrint quirks, font loading, page overflow, browser print CSS). Static analysis first, then reproduce if needed.
-
-## IME / Unicode Issues
-
-For input method, character rendering, or text encoding bugs (IME state, cursor drift, emoji splitting, composition events), check `references/ime-unicode.md` first before forming a hypothesis.
