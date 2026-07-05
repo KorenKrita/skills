@@ -36,6 +36,12 @@
         "output": {
           "type": "string"
         },
+        "animation": {
+          "enum": [
+            "trace",
+            "none"
+          ]
+        },
         "viewBox": {
           "type": "array",
           "prefixItems": [

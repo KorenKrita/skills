@@ -4,15 +4,15 @@ import { applyTemplate, renderCards, esc } from './utils.mjs';
 import { validateSchema } from './validator.mjs';
 
 // Common CLI head: node render-<type>.mjs [input.json] [output.html]
-export function loadDiagram({ rendererDir, diagramType, defaultExample }) {
+export function loadDiagram({ rendererDir, diagramType, defaultExample, argv = process.argv }) {
   const skillRoot = path.resolve(rendererDir, '../..');
-  const inputPath = path.resolve(process.argv[2] || path.join(skillRoot, 'examples', defaultExample));
+  const inputPath = path.resolve(argv[2] || path.join(skillRoot, 'examples', defaultExample));
   const diagram = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
   validateSchema(diagramType, diagram);
   const template = fs.readFileSync(path.join(skillRoot, 'assets/template.html'), 'utf8');
   // Optional chaining: in degraded mode (no ajv) malformed input must still
   // reach the renderer's friendly layout checks instead of crashing here.
-  const outPath = path.resolve(process.cwd(), process.argv[3] || diagram.meta?.output || `${diagramType}.html`);
+  const outPath = path.resolve(process.cwd(), argv[3] || diagram.meta?.output || `${diagramType}.html`);
   return { diagram, template, outPath };
 }
 
@@ -33,5 +33,12 @@ export function writeDiagram({ outPath, template, meta, footerLabel, svg, cards 
 // Accessible name for the generated diagram SVG.
 export function svgRootAttrs(meta, kind) {
   const name = meta.subtitle ? `${meta.title} — ${meta.subtitle}` : meta.title;
-  return `role="img" aria-label="${esc(`${name} (${kind})`)}"`;
+  const animation = meta.animation === 'trace' ? ' data-animation="trace"' : '';
+  return `role="img" aria-label="${esc(`${name} (${kind})`)}"${animation}`;
+}
+
+export function animateAttr(meta, kind, step) {
+  if (meta.animation !== 'trace') return '';
+  const safeStep = Number.isFinite(step) && step >= 0 ? Math.floor(step) : 0;
+  return ` data-animate="${kind}" style="--step:${safeStep}"`;
 }
