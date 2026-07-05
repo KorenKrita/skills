@@ -14,9 +14,6 @@
   "improve": {
     "sha": "03369ee6d7cafbfcecc4346539b05b3dc0a603bb"
   },
-  "hunt": {
-    "sha": "b6fd6252bfb44d4b043fa3add91bbe2aedf08f69"
-  },
   "ocr": {
     "sha": "63b0f02d2715e183e0405bfef12b0f18e51b86de"
   },
@@ -37,12 +34,6 @@
   },
   "grill-with-docs": {
     "sha": "2454c95dc305c158b21a0cdafeb728879dd0359a"
-  },
-  "think": {
-    "sha": "b6fd6252bfb44d4b043fa3add91bbe2aedf08f69"
-  },
-  "core": {
-    "sha": "b6fd6252bfb44d4b043fa3add91bbe2aedf08f69"
   },
   "noai": {
     "sha": "91f3d394db8419c20d67ebe22a96cf8fee0a404b"
@@ -65,14 +56,8 @@
   "ui": {
     "sha": "1bc6113180ec7a1b56f3e9027a404a29bafade27"
   },
-  "learn": {
-    "sha": "b6fd6252bfb44d4b043fa3add91bbe2aedf08f69"
-  },
   "teach": {
     "sha": "2454c95dc305c158b21a0cdafeb728879dd0359a"
-  },
-  "read": {
-    "sha": "b6fd6252bfb44d4b043fa3add91bbe2aedf08f69"
   },
   "write-skill": {
     "sha": "8370e760d0251a3738e006aeacec6d1cb31dd208"
