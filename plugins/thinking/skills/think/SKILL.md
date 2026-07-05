@@ -9,6 +9,8 @@ dispatch_intent: "New feature, architecture, how should I design this, value jud
 
 Prefix your first line with 🥷 inline, not as its own paragraph.
 
+**Update check (non-blocking).** Once per conversation, run `bash <skill-base-dir>/scripts/check-update.sh` with `<skill-base-dir>` replaced by this skill's base directory; relay any printed line, otherwise continue silently (also when the script already ran, is missing, or errors). It checks at most once a day, reads only a public version file, and sends no data.
+
 Turn a rough idea into an approved plan. No code, no scaffolding, no pseudo-code until the user approves.
 
 Give opinions directly. Take a position and state what evidence would change it. Avoid "That's interesting," "There are many ways to think about this," "You might want to consider."
@@ -22,9 +24,9 @@ Give opinions directly. Take a position and state what evidence would change it.
 
 ## Durable Context Preflight
 
-See [rules/durable-context.md](../../rules/durable-context.md) for when to read durable context, the read-order budget, and the memory-type mapping (planning constraints, reusable patterns, facts that need re-verification against current state).
+See [references/durable-context.md](references/durable-context.md) for when to read durable context, the read-order budget, and the memory-type mapping (planning constraints, reusable patterns, facts that need re-verification against current state).
 
-For `/think`, planning constraints are `decision`, `preference`, and `principle` entries; current repo state, live docs, logs, tests, and remote state override memory. Lock durable decisions and preferences before asking questions. Do not ask the user to restate an intent that the durable context already establishes unless it is risky, stale, or contradicted by current state.
+For `/think`: current repo state and live docs override memory. Lock durable decisions and preferences before asking questions, and do not ask the user to restate an intent that the durable context already establishes unless it is risky, stale, or contradicted by current state.
 
 Before outputting any plan, scan the project's `AGENTS.md`, `CLAUDE.md`, `.claude/rules/*.md`, and any local agent-memory summary if the user pointed at one. If the proposed plan contradicts a "hard rule", "never X", "must Y", or "prefer Z" stated in those files, surface the contradiction in the plan output (one sentence: which rule, which step contradicts it, recommended resolution). Do not silently override the rule. If the rule blocks the plan, stop and ask before continuing.
 
@@ -76,7 +78,7 @@ Do not treat the bundle as a to-do list. Classify each item first:
 
 Output the classification table first. Wait for the user to confirm the accepted subset before implementing anything. "Already works" misidentified as missing is the most common waste; grep for the existing affordance before classifying an item as a gap.
 
-**Negative-user feedback is not automatic scope.** When a user evaluation is triggered by a refund customer, a churn report, or a "competitor X is more intuitive" comparison, do not convert the complaint into a rework plan by default. First check whether the current behavior is intentional product differentiation, not an oversight: read the project's own AGENTS.md / CLAUDE.md / product notes for phrases like "review-first", "verifiability over speed", "evidence-driven", "explicit confirmation". If the behavior the user criticized is named there as a deliberate choice, the verdict is **Keep**, with one sentence on why the differentiation matters, and a note that the maintainer can override. Do not write a "fix the friction" plan that quietly removes the differentiator. The signal-to-respect ratio for refund / competitor-comparison feedback on a deliberately-designed surface is low.
+**Negative-user feedback is not automatic scope.** Refund, churn, and "competitor X is more intuitive" complaints often land on deliberate product differentiation, not an oversight. Before converting the complaint into a rework plan, read the project's own docs for the criticized behavior named as a deliberate choice; if it is, the verdict is **Keep**, with one sentence on why the differentiation matters and a note that the maintainer can override. Do not write a "fix the friction" plan that quietly removes the differentiator.
 
 ## Before Reading Any Code
 
@@ -110,7 +112,7 @@ For the recommendation, identify the most fragile assumption (premise collapse) 
 
 If an attack holds, deform the design to survive it. If it shatters the approach entirely, discard it and tell the user why. Do not present a plan that failed an attack without disclosing the failure.
 
-Get approval before proceeding. If the user rejects, ask specifically what did not work. Do not restart from scratch.
+Get approval before proceeding.
 
 ## Validate Before Handing Off
 
@@ -120,16 +122,6 @@ Get approval before proceeding. If the user rejects, ask specifically what did n
 - Can this be rolled back without touching data?
 - Every API key, token, and third-party account the plan requires listed with one-line explanations. No credential requests mid-implementation.
 - Every MCP server, external API, and third-party CLI the plan depends on verified as reachable before approval.
-
-**No placeholders in approved plans.** Every step must be concrete before approval. Forbidden patterns: TBD, TODO, "implement later," "similar to step N," "details to be determined." A plan with placeholders is a promise to plan later.
-
-**Phase independence.** If the plan has multiple phases, each phase must be independently mergeable: after Phase N ships, the system is in a usable state, even if N+1 never lands. Plans that require all phases to complete before anything works are fragile (one stuck phase blocks the whole release) and waste review effort. If the work cannot be cut into mergeable phases, say so and ship it as one phase instead of pretending it is staged.
-
-**Plan red flags (self-check before handoff):**
-- A phase depends on the next phase to be useful (cannot ship alone).
-- A "Phase 0: investigate / spike" exists. Investigation belongs before the plan, not inside it.
-
-Either red flag means the plan is not ready. Resolve it before handing off.
 
 ## Implementation Handoff
 
@@ -145,6 +137,12 @@ A finished plan must be executable by another engineer or agent without re-decid
 When the user asks to export a handoff, or when the environment prevents further execution, make the handoff execution-ready instead of explaining the limitation. Include file targets, key constants or selectors, exact commands, runtime or visual checklist, and risk boundaries. If the work depends on a screenshot or artifact, name the artifact and the pass/fail delta.
 
 When the user later says "Implement the plan", "可以干", "直接改", "整", or equivalent, treat that as approval of the written plan. Do not re-litigate the design. State which plan is being executed, check for obvious drift in the repo, and proceed. If the environment has changed enough that the plan is unsafe, name the specific drift and stop before editing.
+
+## Hard Rules
+
+- **No placeholders in approved plans.** Every step must be concrete before approval. Forbidden patterns: TBD, TODO, "implement later," "similar to step N," "details to be determined." A plan with placeholders is a promise to plan later.
+- **Phase independence.** If the plan has multiple phases, each phase must be independently mergeable: after Phase N ships, the system is in a usable state, even if N+1 never lands. Plans that require all phases to complete before anything works are fragile (one stuck phase blocks the whole release) and waste review effort. If the work cannot be cut into mergeable phases, say so and ship it as one phase instead of pretending it is staged.
+- **Plan red flags (self-check before handoff):** a phase depends on the next phase to be useful, or a "Phase 0: investigate / spike" exists (investigation belongs before the plan, not inside it). Either red flag means the plan is not ready; resolve it before handing off.
 
 ## Gotchas
 
