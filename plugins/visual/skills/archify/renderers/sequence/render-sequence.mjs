@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { esc, renderDefinitions, textUnits } from '../shared/utils.mjs';
-import { loadDiagram, writeDiagram, svgRootAttrs } from '../shared/cli.mjs';
+import { animateAttr, loadDiagram, writeDiagram, svgRootAttrs } from '../shared/cli.mjs';
 import { componentFill, arrowClassMap, rectsOverlap, asArray, isFinitePoint } from '../shared/geometry.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -151,7 +151,7 @@ function validateSequence() {
 function renderParticipant(participant) {
   const fill = componentFill[participant.type] || 'c-external';
   return `        <rect x="${participant.x}" y="${layout.topY}" width="${layout.participantW}" height="${layout.participantH}" rx="6" class="c-mask"/>
-        <rect x="${participant.x}" y="${layout.topY}" width="${layout.participantW}" height="${layout.participantH}" rx="6" class="${fill}" stroke-width="1.5"/>
+        <rect x="${participant.x}" y="${layout.topY}" width="${layout.participantW}" height="${layout.participantH}" rx="6" class="${fill}"${animateAttr(sequence.meta, 'node', participant.index)} stroke-width="1.5"/>
         <text x="${participant.cx}" y="${layout.topY + 22}" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">${esc(participant.label)}</text>
         <text x="${participant.cx}" y="${layout.topY + 39}" class="t-muted" font-size="7" text-anchor="middle">${esc(participant.sublabel)}</text>`;
 }
@@ -189,7 +189,7 @@ function messageLabel(message, x1, x2) {
         <text x="${center}" y="${y}" class="${accent}" font-size="9" text-anchor="middle">${esc(message.label)}</text>`;
 }
 
-function renderMessage(message) {
+function renderMessage(message, index) {
   const from = participants.get(message.from);
   const to = participants.get(message.to);
   const direction = to.cx > from.cx ? 1 : -1;
@@ -201,7 +201,7 @@ function renderMessage(message) {
   const note = message.note
     ? `\n        <text x="${Math.min(start, end) + 12}" y="${message.y + 18}" class="t-dim" font-size="7">${esc(message.note)}</text>`
     : '';
-  return `        <path d="M ${start} ${message.y} L ${end} ${message.y}" class="${cls}" stroke-width="${strokeWidth}"${dash} marker-end="url(#${marker})"/>
+  return `        <path d="M ${start} ${message.y} L ${end} ${message.y}" class="${cls}"${animateAttr(sequence.meta, 'edge', index)} stroke-width="${strokeWidth}"${dash} marker-end="url(#${marker})"/>
 ${messageLabel(message, start, end)}${note}`;
 }
 

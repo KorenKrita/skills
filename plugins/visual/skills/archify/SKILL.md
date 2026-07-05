@@ -3,7 +3,7 @@ name: archify
 description: Create professional architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as standalone HTML files with SVG graphics, a built-in dark/light theme toggle, and one-click export to PNG / JPEG / WebP / SVG. Accepts plain-language descriptions or pasted Mermaid code (flowchart, sequenceDiagram, stateDiagram) and lays the diagram out from scratch in archify style. Use when the user asks for system architecture diagrams, infrastructure diagrams, cloud architecture visualizations, security diagrams, network topology, technical workflows, approval flows, runbooks, CI/CD flows, process diagrams, API call sequences, request lifecycles, data pipelines, ETL/ELT maps, PII boundaries, data lineage, state machines, lifecycle diagrams, status transitions, or asks to convert/beautify a Mermaid diagram.
 license: MIT
 metadata:
-  version: "2.6"
+  version: "2.10"
   author: tt-a1i
   based_on: Cocoon-AI/architecture-diagram-generator (MIT, v1.0)
 ---
@@ -16,7 +16,7 @@ Every diagram ships with a **dark/light theme toggle** (persists in `localStorag
 
 ## Setup (one-time, renderer modes only)
 
-The four typed renderers validate JSON against schemas via `ajv`. From this skill's folder:
+The five typed renderers validate JSON against schemas via `ajv`. From this skill's folder:
 
 ```bash
 npm install
@@ -50,16 +50,33 @@ When the user pastes Mermaid code, do NOT try to render or parse it mechanically
 
 Drop Mermaid styling; keep only the topology and meaning. You choose grouping, lane order, and what deserves emphasis — that judgment is the product.
 
-## Renderer Modes (workflow / sequence / dataflow / lifecycle)
+## Layout principles (read before placing)
 
-All four modes follow the same loop:
+Archify's readability comes from **spatial narrative**, not from drawing every dependency as an arrow. Before you write coordinates or edge lists, plan one clear story:
 
-1. **Read first**: the schema (`schemas/<type>.schema.json`) and the complete worked example (`examples/*.{workflow,sequence,dataflow,lifecycle}.json`) — copy its patterns instead of guessing field shapes.
+1. **One main path** — left → right (architecture) or lane → column (workflow). The reader should trace the happy path without crossing lines.
+2. **Few labeled edges** — label only cross-boundary or non-obvious transitions on the main path. Adjacent steps stay unlabeled.
+3. **Short side branches** — permissions, storage, bots, CI: connect **up or down** from the nearest node on the main path. Never route a secondary edge diagonally across unrelated components.
+4. **Cards for detail** — policies, tech stack notes, and "also connects to X" belong in summary cards, not as extra arrows.
+5. **Mode fit** — process / approval / tool-call stories → `workflow` or `sequence`. Component maps with ≤12 nodes → `architecture`. If the diagram needs 20+ edges, remove edges until the main path is obvious.
+
+Worked examples on this pattern: `examples/archify-repo.architecture.json` (this repo) and `examples/maka-architecture.architecture.json` (third-party desktop app).
+
+When validation fails on label overlap, read the **Suggested fix** lines (coordinates / `labelAt` / `labelDy`) and apply them directly — do not guess offsets blindly.
+
+## Renderer Modes (architecture / workflow / sequence / dataflow / lifecycle)
+
+All five modes follow the same loop:
+
+1. **Read first**: the schema (`schemas/<type>.schema.json`) and the complete worked example (`examples/*.{architecture,workflow,sequence,dataflow,lifecycle}.json`) — copy its patterns instead of guessing field shapes.
 2. Write `<name>.<type>.json`.
-3. Render: `node renderers/<type>/render-<type>.mjs <input>.json <output>.html` (paths relative to this skill's folder).
-4. If it fails, the error names the JSON path or the fix (thresholds, valid ranges, which knob to change). Fix the JSON and re-run; never edit the renderer.
+3. Render: `node bin/archify.mjs render <type> <input>.json <output>.html` (paths relative to this skill's folder).
+4. Validate the generated artifact: `node bin/archify.mjs validate <type> <input>.json --json`, or check an existing HTML file with `node bin/archify.mjs check <output>.html`. This catches malformed SVG output, non-finite SVG values, two-point diagonal arrows, and arrows crossing the legend.
+5. If either step fails, the error names the JSON path or the fix (thresholds, valid ranges, which knob to change). Fix the JSON and re-run; never edit the renderer.
 
-Schema violations exit non-zero with path-prefixed messages like `/nodes/3 (id/label: "router") must NOT have additional properties`. The renderers additionally fail fast on layout problems: node/state overlap (including cross-lane), labels colliding with nodes or other labels, labels wider than their node, out-of-range columns/rows, too-short edges, and legends outside the viewBox. CJK text is measured at double width automatically.
+Schema violations exit non-zero with path-prefixed messages like `/nodes/3 (id/label: "router") must NOT have additional properties`. The renderers additionally fail fast on layout problems: node/state overlap (including cross-lane), labels colliding with nodes or other labels, labels wider than their node, out-of-range columns/rows, too-short edges, workflow edges crossing unrelated nodes, and legends outside the viewBox. CJK text is measured at double width automatically.
+
+Set `meta.animation: "trace"` only when the user asks for motion or a presentation/demo view. It adds lightweight SVG/CSS trace animation to renderer-marked arrows and nodes, respects `prefers-reduced-motion`, and leaves the default static output unchanged.
 
 ### Workflow
 
@@ -68,7 +85,10 @@ Schema violations exit non-zero with path-prefixed messages like `/nodes/3 (id/l
   "schema_version": 1,
   "diagram_type": "workflow",
   "meta": { "title": "Release Workflow", "subtitle": "PR to production", "output": "release.html" },
-  "lanes": [ { "id": "dev", "label": "Developer" }, { "id": "ci", "label": "CI" } ],
+  "lanes": [ { "id": "dev", "label": "Developer" }, { "id": "ci", "label": "CI" }, { "id": "exceptions", "label": "Exception Handling", "variant": "exception" } ],
+  "phases": [ { "id": "intake", "label": "Intake", "fromCol": 0, "toCol": 1 } ],
+  "groups": [ { "id": "checks", "label": "Parallel checks", "lane": "ci", "fromCol": 1, "toCol": 3, "variant": "emphasis" } ],
+  "mainPath": ["pr", "build"],
   "nodes": [
     { "id": "pr", "lane": "dev", "col": 0, "type": "frontend", "label": "Open PR", "sublabel": "feature branch" },
     { "id": "build", "lane": "ci", "col": 1, "type": "backend", "label": "Build", "sublabel": "lint + test", "tag": "blocking" }
@@ -80,7 +100,7 @@ Schema violations exit non-zero with path-prefixed messages like `/nodes/3 (id/l
 }
 ```
 
-**Layout budget**: 6 columns (`col` 0–5) at fixed x positions `[88, 220, 300, 430, 500, 625]` — columns 1↔2 and 3↔4 are only 70–80px apart, so default-width (92px) nodes in those adjacent columns of the same lane overlap; skip a column or shrink `width`. Lane content width is 640px. Omit `meta.viewBox` — the renderer sizes height to the lane count automatically. Edge routes: `straight`, `drop` (bend between lanes; `bias` 0–1 picks where), `outside-right`, `return-left`, `bottom-channel`, `up-channel`, or explicit `via` points. Keep adjacent-step edges unlabeled; reserve labels for cross-lane transitions, approvals, async writes, and returns.
+**Layout budget**: 6 columns (`col` 0–5) at fixed x positions `[88, 220, 300, 430, 500, 625]` — columns 1↔2 and 3↔4 are only 70–80px apart, so default-width (92px) nodes in those adjacent columns of the same lane overlap; skip a column or shrink `width`. Lane content width is 640px. Omit `meta.viewBox` — the renderer sizes height to the lane count automatically. Use `phases` for top-of-diagram story beats, `groups` to frame parallel work or a branch inside one lane, and `lane.variant: "exception"` for error/retry/fallback lanes. `mainPath` is optional but recommended: list the happy-path node ids in order so the renderer can catch missing edges or accidental backward movement. Edge routes: `straight`, `drop` (bend between lanes; `bias` 0–1 picks where), `outside-right`, `return-left`, `bottom-channel`, `up-channel`, or explicit `via` points. Keep adjacent-step edges unlabeled; reserve labels for cross-lane transitions, approvals, async traces, and returns.
 
 ### Sequence
 
@@ -184,11 +204,37 @@ Architecture has the same read-schema-then-render loop as the other modes — pr
 }
 ```
 
-Render: `node renderers/architecture/render-architecture.mjs <input>.json <output>.html`.
+Render: `node bin/archify.mjs render architecture <input>.json <output>.html`.
+
+**Free placement** — `pos: [x, y]` is the component's top-left; `size: [w, h]` defaults to `[120, 60]`. Unlike typed modes there is no lane/stage grid — asymmetric placement is yours to choose. `meta.viewBox` is optional (auto-fitted).
+
+**Grid placement (#8)** — when manual coordinates are painful, set semantic cells instead of doing arithmetic:
+
+```json
+{
+  "layout": { "mode": "grid", "cols": 7, "origin": [40, 100], "gapX": 24, "gapY": 48, "cellW": 120, "cellH": 60 },
+  "components": [
+    { "id": "agents", "type": "frontend", "label": "Agent Hosts", "row": 1, "col": 1 },
+    { "id": "ir", "type": "messagebus", "label": "JSON IR", "row": 1, "col": 2 }
+  ]
+}
+```
+
+`pos` still wins when present (override one cell). This is **not** auto-layout — spacing is fixed cell math. Example: `examples/archify-repo-grid.architecture.json`.
+
+**Inspect layout (#9)** — after editing JSON, dump computed boxes without opening HTML:
+
+```bash
+node bin/archify.mjs inspect architecture my.architecture.json
+# or: node bin/archify.mjs validate architecture my.architecture.json --layout-json
+```
+
+Output includes component rects, boundaries, connection point paths, and label positions.
 
 **The renderer does the mechanical work that used to be hand-tuned**, so you only choose coordinates and meaning:
 
 - **Free coordinates** — `pos: [x, y]` is the component's top-left; `size: [w, h]` defaults to `[120, 60]`. Unlike the typed modes there is no lane/stage grid — asymmetric placement is yours to choose. `meta.viewBox` is optional (auto-fitted to your components + a legend row).
+- **Grid placement** — optional `layout.mode: "grid"` with `row`/`col` per component (see above). Not dagre; fixed cell spacing only.
 - **Boundaries from `wraps`** — list the component ids a `region` (dashed amber) or `security-group` (dashed rose) encloses; the renderer computes the box with correct 30/50 padding automatically. Never hand-arithmetic a boundary again.
 - **Connections** route like edges (`variant`, `fromSide`/`toSide`, `route: straight|orthogonal-h|orthogonal-v|auto`, `via`, `labelDx/labelDy/labelAt`). For a vertical labeled connection, push the label into the gap with `labelDy` (the validator will tell you if it lands on a box).
 - The renderer auto-emits the two-rect `c-mask` pattern, draws arrows before boxes (z-order), builds the legend from the component types you used, and **fails fast on component overlap, off-canvas components/boundaries, unknown wraps/connection ids, label-vs-component collisions, and non-finite coordinates** — the same reliability the other four modes already had.

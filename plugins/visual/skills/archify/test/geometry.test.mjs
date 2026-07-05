@@ -9,6 +9,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   rectsOverlap,
+  segmentIntersectsRect,
   asArray,
   isFinitePoint,
   anchor,
@@ -18,8 +19,10 @@ import {
   polylinePath,
   roundedPath,
   labelPoint,
+  suggestLabelObstacleFix,
+  suggestComponentSeparation,
 } from '../renderers/shared/geometry.mjs';
-import { textUnits } from '../renderers/shared/utils.mjs';
+import { textUnits, applyTemplate } from '../renderers/shared/utils.mjs';
 
 const rect = (x, y, w, h) => ({ x, y, width: w, height: h, cx: x + w / 2, cy: y + h / 2 });
 
@@ -47,6 +50,11 @@ test('rectsOverlap: negative gap shrinks the hit box (label-collision convention
   // does not. This is the sign convention the label checks rely on.
   assert.equal(rectsOverlap(rect(0, 0, 10, 10), rect(9, 0, 10, 10), -2), false);
   assert.equal(rectsOverlap(rect(0, 0, 10, 10), rect(7, 0, 10, 10), -2), true);
+});
+
+test('segmentIntersectsRect: detects an edge crossing a node box', () => {
+  assert.equal(segmentIntersectsRect({ start: [0, 5], end: [20, 5] }, rect(8, 0, 4, 10)), true);
+  assert.equal(segmentIntersectsRect({ start: [0, 20], end: [20, 20] }, rect(8, 0, 4, 10)), false);
 });
 
 test('asArray coerces non-arrays to [] (degraded-mode guard)', () => {
@@ -141,4 +149,38 @@ test('textUnits: ASCII=1, CJK=2, mixed sums, fullwidth supplementary=2', () => {
   assert.equal(textUnits(null), 0);
   assert.equal(textUnits('𠀀'), 2); // CJK Ext-B (supplementary plane)
   assert.equal(textUnits('🚀'), 2); // emoji
+});
+
+test('suggestLabelObstacleFix includes rects and labelAt/labelDy hints', () => {
+  const labelRect = { x: 100, y: 180, width: 48, height: 14, label: '写入' };
+  const obstacle = { id: 'memtool', x: 30, y: 130, width: 230, height: 58 };
+  const hint = suggestLabelObstacleFix(labelRect, 124, 188, obstacle);
+  assert.match(hint, /label rect: \[100, 180, 48, 14\]/);
+  assert.match(hint, /component "memtool"/);
+  assert.match(hint, /Suggested fix: labelAt/);
+  assert.match(hint, /labelDy \+\d+/);
+});
+
+test('suggestComponentSeparation proposes nudged pos', () => {
+  const a = { id: 'api', x: 100, y: 200, width: 120, height: 60 };
+  const b = { id: 'db', x: 150, y: 200, width: 120, height: 60 };
+  const hint = suggestComponentSeparation(a, b, 8);
+  assert.match(hint, /move "db" pos to \[228, 200\]/);
+});
+
+test('applyTemplate preserves dollar sequences in titles', () => {
+  const template = `<title>[PROJECT NAME] Architecture Diagram</title>
+<h1>[PROJECT NAME] Architecture</h1>
+<p class="subtitle">[Subtitle description]</p>
+      <!-- ARCHIFY:SVG_SLOT_START --><svg></svg>      <!-- ARCHIFY:SVG_SLOT_END -->
+    <!-- ARCHIFY:CARDS_SLOT_START --><div></div>    <!-- ARCHIFY:CARDS_SLOT_END -->
+[Project Name] &bull; [Additional metadata]`;
+  const html = applyTemplate(template, {
+    title: 'Plan $$50 tier',
+    subtitle: 'test',
+    footer: 'f',
+    svg: '<svg/>',
+    cards: '',
+  });
+  assert.match(html, /Plan \$\$50 tier/);
 });

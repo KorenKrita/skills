@@ -71,7 +71,7 @@ function assertFriendlyFailure(mode, doc, label) {
 
 // ---- type-wrong-but-JSON-legal documents per mode ----
 const ARRAY_FIELDS = {
-  workflow: ['lanes', 'nodes', 'edges', 'cards'],
+  workflow: ['lanes', 'phases', 'groups', 'mainPath', 'nodes', 'edges', 'cards'],
   sequence: ['participants', 'messages', 'segments', 'activations', 'cards'],
   dataflow: ['stages', 'nodes', 'flows', 'cards'],
   lifecycle: ['lanes', 'states', 'transitions', 'cards'],

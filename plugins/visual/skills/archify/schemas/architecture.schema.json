@@ -16,6 +16,7 @@
         "title": { "type": "string", "minLength": 1 },
         "subtitle": { "type": "string" },
         "output": { "type": "string" },
+        "animation": { "enum": ["trace", "none"] },
         "viewBox": {
           "type": "array",
           "prefixItems": [
@@ -28,19 +29,35 @@
         }
       }
     },
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode"],
+      "properties": {
+        "mode": { "enum": ["grid"] },
+        "origin": { "$ref": "common.schema.json#/$defs/point" },
+        "cols": { "type": "integer", "minimum": 1, "maximum": 12 },
+        "gapX": { "type": "number", "minimum": 0 },
+        "gapY": { "type": "number", "minimum": 0 },
+        "cellW": { "type": "number", "minimum": 40 },
+        "cellH": { "type": "number", "minimum": 24 }
+      }
+    },
     "components": {
       "type": "array",
       "minItems": 1,
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "type", "label", "pos"],
+        "required": ["id", "type", "label"],
         "properties": {
           "id": { "$ref": "common.schema.json#/$defs/id" },
           "type": { "$ref": "common.schema.json#/$defs/componentType" },
           "label": { "type": "string", "minLength": 1 },
           "sublabel": { "type": "string" },
           "tag": { "type": "string" },
+          "row": { "type": "integer", "minimum": 0 },
+          "col": { "type": "integer", "minimum": 0 },
           "pos": { "$ref": "common.schema.json#/$defs/point" },
           "size": { "$ref": "common.schema.json#/$defs/point" }
         }

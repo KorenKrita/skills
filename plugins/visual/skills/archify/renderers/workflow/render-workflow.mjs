@@ -1,11 +1,14 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { esc, renderDefinitions, textUnits } from '../shared/utils.mjs';
-import { loadDiagram, writeDiagram, svgRootAttrs } from '../shared/cli.mjs';
+import { animateAttr, loadDiagram, writeDiagram, svgRootAttrs } from '../shared/cli.mjs';
 import {
   asArray,
   isFinitePoint,
   rectsOverlap,
+  segmentIntersectsRect,
+  suggestLabelObstacleFix,
+  suggestLabelPairFix,
   anchor,
   defaultFromSide,
   defaultToSide,
@@ -77,6 +80,18 @@ function measureNode(node) {
 
 const nodes = new Map(asArray(workflow.nodes).map((node) => [node.id, measureNode(node)]));
 
+const mainPathSteps = new Map(asArray(workflow.mainPath).map((id, index) => [id, index]));
+const edgeSteps = new Map(asArray(workflow.edges).map((edge, index) => {
+  const fromStep = mainPathSteps.get(edge.from);
+  const toStep = mainPathSteps.get(edge.to);
+  const mainStep = Number.isInteger(fromStep) && toStep === fromStep + 1 ? fromStep : null;
+  return [edge, mainStep ?? asArray(workflow.mainPath).length + index];
+}));
+
+function nodeStep(node) {
+  return mainPathSteps.get(node.id) ?? asArray(workflow.mainPath).length + asArray(workflow.nodes).findIndex((item) => item.id === node.id);
+}
+
 function validateWorkflow() {
   const problems = [];
   if (workflow.schema_version !== 1) {
@@ -97,6 +112,15 @@ function validateWorkflow() {
   if (!Array.isArray(workflow.edges)) {
     problems.push('Workflow files must include an edges array.');
   }
+  if (workflow.phases !== undefined && !Array.isArray(workflow.phases)) {
+    problems.push('Workflow "phases" must be an array.');
+  }
+  if (workflow.groups !== undefined && !Array.isArray(workflow.groups)) {
+    problems.push('Workflow "groups" must be an array.');
+  }
+  if (workflow.mainPath !== undefined && !Array.isArray(workflow.mainPath)) {
+    problems.push('Workflow "mainPath" must be an array of node ids.');
+  }
   if (workflow.cards !== undefined && !Array.isArray(workflow.cards)) {
     problems.push('Workflow "cards" must be an array.');
   }
@@ -110,6 +134,14 @@ function validateWorkflow() {
   }
   if (nodes.size !== workflow.nodes.length) {
     problems.push('Node ids must be unique.');
+  }
+  const phaseIds = new Set(asArray(workflow.phases).map((phase) => phase.id));
+  if (phaseIds.size !== asArray(workflow.phases).length) {
+    problems.push('Phase ids must be unique.');
+  }
+  const groupIds = new Set(asArray(workflow.groups).map((group) => group.id));
+  if (groupIds.size !== asArray(workflow.groups).length) {
+    problems.push('Group ids must be unique.');
   }
 
   for (const node of nodes.values()) {
@@ -141,6 +173,39 @@ function validateWorkflow() {
     }
   }
 
+  for (const phase of asArray(workflow.phases)) {
+    if (!Number.isInteger(phase.fromCol) || !Number.isInteger(phase.toCol)) {
+      problems.push(`Phase "${phase.id}" must use integer fromCol/toCol values.`);
+      continue;
+    }
+    if (phase.fromCol < 0 || phase.toCol >= layout.colXs.length || phase.fromCol > phase.toCol) {
+      problems.push(`Phase "${phase.id}" uses invalid columns ${phase.fromCol}..${phase.toCol}; use an ordered range within 0..${layout.colXs.length - 1}.`);
+    }
+    const estLabelW = textUnits(phase.label) * 5.6;
+    const width = spanForCols(phase.fromCol, phase.toCol).width;
+    if (estLabelW > width + 8) {
+      problems.push(`Phase label "${phase.label}" (~${Math.round(estLabelW)}px) is wider than its ${Math.round(width)}px span — shorten the label or widen the phase range.`);
+    }
+  }
+
+  for (const group of asArray(workflow.groups)) {
+    if (!laneIds.has(group.lane)) {
+      problems.push(`Group "${group.id}" uses unknown lane "${group.lane}".`);
+      continue;
+    }
+    if (!Number.isInteger(group.fromCol) || !Number.isInteger(group.toCol)) {
+      problems.push(`Group "${group.id}" must use integer fromCol/toCol values.`);
+      continue;
+    }
+    if (group.fromCol < 0 || group.toCol >= layout.colXs.length || group.fromCol > group.toCol) {
+      problems.push(`Group "${group.id}" uses invalid columns ${group.fromCol}..${group.toCol}; use an ordered range within 0..${layout.colXs.length - 1}.`);
+    }
+    const contained = [...nodes.values()].some((node) => node.lane === group.lane && node.col >= group.fromCol && node.col <= group.toCol);
+    if (!contained) {
+      problems.push(`Group "${group.id}" does not contain any nodes — align its lane/columns with the parallel or branch work it frames.`);
+    }
+  }
+
   const byLane = new Map();
   for (const node of nodes.values()) {
     byLane.set(node.lane, [...(byLane.get(node.lane) || []), node]);
@@ -167,6 +232,38 @@ function validateWorkflow() {
           problems.push(`Edge "${edge.from}" -> "${edge.to}" is too short (${Math.round(segmentLength)}px; minimum 28px) — drop its label or route it through a channel.`);
         }
       }
+      const segments = [];
+      for (let i = 1; i < routed.points.length; i += 1) {
+        segments.push({ start: routed.points[i - 1], end: routed.points[i] });
+      }
+      for (const node of nodes.values()) {
+        if (node.id === edge.from || node.id === edge.to) continue;
+        if (segments.some((segment) => segmentIntersectsRect(segment, node, 2))) {
+          problems.push(`Edge "${edge.from}" -> "${edge.to}" crosses node "${node.id}" — adjust fromSide/toSide, route it through a channel, or move one node to a clearer lane/column.`);
+        }
+      }
+    }
+  }
+
+  if (Array.isArray(workflow.mainPath)) {
+    for (const id of workflow.mainPath) {
+      if (!nodes.has(id)) {
+        problems.push(`mainPath references unknown node "${id}".`);
+      }
+    }
+    for (let i = 0; i < workflow.mainPath.length - 1; i += 1) {
+      const fromId = workflow.mainPath[i];
+      const toId = workflow.mainPath[i + 1];
+      const from = nodes.get(fromId);
+      const to = nodes.get(toId);
+      if (!from || !to) continue;
+      const linked = workflow.edges.some((edge) => edge.from === fromId && edge.to === toId);
+      if (!linked) {
+        problems.push(`mainPath step "${fromId}" -> "${toId}" has no matching edge — add the edge or remove the pair from mainPath.`);
+      }
+      if (to.col < from.col) {
+        problems.push(`mainPath step "${fromId}" -> "${toId}" moves backward from col ${from.col} to ${to.col} — use a return edge outside mainPath for loops.`);
+      }
     }
   }
 
@@ -175,19 +272,19 @@ function validateWorkflow() {
     if (!edge.label || !nodes.has(edge.from) || !nodes.has(edge.to)) continue;
     const [lx, ly] = labelPoint(edge, pathFor(edge).points);
     const width = Math.max(30, textUnits(edge.label) * 4.8 + 10);
-    labelRects.push({ label: edge.label, x: lx - width / 2, y: ly - 10, width, height: 14 });
+    labelRects.push({ label: edge.label, x: lx - width / 2, y: ly - 10, width, height: 14, lx, ly });
   }
   for (const rect of labelRects) {
     for (const node of nodes.values()) {
       if (rectsOverlap(rect, node, -2)) {
-        problems.push(`Label "${rect.label}" overlaps node "${node.id}" — adjust labelDx/labelDy/labelSegment or set labelAt.`);
+        problems.push(`Label "${rect.label}" overlaps node "${node.id}" — adjust labelDx/labelDy/labelSegment or set labelAt.\n${suggestLabelObstacleFix(rect, rect.lx, rect.ly, node, 'node')}`);
       }
     }
   }
   for (let i = 0; i < labelRects.length; i += 1) {
     for (let j = i + 1; j < labelRects.length; j += 1) {
       if (rectsOverlap(labelRects[i], labelRects[j], -2)) {
-        problems.push(`Labels "${labelRects[i].label}" and "${labelRects[j].label}" overlap — adjust labelDx/labelDy or remove one label.`);
+        problems.push(`Labels "${labelRects[i].label}" and "${labelRects[j].label}" overlap — adjust labelDx/labelDy or remove one label.\n${suggestLabelPairFix(labelRects[i], labelRects[j])}`);
       }
     }
   }
@@ -208,6 +305,18 @@ function gapYBetween(fromLane, toLane, bias = 0.5) {
   const a = laneTop(fromLane) + layout.laneH;
   const b = laneTop(toLane);
   return a + (b - a) * bias;
+}
+
+function spanForCols(fromCol, toCol, pad = 46) {
+  const start = layout.colXs[fromCol] - pad;
+  const end = layout.colXs[toCol] + pad;
+  return { x: start, width: end - start, cx: (start + end) / 2 };
+}
+
+function sameLaneAutoVia(start, end) {
+  if (start[0] === end[0] || start[1] === end[1]) return [];
+  const midX = (start[0] + end[0]) / 2;
+  return [[midX, start[1]], [midX, end[1]]];
 }
 
 function routeVia(edge, from, to, start, end) {
@@ -237,7 +346,7 @@ function routeVia(edge, from, to, start, end) {
     }
     case 'auto':
     default: {
-      if (from.lane === to.lane) return [];
+      if (from.lane === to.lane) return sameLaneAutoVia(start, end);
       const y = gapYBetween(from.lane, to.lane, edge.bias ?? 0.5);
       return [[start[0], y], [end[0], y]];
     }
@@ -260,8 +369,32 @@ function pathFor(edge) {
 
 function renderLane(lane, index) {
   const y = layout.laneY + index * (layout.laneH + layout.laneGap);
-  return `        <rect x="${layout.laneX}" y="${y}" width="${layout.laneW}" height="${layout.laneH}" rx="10" class="c-lane" stroke-width="1"/>
-        <text x="${layout.laneX + 14}" y="${y + 22}" class="t-dim" font-size="10" font-weight="600">${String(index + 1).padStart(2, '0')} / ${esc(lane.label)}</text>`;
+  const exception = lane.variant === 'exception'
+    ? `\n        <rect x="${layout.laneX + 6}" y="${y + 6}" width="${layout.laneW - 12}" height="${layout.laneH - 12}" rx="8" class="c-security-group" stroke-width="1"/>`
+    : '';
+  const labelClass = lane.variant === 'exception' ? 't-security' : 't-dim';
+  const prefix = lane.variant === 'exception' ? 'EX' : String(index + 1).padStart(2, '0');
+  return `        <rect x="${layout.laneX}" y="${y}" width="${layout.laneW}" height="${layout.laneH}" rx="10" class="c-lane" stroke-width="1"/>${exception}
+        <text x="${layout.laneX + 14}" y="${y + 22}" class="${labelClass}" font-size="10" font-weight="600">${prefix} / ${esc(lane.label)}</text>`;
+}
+
+function renderPhase(phase) {
+  const span = spanForCols(phase.fromCol, phase.toCol, 46);
+  const accent = variantAccent(phase.variant);
+  const [lineClass] = arrowClassMap[phase.variant || 'default'] || arrowClassMap.default;
+  return `        <line x1="${span.x}" y1="35" x2="${span.x + span.width}" y2="35" class="${lineClass}" stroke-width="1.1"/>
+        <rect x="${span.x}" y="27" width="${span.width}" height="16" rx="4" class="c-mask"/>
+        <text x="${span.cx}" y="39" class="${accent}" font-size="8" font-weight="600" text-anchor="middle">${esc(phase.label)}</text>`;
+}
+
+function renderGroup(group) {
+  const span = spanForCols(group.fromCol, group.toCol, 50);
+  const y = laneTop(group.lane) + layout.laneTitleH + 8;
+  const height = layout.laneH - layout.laneTitleH - 16;
+  const cls = group.variant === 'security' ? 'c-security-group' : 'c-lane';
+  const textClass = variantAccent(group.variant);
+  return `        <rect x="${span.x}" y="${y}" width="${span.width}" height="${height}" rx="9" class="${cls}" stroke-width="1"/>
+        <text x="${span.x + 10}" y="${y + 14}" class="${textClass}" font-size="7" font-weight="600">${esc(group.label)}</text>`;
 }
 
 function renderNode(node) {
@@ -271,7 +404,7 @@ function renderNode(node) {
     ? `\n        <text x="${node.cx}" y="${node.y + node.height - 12}" class="${accent}" font-size="7" text-anchor="middle">${esc(node.tag)}</text>`
     : '';
   return `        <rect x="${node.x}" y="${node.y}" width="${node.width}" height="${node.height}" rx="6" class="c-mask"/>
-        <rect x="${node.x}" y="${node.y}" width="${node.width}" height="${node.height}" rx="6" class="${fill}" stroke-width="1.5"/>
+        <rect x="${node.x}" y="${node.y}" width="${node.width}" height="${node.height}" rx="6" class="${fill}"${animateAttr(workflow.meta, 'node', nodeStep(node))} stroke-width="1.5"/>
         <text x="${node.cx}" y="${node.y + 21}" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">${esc(node.label)}</text>
         <text x="${node.cx}" y="${node.y + 38}" class="t-muted" font-size="8" text-anchor="middle">${esc(node.sublabel || '')}</text>${tag}`;
 }
@@ -280,7 +413,7 @@ function renderEdgePath(edge) {
   const [cls, marker] = arrowClassMap[edge.variant || 'default'] || arrowClassMap.default;
   const routed = pathFor(edge);
   const strokeWidth = edge.width || (edge.variant === 'emphasis' ? 1.8 : 1.4);
-  return `        <path d="${routed.d}" class="${cls}" stroke-width="${strokeWidth}" marker-end="url(#${marker})"/>`;
+  return `        <path d="${routed.d}" class="${cls}"${animateAttr(workflow.meta, 'edge', edgeSteps.get(edge))} stroke-width="${strokeWidth}" marker-end="url(#${marker})"/>`;
 }
 
 function renderEdgeLabel(edge) {
@@ -316,6 +449,12 @@ ${renderDefinitions()}
 
         <!-- Swimlanes -->
 ${workflow.lanes.map(renderLane).join('\n\n')}
+
+        <!-- Phase headers -->
+${asArray(workflow.phases).map(renderPhase).join('\n')}
+
+        <!-- Workflow groups -->
+${asArray(workflow.groups).map(renderGroup).join('\n')}
 
         <!-- Edge paths -->
 ${workflow.edges.map(renderEdgePath).join('\n')}

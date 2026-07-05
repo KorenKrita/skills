@@ -24,6 +24,56 @@ export function rectsOverlap(a, b, gap = 0) {
   );
 }
 
+export function segmentIntersectsRect(segment, rect, gap = 0) {
+  const box = {
+    x1: rect.x - gap,
+    y1: rect.y - gap,
+    x2: rect.x + rect.width + gap,
+    y2: rect.y + rect.height + gap
+  };
+  const [a, b] = [segment.start, segment.end];
+  if (pointInBox(a, box) || pointInBox(b, box)) return true;
+  return (
+    segmentsIntersect(a, b, [box.x1, box.y1], [box.x2, box.y1]) ||
+    segmentsIntersect(a, b, [box.x2, box.y1], [box.x2, box.y2]) ||
+    segmentsIntersect(a, b, [box.x2, box.y2], [box.x1, box.y2]) ||
+    segmentsIntersect(a, b, [box.x1, box.y2], [box.x1, box.y1])
+  );
+}
+
+function pointInBox(point, box) {
+  return point[0] >= box.x1 && point[0] <= box.x2 && point[1] >= box.y1 && point[1] <= box.y2;
+}
+
+function segmentsIntersect(a, b, c, d) {
+  const o1 = orientation(a, b, c);
+  const o2 = orientation(a, b, d);
+  const o3 = orientation(c, d, a);
+  const o4 = orientation(c, d, b);
+
+  if (o1 === 0 && onSegment(a, c, b)) return true;
+  if (o2 === 0 && onSegment(a, d, b)) return true;
+  if (o3 === 0 && onSegment(c, a, d)) return true;
+  if (o4 === 0 && onSegment(c, b, d)) return true;
+
+  return o1 !== o2 && o3 !== o4;
+}
+
+function orientation(a, b, c) {
+  const value = (b[1] - a[1]) * (c[0] - b[0]) - (b[0] - a[0]) * (c[1] - b[1]);
+  if (Math.abs(value) < 0.0001) return 0;
+  return value > 0 ? 1 : 2;
+}
+
+function onSegment(a, b, c) {
+  return (
+    b[0] <= Math.max(a[0], c[0]) &&
+    b[0] >= Math.min(a[0], c[0]) &&
+    b[1] <= Math.max(a[1], c[1]) &&
+    b[1] >= Math.min(a[1], c[1])
+  );
+}
+
 export function anchor(rect, side) {
   switch (side) {
     case 'left': return [rect.x, rect.cy];
@@ -137,4 +187,44 @@ export function variantAccent(variant, { dashed = 't-messagebus' } = {}) {
       : variant === 'dashed'
         ? dashed
         : 't-muted';
+}
+
+export function formatRect(r) {
+  return `[${Math.round(r.x)}, ${Math.round(r.y)}, ${Math.round(r.width)}, ${Math.round(r.height)}]`;
+}
+
+function formatDelta(n) {
+  const v = Math.round(n);
+  return v >= 0 ? `+${v}` : String(v);
+}
+
+/** Actionable hint when an edge label rect hits a node/component box (#7). */
+export function suggestLabelObstacleFix(labelRect, lx, ly, obstacle, obstacleKind = 'component') {
+  const lxR = Math.round(lx);
+  const lyR = Math.round(ly);
+  const belowY = Math.round(obstacle.y + obstacle.height + 14);
+  const aboveY = Math.round(obstacle.y - 4);
+  return [
+    `  label rect: ${formatRect(labelRect)}`,
+    `  ${obstacleKind} "${obstacle.id}" rect: ${formatRect(obstacle)}`,
+    `  Suggested fix: labelAt [${lxR}, ${belowY}] or labelDy ${formatDelta(belowY - lyR)} (below); or labelAt [${lxR}, ${aboveY}] or labelDy ${formatDelta(aboveY - lyR)} (above)`,
+  ].join('\n');
+}
+
+/** Hint when two edge labels collide. */
+export function suggestLabelPairFix(a, b) {
+  return [
+    `  "${a.label}" ${formatRect(a)}; "${b.label}" ${formatRect(b)}`,
+    '  Suggested fix: add labelDy +24 on one edge, adjust labelDx, or remove one label',
+  ].join('\n');
+}
+
+/** Hint when two components/nodes are too close. */
+export function suggestComponentSeparation(a, b, minGap = 8) {
+  const rightX = Math.round(a.x + a.width + minGap);
+  const belowY = Math.round(a.y + a.height + minGap);
+  return [
+    `  "${a.id}" ${formatRect(a)}; "${b.id}" ${formatRect(b)}`,
+    `  Suggested fix: move "${b.id}" pos to [${rightX}, ${Math.round(b.y)}] (right of "${a.id}") or [${Math.round(b.x)}, ${belowY}] (below)`,
+  ].join('\n');
 }

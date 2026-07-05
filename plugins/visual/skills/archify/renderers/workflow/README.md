@@ -15,6 +15,16 @@ still run.
 If `output.html` is omitted, the renderer uses `meta.output` from the JSON file
 or falls back to `workflow.html` in the current working directory.
 
+After rendering, run the artifact checker:
+
+```bash
+node archify/scripts/check-render-output.mjs output.html
+```
+
+It catches final-SVG issues that are easiest to see in a browser: non-finite
+SVG values, accidental two-point diagonal arrows, and arrows crossing the
+legend.
+
 ## Input
 
 Workflow JSON files must set:
@@ -28,6 +38,9 @@ Workflow JSON files must set:
     "subtitle": "Renderer-driven workflow prototype"
   },
   "lanes": [],
+  "phases": [],
+  "groups": [],
+  "mainPath": [],
   "nodes": [],
   "edges": [],
   "cards": []
@@ -53,6 +66,10 @@ archify/schemas/workflow.schema.json
 | Lane frame | x 40, width 640, height 104, gap 20; first lane top at y 52 |
 | Lane title strip | top 30px of each lane; node boxes must stay below it |
 | Column centers (`col` 0–5) | x = 88, 220, 300, 430, 500, 625 |
+| Phase headers | Optional `phases[]` render above the first lane, spanning `fromCol..toCol` |
+| Lane groups | Optional `groups[]` frame parallel work or branch work inside one lane |
+| Exception lanes | Set `lane.variant: "exception"` for retry, denial, fallback, or failure paths |
+| Main path lint | Optional `mainPath[]` checks that happy-path steps have matching edges and do not move backward |
 | Default node | 92×52 (height 68 when `tag` is set) |
 | Node spacing | ≥8px between nodes in the same lane |
 | Edge length | straight segments must span ≥28px |
@@ -65,6 +82,10 @@ column or reduce `width`.
 ## Design Rules
 
 - Use lanes for ownership or runtime boundaries.
+- Use phase headers for high-level story beats such as Intake, Plan, Execute, and Report.
+- Use groups for parallel checks, branch handling, or bounded work within a lane; every group must contain at least one node.
+- Use `lane.variant: "exception"` for human wait, denial, retry, fallback, and failure lanes instead of mixing those paths into the happy path.
+- Set `mainPath` when the diagram has a clear happy path; the renderer validates that consecutive ids have matching edges and move left-to-right.
 - Place nodes with lane IDs and column indexes, not raw SVG coordinates.
 - Leave short adjacent links unlabeled; the arrow is enough.
 - Use labels for cross-lane decisions, approvals, async traces, and return paths.
@@ -76,8 +97,9 @@ column or reduce `width`.
 
 Schema violations exit non-zero with path-prefixed messages annotated with the
 element's id or label. The renderer additionally fails when it can detect
-layout problems, including node overlap, nodes outside their lanes, unknown
-edge targets, labels colliding with nodes or other labels, labels wider than
-their node, legends outside the viewBox, or straight arrows that are too short
-to read cleanly. Text width is estimated CJK-aware: fullwidth glyphs count as
-two units.
+layout problems, including node overlap, nodes outside their lanes, invalid
+phase/group column ranges, empty groups, broken `mainPath` steps, unknown edge
+targets, labels colliding with nodes or other labels, labels wider than their
+node, legends outside the viewBox, or straight arrows that are too short to
+read cleanly. Text width is estimated CJK-aware: fullwidth glyphs count as two
+units.
