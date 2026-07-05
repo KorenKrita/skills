@@ -5,7 +5,7 @@
   <title>Kami 紙：AIエージェント向けドキュメントデザインシステム</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Kami（紙）は、AI時代の文書制作に向けた、あたたかな紙面デザインシステムです。単一アクセントカラー、serif中心の階層、編集的な余白で一貫した可読性をつくります。">
-  <link rel="icon" href="https://gw.alipayobjects.com/zos/k/vl/logo.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/images/logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./styles.css">
   <link rel="canonical" href="https://kami.tw93.fun/index-ja.html">
   <link rel="alternate" hreflang="en" href="https://kami.tw93.fun/">
@@ -61,12 +61,12 @@
       {
         "@type": "Question",
         "name": "どんなドキュメントを作れますか？",
-        "acceptedAnswer": { "@type": "Answer", "text": "8種類のドキュメントテンプレート：ワンページャー、長文ドキュメント、レター、ポートフォリオ、履歴書、スライド、個別株レポート、変更履歴に加え、ランディングページシステム（EN + CN + KO）。さらに17種のインラインSVG図表。HTML出力でPDF、PNG、編集可能なPPTXスライドに変換可能です。" }
+        "acceptedAnswer": { "@type": "Answer", "text": "8種類のドキュメントテンプレート：ワンページャー、長文ドキュメント、レター、ポートフォリオ、履歴書、スライド、個別株レポート、変更履歴に加え、ランディングページシステム（EN + CN + KO）。さらに18種のインラインSVG図表。HTML出力でPDF、PNG、編集可能なPPTXスライドに変換可能です。" }
       },
       {
         "@type": "Question",
         "name": "セットアップ方法は？",
-        "acceptedAnswer": { "@type": "Answer", "text": "Claude Code（v2.1.142+）：/plugin marketplace add tw93/kami && /plugin install kami@kami。Codex plugin marketplace：codex plugin marketplace add tw93/kami && codex plugin add kami@kami。汎用エージェント（OpenCode、Pi）：npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y。Claude Desktop：GitHub Releases から kami.zip をダウンロードし、Skills 設定でアップロード。" }
+        "acceptedAnswer": { "@type": "Answer", "text": "Claude Code（v2.1.142+）：/plugin marketplace add tw93/kami && /plugin install kami@kami。Codex plugin marketplace：codex plugin marketplace add tw93/kami && codex plugin add kami@kami。~/.agents を読む汎用エージェント：npx skills add tw93/kami/plugins/kami -a universal -g -y。Claude Desktop：GitHub Releases からリリースアセットの kami.zip をダウンロードします。Source code ZIP ではありません。Skills 設定でアップロードします。" }
       },
       {
         "@type": "Question",
@@ -83,7 +83,7 @@
   <!-- ============ HERO ============ -->
   <header class="hero">
     <div class="eyebrow">
-      <span>Design System · v1.9.1<span class="eyebrow-date"> · 2026.06</span></span>
+      <span>Design System · v1.9.2<span class="eyebrow-date"> · 2026.07</span></span>
       <span class="hero-links">
         <nav class="lang-switch" aria-label="Language" data-lang-switch>
           <button class="lang-trigger" type="button" aria-expanded="false" data-lang-trigger>日本語</button>
@@ -189,8 +189,8 @@
 <span class="c"># Codex plugin marketplace</span>
 codex plugin marketplace add tw93/kami
 codex plugin add kami@kami</pre>
-    <p class="section-lede" style="font-size:14px;">汎用エージェント（OpenCode、Pi など <code>~/.agents/</code> を読むツール）：<code>npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y</code>。サブパスは自己完結型の skill パッケージを指します。単に <code>tw93/kami</code> を指定すると SKILL.md しかインストールされません。</p>
-    <p class="section-lede" style="font-size:14px;">Claude Desktop の場合は <a href="https://github.com/tw93/kami/releases/latest/download/kami.zip" style="color:var(--brand); text-decoration:none; font-weight:500;">kami.zip</a> をダウンロードし、Customize &gt; Skills &gt; "+" &gt; Create skill からそのままアップロードします。</p>
+    <p class="section-lede" style="font-size:14px;"><code>~/.agents/</code> を読む汎用エージェント：<code>npx skills add tw93/kami/plugins/kami -a universal -g -y</code>。この plugin パスは生成済みの軽量 skill パッケージを公開します。単に <code>tw93/kami</code> を指定すると SKILL.md しかインストールされません。</p>
+    <p class="section-lede" style="font-size:14px;">Claude Desktop の場合はリリースアセットの <a href="https://github.com/tw93/kami/releases/latest/download/kami.zip" style="color:var(--brand); text-decoration:none; font-weight:500;">kami.zip</a> をダウンロードします。GitHub の Source code ZIP ではありません。Customize &gt; Skills &gt; "+" &gt; Create skill からそのままアップロードします。</p>
   </section>
 
   <!-- ============ 02 MANIFESTO ============ -->
@@ -312,7 +312,7 @@ codex plugin add kami@kami</pre>
       </div>
       <div class="type-row">
         <div class="type-label">Label</div>
-        <div class="type-sample label">Design System · v1.9.1</div>
+        <div class="type-sample label">Design System · v1.9.2</div>
         <div class="type-specs"><b>7.5-8 pt</b><br>weight 600<br>line 1.35</div>
       </div>
     </div>
@@ -376,7 +376,7 @@ codex plugin add kami@kami</pre>
 
     <div class="comp-grid">
       <div class="comp">
-        <h4>Buttons</h4>
+        <h3>Buttons</h3>
         <p class="hint">強い drop shadow ではなく ring shadow ・角丸 8pt</p>
         <div class="demo" style="display:flex; gap:10px; flex-wrap:wrap;">
           <span class="btn btn-primary">主要 CTA</span>
@@ -385,7 +385,7 @@ codex plugin add kami@kami</pre>
         </div>
       </div>
       <div class="comp">
-        <h4>タグ（3 段階）</h4>
+        <h3>タグ（3 段階）</h3>
         <p class="hint">実色 hex ・弱から強へ選択</p>
         <div class="demo" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
           <span class="tag calm">Light 0.08</span>
@@ -394,12 +394,12 @@ codex plugin add kami@kami</pre>
         </div>
       </div>
       <div class="comp">
-        <h4>引用</h4>
+        <h3>引用</h3>
         <p class="hint">左 2pt のブランド実線 + olive テキスト</p>
         <blockquote class="quote">装飾より明快さを優先する。ひとつの Yes のために多くの No を選ぶ。</blockquote>
       </div>
       <div class="comp">
-        <h4>指標カード</h4>
+        <h3>指標カード</h3>
         <p class="hint">serif 数字 + sans ラベル ・ tabular-nums</p>
         <div class="metrics demo">
           <div class="metric"><span class="metric-value">8</span><span class="metric-label">文書タイプ</span></div>
@@ -408,14 +408,14 @@ codex plugin add kami@kami</pre>
         </div>
       </div>
       <div class="comp">
-        <h4>セクション見出し</h4>
+        <h3>セクション見出し</h3>
         <p class="hint">serif 500 ・ 15pt ・サイズ主導の階層、装飾は不要</p>
         <div class="demo">
           <span class="sample-section-title">Selected Works · Projects</span>
         </div>
       </div>
       <div class="comp">
-        <h4>Dash List</h4>
+        <h3>Dash List</h3>
         <p class="hint">丸点ではなくダッシュ ・ 編集文体</p>
         <ul class="dash demo">
           <li>紙色は暖色、純白は使わない</li>
@@ -424,7 +424,7 @@ codex plugin add kami@kami</pre>
         </ul>
       </div>
       <div class="comp">
-        <h4>コードブロック</h4>
+        <h3>コードブロック</h3>
         <p class="hint">ivory 背景 + 0.5pt 枠線 + 6pt 角丸</p>
 <pre class="code"><span class="c">// 温かみは色数ではなく、抑制で作る</span>
 canvas   = parchment; accent = <span class="k">ink_blue</span>
@@ -433,7 +433,7 @@ document = <span class="k">serif</span> × hierarchy + generous_space
 beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
       </div>
       <div class="comp">
-        <h4>特集カード</h4>
+        <h3>特集カード</h3>
         <p class="hint">whisper shadow + 16pt 角丸</p>
         <div class="demo" style="background:var(--ivory); border-radius:16px; padding:18px 20px; box-shadow: 0 4px 24px rgba(0,0,0,0.05); border: 1px solid var(--border-cream);">
           <p style="font-family:var(--serif); font-weight:500; font-size:15px; margin:0 0 6px; color:var(--near-black);">Tesla 企業紹介 · One-Pager</p>
@@ -453,7 +453,7 @@ beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
     <div class="section-head">
       <p class="section-num">07 · Diagrams</p>
       <h2 class="section-title">インライン図表</h2>
-      <p class="section-lede">アーキテクチャ、フロー、データ可視化をカバーする 17 種の SVG 図表を用意。必要な種類を Claude に伝えると、Kami の色と書体規則に沿って文書へ直接埋め込みます。</p>
+      <p class="section-lede">アーキテクチャ、フロー、データ可視化をカバーする 18 種の SVG 図表を用意。必要な種類を Claude に伝えると、Kami の色と書体規則に沿って文書へ直接埋め込みます。</p>
     </div>
     <div class="chart-showcase">
       <!-- Architecture mini -->
@@ -579,35 +579,35 @@ beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
 
     <div class="anti">
       <div class="no">
-        <h5>Don't</h5>
+        <h3>Don't</h3>
         <p>ページ背景に <code>#ffffff</code> の純白や <code>#f3f4f6</code> の寒色グレーを使わない。紙面が硬く見え、温かい紙質感が崩れます。</p>
       </div>
       <div class="yes">
-        <h5>Do</h5>
+        <h3>Do</h3>
         <p>常に <code>#f5f4ed</code> の parchment を使う。印刷時の白フチを防ぐため、<code>@page background</code> も同色に設定します。</p>
       </div>
       <div class="no">
-        <h5>Don't</h5>
+        <h3>Don't</h3>
         <p>タグに <code>rgba(27,54,93,0.18)</code> を使わない。WeasyPrint で文字領域と余白領域の不透明度がずれ、二重矩形が出ます。</p>
       </div>
       <div class="yes">
-        <h5>Do</h5>
+        <h3>Do</h3>
         <p>tint 対照表の実色 hex <code>#E4ECF5</code> を使う。描画が安定し、色ぶれを防げます。</p>
       </div>
       <div class="no">
-        <h5>Don't</h5>
+        <h3>Don't</h3>
         <p>見出しに <code>font-weight: 600</code> 以上の合成ボールドを使わない。線が潰れて可読性と品位が落ちます。</p>
       </div>
       <div class="yes">
-        <h5>Do</h5>
+        <h3>Do</h3>
         <p>本文 400、見出し 500（実フォント W05）。強調が必要ならサイズや左バーで対応し、合成ボールドは使わない。</p>
       </div>
       <div class="no">
-        <h5>Don't</h5>
+        <h3>Don't</h3>
         <p>強い drop shadow <code>0 2px 8px rgba(0,0,0,0.3)</code> を使わない。重く見え、印刷時に黒く潰れやすい。</p>
       </div>
       <div class="yes">
-        <h5>Do</h5>
+        <h3>Do</h3>
         <p>ring shadow <code>0 0 0 1pt</code> か whisper <code>rgba 0.05</code> を使う。あるいは明暗の切り替えで階層を作る。</p>
       </div>
     </div>
@@ -638,11 +638,11 @@ beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
       </div>
       <div class="faq-pair">
         <dt>どんなドキュメントを作れますか？</dt>
-        <dd>8種類のドキュメントテンプレート：ワンページャー、長文ドキュメント、レター、ポートフォリオ、履歴書、スライド、個別株レポート、変更履歴に加え、ランディングページシステム（EN + CN + KO）。さらに17種のインラインSVG図表で視覚的な説明も可能です。出力はHTMLで、PDF、PNG、編集可能なPPTXスライドに変換できます。</dd>
+        <dd>8種類のドキュメントテンプレート：ワンページャー、長文ドキュメント、レター、ポートフォリオ、履歴書、スライド、個別株レポート、変更履歴に加え、ランディングページシステム（EN + CN + KO）。さらに18種のインラインSVG図表で視覚的な説明も可能です。出力はHTMLで、PDF、PNG、編集可能なPPTXスライドに変換できます。</dd>
       </div>
       <div class="faq-pair">
         <dt>セットアップ方法は？</dt>
-        <dd>Claude Code（v2.1.142+）：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin marketplace add tw93/kami</code> の後に <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin install kami@kami</code>。Codex：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin marketplace add tw93/kami</code> の後に <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin add kami@kami</code>。汎用エージェント：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y</code>。Claude Desktop：GitHub Releasesからkami.zipをダウンロードし、カスタマイズ &gt; スキルでアップロード。</dd>
+        <dd>Claude Code（v2.1.142+）：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin marketplace add tw93/kami</code> の後に <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin install kami@kami</code>。Codex：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin marketplace add tw93/kami</code> の後に <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin add kami@kami</code>。<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">~/.agents</code> を読む汎用エージェント：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami/plugins/kami -a universal -g -y</code>。Claude Desktop：GitHub Releases からリリースアセットの kami.zip をダウンロードします。Source code ZIP ではありません。カスタマイズ &gt; スキルでアップロード。</dd>
       </div>
       <div class="faq-pair">
         <dt>対応言語は？</dt>

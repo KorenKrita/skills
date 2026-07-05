@@ -5,7 +5,7 @@
   <title>Kami 紙: AI 에이전트를 위한 문서 디자인 시스템</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Kami - AI 기반 전문 문서를 위한 따뜻한 양피지 디자인 시스템. 하나의 강조색, 세리프 주도 계층 구조, 에디토리얼 여백으로 구성됩니다.">
-  <link rel="icon" href="https://gw.alipayobjects.com/zos/k/vl/logo.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/images/logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./styles.css">
   <link rel="canonical" href="https://kami.tw93.fun/index-ko.html">
   <link rel="alternate" hreflang="en" href="https://kami.tw93.fun/">
@@ -66,7 +66,7 @@
         "name": "Kami로 무엇을 만들 수 있나요?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "8가지 문서 템플릿: 원페이저, 긴 문서, 레터, 포트폴리오, 이력서, 슬라이드, 주식 리포트, 변경 로그에 더해 랜딩 페이지 시스템(영문 + 중문 + 한국어). 17가지 인라인 SVG 다이어그램 유형 포함. HTML 출력물을 PDF, PNG 또는 편집 가능한 PPTX 슬라이드 덱으로 내보낼 수 있습니다."
+          "text": "8가지 문서 템플릿: 원페이저, 긴 문서, 레터, 포트폴리오, 이력서, 슬라이드, 주식 리포트, 변경 로그에 더해 랜딩 페이지 시스템(영문 + 중문 + 한국어). 18가지 인라인 SVG 다이어그램 유형 포함. HTML 출력물을 PDF, PNG 또는 편집 가능한 PPTX 슬라이드 덱으로 내보낼 수 있습니다."
         }
       },
       {
@@ -74,7 +74,7 @@
         "name": "Kami는 어떻게 설정하나요?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Claude Code(v2.1.142+): /plugin marketplace add tw93/kami && /plugin install kami@kami. Codex plugin marketplace: codex plugin marketplace add tw93/kami && codex plugin add kami@kami. 범용 에이전트(OpenCode, Pi): npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y. Claude Desktop: GitHub Releases에서 kami.zip을 다운로드하여 Skills 설정에서 업로드하세요."
+          "text": "Claude Code(v2.1.142+): /plugin marketplace add tw93/kami && /plugin install kami@kami. Codex plugin marketplace: codex plugin marketplace add tw93/kami && codex plugin add kami@kami. ~/.agents를 읽는 범용 에이전트: npx skills add tw93/kami/plugins/kami -a universal -g -y. Claude Desktop: GitHub Releases에서 릴리스 에셋 kami.zip을 다운로드하세요. Source code ZIP이 아닙니다. Skills 설정에서 업로드하세요."
         }
       },
       {
@@ -95,7 +95,7 @@
   <!-- ============ HERO ============ -->
   <header class="hero">
     <div class="eyebrow">
-      <span>Design System · v1.9.1<span class="eyebrow-date"> · 2026.06</span></span>
+      <span>Design System · v1.9.2<span class="eyebrow-date"> · 2026.07</span></span>
       <span class="hero-links">
         <nav class="lang-switch" aria-label="Language" data-lang-switch>
           <button class="lang-trigger" type="button" aria-expanded="false" data-lang-trigger>한국어</button>
@@ -200,8 +200,8 @@
 <span class="c"># Codex plugin marketplace</span>
 codex plugin marketplace add tw93/kami
 codex plugin add kami@kami</pre>
-    <p class="section-lede" style="font-size:14px;">범용 에이전트(OpenCode, Pi 등 <code>~/.agents/</code>를 읽는 도구): <code>npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y</code>. 서브 경로는 자체 완결형 스킬 패키지를 가리킵니다. 그냥 <code>tw93/kami</code>를 쓰면 SKILL.md만 설치됩니다.</p>
-    <p class="section-lede" style="font-size:14px;">Claude Desktop: <a href="https://github.com/tw93/kami/releases/latest/download/kami.zip" style="color:var(--brand); text-decoration:none; font-weight:500;">kami.zip</a>을 다운로드한 후, Customize &gt; Skills &gt; "+" &gt; Create skill에서 업로드하세요.</p>
+    <p class="section-lede" style="font-size:14px;"><code>~/.agents/</code>를 읽는 범용 에이전트: <code>npx skills add tw93/kami/plugins/kami -a universal -g -y</code>. 이 plugin 경로는 생성된 경량 스킬 번들을 제공합니다. 그냥 <code>tw93/kami</code>를 쓰면 SKILL.md만 설치됩니다.</p>
+    <p class="section-lede" style="font-size:14px;">Claude Desktop: 릴리스 에셋 <a href="https://github.com/tw93/kami/releases/latest/download/kami.zip" style="color:var(--brand); text-decoration:none; font-weight:500;">kami.zip</a>을 다운로드하세요. GitHub Source code ZIP이 아닙니다. Customize &gt; Skills &gt; "+" &gt; Create skill에서 업로드하세요.</p>
   </section>
 
   <!-- ============ 02 MANIFESTO ============ -->
@@ -323,7 +323,7 @@ codex plugin add kami@kami</pre>
       </div>
       <div class="type-row">
         <div class="type-label">Label</div>
-        <div class="type-sample label">Design System · v1.9.1</div>
+        <div class="type-sample label">Design System · v1.9.2</div>
         <div class="type-specs"><b>7.5-8 pt</b><br>weight 600<br>line 1.35</div>
       </div>
     </div>
@@ -387,7 +387,7 @@ codex plugin add kami@kami</pre>
 
     <div class="comp-grid">
       <div class="comp">
-        <h4>버튼</h4>
+        <h3>버튼</h3>
         <p class="hint">하드 드롭 대신 링 섀도우 · 8pt radius</p>
         <div class="demo" style="display:flex; gap:10px; flex-wrap:wrap;">
           <span class="btn btn-primary">Primary CTA</span>
@@ -396,7 +396,7 @@ codex plugin add kami@kami</pre>
         </div>
       </div>
       <div class="comp">
-        <h4>태그, 세 단계</h4>
+        <h3>태그, 세 단계</h3>
         <p class="hint">솔리드 hex · 약에서 강으로 선택</p>
         <div class="demo" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
           <span class="tag calm">Light 0.08</span>
@@ -405,12 +405,12 @@ codex plugin add kami@kami</pre>
         </div>
       </div>
       <div class="comp">
-        <h4>인용</h4>
+        <h3>인용</h3>
         <p class="hint">좌측 2pt brand solid + olive 텍스트</p>
         <blockquote class="quote">천 번의 거절 끝에 하나의 승낙, 장식보다 명확함을 우선합니다.</blockquote>
       </div>
       <div class="comp">
-        <h4>메트릭</h4>
+        <h3>메트릭</h3>
         <p class="hint">세리프 숫자 + 산세리프 레이블 · tabular-nums</p>
         <div class="metrics demo">
           <div class="metric"><span class="metric-value">8</span><span class="metric-label">문서 유형</span></div>
@@ -419,14 +419,14 @@ codex plugin add kami@kami</pre>
         </div>
       </div>
       <div class="comp">
-        <h4>섹션 제목</h4>
+        <h3>섹션 제목</h3>
         <p class="hint">serif 500 · 15pt · 크기 주도 계층, 장식 없음</p>
         <div class="demo">
           <span class="sample-section-title">Selected Works · Projects</span>
         </div>
       </div>
       <div class="comp">
-        <h4>대시 목록</h4>
+        <h3>대시 목록</h3>
         <p class="hint">불릿 대신 대시 · 에디토리얼 톤</p>
         <ul class="dash demo">
           <li>따뜻한 양피지, 순백은 절대 아님</li>
@@ -435,7 +435,7 @@ codex plugin add kami@kami</pre>
         </ul>
       </div>
       <div class="comp">
-        <h4>코드 블록</h4>
+        <h3>코드 블록</h3>
         <p class="hint">ivory bg + 0.5pt border + 6pt radius</p>
 <pre class="code"><span class="c">// warmth from restraint, not from color</span>
 canvas   = parchment; accent = <span class="k">ink_blue</span>
@@ -444,7 +444,7 @@ document = <span class="k">serif</span> × hierarchy + generous_space
 beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
       </div>
       <div class="comp">
-        <h4>피처 카드</h4>
+        <h3>피처 카드</h3>
         <p class="hint">whisper shadow + 16pt radius</p>
         <div class="demo" style="background:var(--ivory); border-radius:16px; padding:18px 20px; box-shadow: 0 4px 24px rgba(0,0,0,0.05); border: 1px solid var(--border-cream);">
           <p style="font-family:var(--serif); font-weight:500; font-size:15px; margin:0 0 6px; color:var(--near-black);">Tesla Company Profile · One-Pager</p>
@@ -464,7 +464,7 @@ beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
     <div class="section-head">
       <p class="section-num">07 · Diagrams</p>
       <h2 class="section-title">인라인 차트</h2>
-      <p class="section-lede">아키텍처, 프로세스, 데이터 차트 시나리오를 아우르는 17가지 인라인 SVG 다이어그램 유형. Claude에게 필요한 유형을 말하면 문서에 직접 삽입되며, 색상과 폰트는 Kami 디자인 언어를 따릅니다.</p>
+      <p class="section-lede">아키텍처, 프로세스, 데이터 차트 시나리오를 아우르는 18가지 인라인 SVG 다이어그램 유형. Claude에게 필요한 유형을 말하면 문서에 직접 삽입되며, 색상과 폰트는 Kami 디자인 언어를 따릅니다.</p>
     </div>
     <div class="chart-showcase">
       <!-- Architecture mini -->
@@ -590,35 +590,35 @@ beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
 
     <div class="anti">
       <div class="no">
-        <h5>하지 마세요</h5>
+        <h3>하지 마세요</h3>
         <p><code>#ffffff</code> 순백이나 <code>#f3f4f6</code> 쿨 그레이를 페이지 배경으로 사용하지 마세요. 페이지가 딱딱해지고 따뜻한 양피지 특성이 약해집니다.</p>
       </div>
       <div class="yes">
-        <h5>하세요</h5>
+        <h3>하세요</h3>
         <p>항상 <code>#f5f4ed</code> 양피지를 사용하세요. 인쇄 시 흰 테두리를 방지하기 위해 <code>@page background</code>도 같은 색상으로 설정하세요.</p>
       </div>
       <div class="no">
-        <h5>하지 마세요</h5>
+        <h3>하지 마세요</h3>
         <p>태그에 <code>rgba(27,54,93,0.18)</code>를 사용하지 마세요. WeasyPrint는 패딩과 글리프 영역을 다른 불투명도로 렌더링하여 이중 사각형을 만듭니다.</p>
       </div>
       <div class="yes">
-        <h5>하세요</h5>
+        <h3>하세요</h3>
         <p>등가 솔리드 hex <code>#E4ECF5</code>를 위한 틴트 조회 표를 사용하세요. 렌더링이 깔끔하게 유지되고 색상이 안정적입니다.</p>
       </div>
       <div class="no">
-        <h5>하지 마세요</h5>
+        <h3>하지 마세요</h3>
         <p>제목을 <code>font-weight: 600</code> 이상의 합성 볼드로 설정하지 마세요. 합성 볼드는 획을 흐리게 하고 타이포그래피 품질을 떨어뜨립니다.</p>
       </div>
       <div class="yes">
-        <h5>하세요</h5>
+        <h3>하세요</h3>
         <p>본문 400, 제목 500 (실제 W05). 더 강한 존재감이 필요하면 크기나 brand 좌측 바를 사용하고, 합성 볼드는 절대 사용하지 마세요.</p>
       </div>
       <div class="no">
-        <h5>하지 마세요</h5>
+        <h3>하지 마세요</h3>
         <p>하드 드롭 섀도우 <code>0 2px 8px rgba(0,0,0,0.3)</code>을 사용하지 마세요. 시각적으로 무겁고 인쇄 시 어두운 얼룩으로 나타날 수 있습니다.</p>
       </div>
       <div class="yes">
-        <h5>하세요</h5>
+        <h3>하세요</h3>
         <p>링 섀도우 <code>0 0 0 1pt</code> 또는 위스퍼 <code>rgba 0.05</code>, 아니면 단순히 밝고 어두운 섹션을 교차시키세요.</p>
       </div>
     </div>
@@ -649,11 +649,11 @@ beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
       </div>
       <div class="faq-pair">
         <dt>무엇을 만들 수 있나요?</dt>
-        <dd>8가지 문서 템플릿: 원페이저, 긴 문서, 레터, 포트폴리오, 이력서, 슬라이드, 주식 리포트, 변경 로그에 더해 랜딩 페이지 시스템(영문 + 중문 + 한국어). 비주얼 설명을 위한 17가지 인라인 SVG 다이어그램 유형 포함. HTML 출력물을 PDF, PNG 또는 편집 가능한 PPTX 슬라이드 덱으로 내보낼 수 있습니다.</dd>
+        <dd>8가지 문서 템플릿: 원페이저, 긴 문서, 레터, 포트폴리오, 이력서, 슬라이드, 주식 리포트, 변경 로그에 더해 랜딩 페이지 시스템(영문 + 중문 + 한국어). 비주얼 설명을 위한 18가지 인라인 SVG 다이어그램 유형 포함. HTML 출력물을 PDF, PNG 또는 편집 가능한 PPTX 슬라이드 덱으로 내보낼 수 있습니다.</dd>
       </div>
       <div class="faq-pair">
         <dt>어떻게 설정하나요?</dt>
-        <dd>Claude Code(v2.1.142+): <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin marketplace add tw93/kami</code> 실행 후 <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin install kami@kami</code>. Codex: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin marketplace add tw93/kami</code> 실행 후 <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin add kami@kami</code>. OpenCode 같은 범용 에이전트: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y</code>. Claude Desktop: GitHub Releases에서 kami.zip을 다운로드하여 Customize &gt; Skills에서 업로드하세요. 슬래시 명령어가 필요 없으며, 자연어 요청으로 스킬이 자동 실행됩니다.</dd>
+        <dd>Claude Code(v2.1.142+): <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin marketplace add tw93/kami</code> 실행 후 <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin install kami@kami</code>. Codex: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin marketplace add tw93/kami</code> 실행 후 <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin add kami@kami</code>. <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">~/.agents</code>를 읽는 범용 에이전트: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami/plugins/kami -a universal -g -y</code>. Claude Desktop: GitHub Releases에서 릴리스 에셋 kami.zip을 다운로드하세요. Source code ZIP이 아닙니다. Customize &gt; Skills에서 업로드하세요. 슬래시 명령어가 필요 없으며, 자연어 요청으로 스킬이 자동 실행됩니다.</dd>
       </div>
       <div class="faq-pair">
         <dt>어떤 언어를 지원하나요?</dt>
