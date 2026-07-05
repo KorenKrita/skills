@@ -5,7 +5,7 @@
   <title>Kami 紙：面向 AI Agent 的文件設計系統</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Kami 紙：面向 AI 文件生成的溫暖紙質感設計系統，以單一強調色、serif 層級與編輯級留白，收束成穩定的排版。">
-  <link rel="icon" href="https://gw.alipayobjects.com/zos/k/vl/logo.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/images/logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./styles.css">
   <link rel="canonical" href="https://kami.tw93.fun/index-tw.html">
   <link rel="alternate" hreflang="en" href="https://kami.tw93.fun/">
@@ -61,12 +61,12 @@
       {
         "@type": "Question",
         "name": "Kami 能生成什麼？",
-        "acceptedAnswer": { "@type": "Answer", "text": "八種文件範本：一頁紙、長文件、信件、作品集、履歷、簡報、個股研報、更新日誌，外加一套落地頁系統（中、英、韓文）。另有 17 種內聯 SVG 圖表。輸出為 HTML，可匯出為 PDF、PNG 或可編輯的 PPTX 簡報。" }
+        "acceptedAnswer": { "@type": "Answer", "text": "八種文件範本：一頁紙、長文件、信件、作品集、履歷、簡報、個股研報、更新日誌，外加一套落地頁系統（中、英、韓文）。另有 18 種內聯 SVG 圖表。輸出為 HTML，可匯出為 PDF、PNG 或可編輯的 PPTX 簡報。" }
       },
       {
         "@type": "Question",
         "name": "怎麼安裝 Kami？",
-        "acceptedAnswer": { "@type": "Answer", "text": "Claude Code（v2.1.142+）：/plugin marketplace add tw93/kami && /plugin install kami@kami。Codex 外掛市場：codex plugin marketplace add tw93/kami && codex plugin add kami@kami。通用 agent（OpenCode、Pi）：npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y。Claude Desktop：從 GitHub Releases 下載 kami.zip，在 Skills 設定中上傳即可。" }
+        "acceptedAnswer": { "@type": "Answer", "text": "Claude Code（v2.1.142+）：/plugin marketplace add tw93/kami && /plugin install kami@kami。Codex 外掛市場：codex plugin marketplace add tw93/kami && codex plugin add kami@kami。讀取 ~/.agents 的通用 agent：npx skills add tw93/kami/plugins/kami -a universal -g -y。Claude Desktop：從 GitHub Releases 下載 release asset kami.zip，不要下載 Source code 壓縮包，然後在 Skills 設定中上傳即可。" }
       },
       {
         "@type": "Question",
@@ -83,7 +83,7 @@
   <!-- ============ HERO ============ -->
   <header class="hero">
     <div class="eyebrow">
-      <span>Design System · v1.9.1<span class="eyebrow-date"> · 2026.06</span></span>
+      <span>Design System · v1.9.2<span class="eyebrow-date"> · 2026.07</span></span>
       <span class="hero-links">
         <nav class="lang-switch" aria-label="Language" data-lang-switch>
           <button class="lang-trigger" type="button" aria-expanded="false" data-lang-trigger>繁體中文</button>
@@ -188,8 +188,8 @@
 <span class="c"># Codex plugin marketplace</span>
 codex plugin marketplace add tw93/kami
 codex plugin add kami@kami</pre>
-    <p class="section-lede" style="font-size:14px;">通用 agent（OpenCode、Pi 等讀取 <code>~/.agents/</code> 的工具）：<code>npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y</code>。子路徑指向自包含的 skill 套件；直接用 <code>tw93/kami</code> 只會裝到 SKILL.md。</p>
-    <p class="section-lede" style="font-size:14px;">Claude Desktop：下載 <a href="https://github.com/tw93/kami/releases/latest/download/kami.zip" style="color:var(--brand); text-decoration:none; font-weight:500;">kami.zip</a>，在 Customize &gt; Skills &gt; "+" &gt; Create skill 中直接上傳。</p>
+    <p class="section-lede" style="font-size:14px;">讀取 <code>~/.agents/</code> 的通用 agent：<code>npx skills add tw93/kami/plugins/kami -a universal -g -y</code>。這個 plugin 路徑暴露生成好的輕量 skill 套件；直接用 <code>tw93/kami</code> 只會裝到 SKILL.md。</p>
+    <p class="section-lede" style="font-size:14px;">Claude Desktop：下載 release asset <a href="https://github.com/tw93/kami/releases/latest/download/kami.zip" style="color:var(--brand); text-decoration:none; font-weight:500;">kami.zip</a>，不要下載 GitHub 的 Source code 壓縮包，然後在 Customize &gt; Skills &gt; "+" &gt; Create skill 中直接上傳。</p>
   </section>
 
   <!-- ============ 02 MANIFESTO ============ -->
@@ -322,7 +322,7 @@ codex plugin add kami@kami</pre>
       </div>
       <div class="type-row">
         <div class="type-label">Label</div>
-        <div class="type-sample label">Design System · v1.9.1</div>
+        <div class="type-sample label">Design System · v1.9.2</div>
         <div class="type-specs"><b>7.5-8 pt</b><br>weight 600<br>line 1.35</div>
       </div>
 
@@ -390,7 +390,7 @@ codex plugin add kami@kami</pre>
     <div class="comp-grid">
 
       <div class="comp">
-        <h4>Buttons</h4>
+        <h3>Buttons</h3>
         <p class="hint">ring shadow 替代硬投影 · 8pt 圓角</p>
         <div class="demo" style="display:flex; gap:10px; flex-wrap:wrap;">
           <span class="btn btn-primary">Primary CTA</span>
@@ -400,7 +400,7 @@ codex plugin add kami@kami</pre>
       </div>
 
       <div class="comp">
-        <h4>Tags · 三檔</h4>
+        <h3>Tags · 三檔</h3>
         <p class="hint">實色 hex · 從弱到強選</p>
         <div class="demo" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
           <span class="tag calm">極淡 0.08</span>
@@ -410,13 +410,13 @@ codex plugin add kami@kami</pre>
       </div>
 
       <div class="comp">
-        <h4>Quote</h4>
+        <h3>Quote</h3>
         <p class="hint">左 2pt 品牌實線 + olive 色</p>
         <blockquote class="quote">一千個 no 換一個 yes，寧可清淡，不可濃豔。</blockquote>
       </div>
 
       <div class="comp">
-        <h4>Metric</h4>
+        <h3>Metric</h3>
         <p class="hint">serif 數字 + sans 標籤 · tabular-nums</p>
         <div class="metrics demo">
           <div class="metric"><span class="metric-value">6</span><span class="metric-label">文件類型</span></div>
@@ -426,7 +426,7 @@ codex plugin add kami@kami</pre>
       </div>
 
       <div class="comp">
-        <h4>Section Title</h4>
+        <h3>Section Title</h3>
         <p class="hint">serif 500 · 15pt · 純字號層級，無裝飾</p>
         <div class="demo">
           <span class="sample-section-title">核心項目 · Selected Works</span>
@@ -434,7 +434,7 @@ codex plugin add kami@kami</pre>
       </div>
 
       <div class="comp">
-        <h4>Dash List</h4>
+        <h3>Dash List</h3>
         <p class="hint">短橫線代替圓點 · 更書卷氣</p>
         <ul class="dash demo">
           <li>暖米紙底，不用純白</li>
@@ -444,7 +444,7 @@ codex plugin add kami@kami</pre>
       </div>
 
       <div class="comp">
-        <h4>Code Block</h4>
+        <h3>Code Block</h3>
         <p class="hint">ivory 底 + 0.5pt border + 6pt 圓角 + mono 字體</p>
 <pre class="code"><span class="c">// 暖米紙 · 一種克制的溫度</span>
 canvas   = parchment; accent = <span class="k">ink_blue</span>
@@ -454,7 +454,7 @@ beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
       </div>
 
       <div class="comp">
-        <h4>Featured Card</h4>
+        <h3>Featured Card</h3>
         <p class="hint">whisper shadow + 16pt 圓角</p>
         <div class="demo" style="background:var(--ivory); border-radius:16px; padding:18px 20px; box-shadow: 0 4px 24px rgba(0,0,0,0.05); border: 1px solid var(--border-cream);">
           <p style="font-family:var(--serif); font-weight:500; font-size:15px; margin:0 0 6px; color:var(--near-black);">Tesla 公司介紹 · One-Pager</p>
@@ -475,7 +475,7 @@ beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
     <div class="section-head">
       <p class="section-num">07 · Diagrams</p>
       <h2 class="section-title">內聯圖表</h2>
-      <p class="section-lede">十七種內聯 SVG 圖表，覆蓋架構、流程、資料三大場景。直接告訴 Claude 需要哪種圖，會自動嵌入文件，配色與字體沿用 Kami 設計語言。</p>
+      <p class="section-lede">十八種內聯 SVG 圖表，覆蓋架構、流程、資料三大場景。直接告訴 Claude 需要哪種圖，會自動嵌入文件，配色與字體沿用 Kami 設計語言。</p>
     </div>
     <div class="chart-showcase">
       <!-- Architecture mini -->
@@ -605,38 +605,38 @@ beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
 
     <div class="anti">
       <div class="no">
-        <h5>Don't</h5>
+        <h3>Don't</h3>
         <p>頁面背景用 <code>#ffffff</code> 純白或 <code>#f3f4f6</code> 冷灰，會讓版面變硬，也削弱 Kami 的暖米紙氣質。</p>
       </div>
       <div class="yes">
-        <h5>Do</h5>
+        <h3>Do</h3>
         <p>始終使用 <code>#f5f4ed</code> parchment，列印時把 <code>@page background</code> 也設為同色，避免白邊。</p>
       </div>
 
       <div class="no">
-        <h5>Don't</h5>
+        <h3>Don't</h3>
         <p>Tag 用 <code>rgba(201,100,66,0.18)</code>，WeasyPrint 會讓 padding 區與字形區透明度疊加，形成雙層矩形。</p>
       </div>
       <div class="yes">
-        <h5>Do</h5>
+        <h3>Do</h3>
         <p>查 tint 對照表，改用等效實色 <code>#E4ECF5</code>，顏色穩定，PDF 也乾淨。</p>
       </div>
 
       <div class="no">
-        <h5>Don't</h5>
+        <h3>Don't</h3>
         <p>標題用 <code>font-weight: 600</code> 或更粗的合成 bold，筆畫容易變糊，版面也會顯得粗重。</p>
       </div>
       <div class="yes">
-        <h5>Do</h5>
+        <h3>Do</h3>
         <p>正文 400，標題 500（真實 W05 字重）；需要更強存在感時，用字號或品牌色左側豎線，不靠合成粗體。</p>
       </div>
 
       <div class="no">
-        <h5>Don't</h5>
+        <h3>Don't</h3>
         <p>box-shadow 硬投影 <code>0 2px 8px rgba(0,0,0,0.3)</code> 觀感偏硬，印刷時也容易發黑。</p>
       </div>
       <div class="yes">
-        <h5>Do</h5>
+        <h3>Do</h3>
         <p>用 ring shadow (<code>0 0 0 1pt</code>)、whisper (<code>rgba 0.05</code>)，或直接用明暗交替建立層次。</p>
       </div>
     </div>
@@ -667,11 +667,11 @@ beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
       </div>
       <div class="faq-pair">
         <dt>能生成什麼？</dt>
-        <dd>八種文件範本：一頁紙、長文件、信件、作品集、履歷、簡報、個股研報、更新日誌，外加一套落地頁系統（中、英、韓文）。另有 17 種內聯 SVG 圖表用於視覺化說明。輸出為 HTML，可匯出為 PDF、PNG 或可編輯的 PPTX 簡報。</dd>
+        <dd>八種文件範本：一頁紙、長文件、信件、作品集、履歷、簡報、個股研報、更新日誌，外加一套落地頁系統（中、英、韓文）。另有 18 種內聯 SVG 圖表用於視覺化說明。輸出為 HTML，可匯出為 PDF、PNG 或可編輯的 PPTX 簡報。</dd>
       </div>
       <div class="faq-pair">
         <dt>怎麼安裝？</dt>
-        <dd>Claude Code（v2.1.142+）：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin marketplace add tw93/kami</code>，然後 <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin install kami@kami</code>。Codex：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin marketplace add tw93/kami</code>，然後 <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin add kami@kami</code>。通用 agent：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y</code>。Claude Desktop：從 GitHub Releases 下載 kami.zip，在自訂 &gt; Skills 中上傳即可。</dd>
+        <dd>Claude Code（v2.1.142+）：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin marketplace add tw93/kami</code>，然後 <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin install kami@kami</code>。Codex：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin marketplace add tw93/kami</code>，然後 <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin add kami@kami</code>。讀取 <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">~/.agents</code> 的通用 agent：<code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami/plugins/kami -a universal -g -y</code>。Claude Desktop：從 GitHub Releases 下載 release asset kami.zip，不要下載 Source code 壓縮包，然後在自訂 &gt; Skills 中上傳即可。</dd>
       </div>
       <div class="faq-pair">
         <dt>支援哪些語言？</dt>

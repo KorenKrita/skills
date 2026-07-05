@@ -141,6 +141,7 @@ When the user asks for **a diagram inside** a long-doc / portfolio / slide (not 
 | User says | Diagram | Template |
 |---|---|---|
 | "架构图 / architecture / 系统图 / components diagram" | Architecture | `assets/diagrams/architecture.html` |
+| "架构全景 / architecture board / 平台全景 / 系统大图 / five-layer panorama" | Architecture Board | `assets/diagrams/architecture-board.html` |
 | "流程图 / flowchart / 决策流 / branching logic" | Flowchart | `assets/diagrams/flowchart.html` |
 | "象限图 / quadrant / 优先级矩阵 / 2×2 matrix" | Quadrant | `assets/diagrams/quadrant.html` |
 | "柱状图 / bar chart / 分类对比 / grouped bars" | Bar Chart | `assets/diagrams/bar-chart.html` |
@@ -156,6 +157,8 @@ When the user asks for **a diagram inside** a long-doc / portfolio / slide (not 
 | "瀑布图 / waterfall / 收入桥 / revenue bridge / decomposition" | Waterfall | `assets/diagrams/waterfall.html` |
 
 Read `references/diagrams.md` before drawing - it has the selection guide, kami token map, and the AI-slop anti-pattern table. Extract the `<svg>` block from the template and drop it into a `<figure>` inside long-doc / portfolio.
+
+For a **full-system architecture board** (platform panorama, control plane, roadmap, or owner map in one artifact), do not inflate the single architecture figure past its node budget. Start from `assets/diagrams/architecture-board.html` and follow the «Architecture boards» section in `references/diagrams.md`: five fixed information layers, bands over cards, lines never on module edges, and a structure outline before any rendering.
 
 Before drawing, always ask: **would a well-written paragraph teach the reader less than this diagram?** If no, don't draw.
 
@@ -465,15 +468,18 @@ python3 scripts/build.py --verify resume-en # single target full verification
 python3 scripts/build.py landing-page        # screen-first static HTML template check
 python3 scripts/build.py --verify slides    # single slide deck verification
 python3 scripts/build.py --check-placeholders path/to/filled.html
+python3 scripts/build.py --check-markdown path/to/filled.pdf
 python3 scripts/build.py --check-resume-balance path/to/resume.pdf
 python3 scripts/build.py --check-density              # page whitespace scanner (skips cover)
-python3 scripts/build.py --check            # CSS rule violations only (fast, no build)
-python3 scripts/build_metadata.py --check   # Codex plugin mirror + marketplace drift check
+python3 scripts/build.py --check            # lint + token/theme + public-site fact checks
+python3 scripts/build_metadata.py --check   # Claude/Codex plugin mirror + marketplace drift check
 ```
 
 > **Screen verify**: `--check-density` is a print gate. For screen output (landing or docs pages) instead screenshot the rendered page at 375px and 1280px in every locale and scan for line widows before shipping. See `references/design.md` Section 11 «Responsive screenshot verification».
 
 Source templates intentionally keep `{{...}}` fields. Run placeholder checks on completed documents, not on the template library.
+
+For Markdown-sourced long documents, also run `--check-markdown` on the rendered PDF. It catches visible raw `---`, `**bold**`, and inline-code backticks that should have been converted or removed before delivery.
 
 Visual anomalies (tag double rectangle, font fallback, page break issues) -> `production.md` Part 4.
 
@@ -481,7 +487,7 @@ Visual anomalies (tag double rectangle, font fallback, page break issues) -> `pr
 
 Use these only when maintaining this repository or release package, not for ordinary document generation.
 
-- If marketplace metadata, generated plugin mirrors, version selection, or install paths change, run `python3 scripts/build_metadata.py --check`; for Codex install behavior, also smoke with an isolated `CODEX_HOME=/tmp/...` using `codex plugin marketplace add <path>`, `codex plugin add kami@kami`, and `codex plugin list`.
+- If marketplace metadata, generated plugin mirrors, version selection, or install paths change, run `python3 scripts/build_metadata.py --check`; for Claude Code install behavior, smoke with an isolated `HOME=/tmp/...` using `claude plugin marketplace add <path>`, `claude plugin install kami@kami`, and `claude plugin details kami@kami`; for Codex install behavior, smoke with an isolated `CODEX_HOME=/tmp/...` using `codex plugin marketplace add <path>`, `codex plugin add kami@kami`, and `codex plugin list`.
 - If `SKILL.md`, templates, scripts, references, or other package inputs change and the behavior ships through the skill package, run `bash scripts/package-skill.sh` and inspect `dist/kami.zip` before handoff.
 - If a GitHub release asset is refreshed, download the uploaded `kami.zip` and compare ZIP entry names plus per-entry SHA-256 digests against local `dist/kami.zip`; page text, file size, and the container hash are not enough.
 
@@ -508,7 +514,7 @@ Use these only when maintaining this repository or release package, not for ordi
 - No separate sans: `--sans: var(--serif)`, one font per page
 - Fallback: Georgia (cross-platform) / Palatino / Times New Roman
 
-Font files next to HTML with relative `@font-face` paths is the most stable setup. `scripts/package-skill.sh` excludes large CJK font files from the Claude Desktop ZIP, so the uploaded package stays under the 6MB package ceiling. Always upload that `package-skill.sh` output, never a hand-zipped checkout (the tracked CJK fonts make it too large and Claude Desktop rejects the upload).
+Font files next to HTML with relative `@font-face` paths is the most stable setup. `scripts/package-skill.sh` excludes large CJK font files from the Claude Desktop ZIP, so the uploaded package stays under the 6MB package ceiling and contains a top-level `kami/` skill folder. Always upload that `package-skill.sh` output, never a hand-zipped checkout (the tracked CJK fonts make it too large and Claude Desktop rejects the upload).
 
 **Font auto-recovery (Claude Desktop)**
 

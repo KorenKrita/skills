@@ -15,7 +15,7 @@
   <title>Kami: Document Design System for AI Agents</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Kami - a warm parchment design system for AI-assisted professional documents, shaped by one accent color, serif-led hierarchy, and editorial whitespace.">
-  <link rel="icon" href="https://gw.alipayobjects.com/zos/k/vl/logo.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/images/logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./styles.css">
   <link rel="canonical" href="https://kami.tw93.fun/">
   <link rel="alternate" hreflang="en" href="https://kami.tw93.fun/">
@@ -76,7 +76,7 @@
         "name": "What can Kami produce?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Eight document templates: one-pagers, long documents, letters, portfolios, resumes, slides, equity reports, and changelogs, plus a landing-page system (EN + CN + KO). Plus 17 inline SVG diagram types. Outputs are HTML exportable to PDF, PNG, or editable PPTX slide decks."
+          "text": "Eight document templates: one-pagers, long documents, letters, portfolios, resumes, slides, equity reports, and changelogs, plus a landing-page system (EN + CN + KO). Plus 18 inline SVG diagram types. Outputs are HTML exportable to PDF, PNG, or editable PPTX slide decks."
         }
       },
       {
@@ -84,7 +84,7 @@
         "name": "How do I set up Kami?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Claude Code (v2.1.142+): /plugin marketplace add tw93/kami && /plugin install kami@kami. Codex plugin marketplace: codex plugin marketplace add tw93/kami && codex plugin add kami@kami. Generic agents (OpenCode, Pi): npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y. Claude Desktop: download kami.zip from GitHub Releases and upload it in Skills settings."
+          "text": "Claude Code (v2.1.142+): /plugin marketplace add tw93/kami && /plugin install kami@kami. Codex plugin marketplace: codex plugin marketplace add tw93/kami && codex plugin add kami@kami. Generic agents that read ~/.agents: npx skills add tw93/kami/plugins/kami -a universal -g -y. Claude Desktop: download the release asset kami.zip from GitHub Releases, not the Source code ZIP, and upload it in Skills settings."
         }
       },
       {
@@ -105,7 +105,7 @@
   <!-- ============ HERO ============ -->
   <header class="hero">
     <div class="eyebrow">
-      <span>Design System · v1.9.1<span class="eyebrow-date"> · 2026.06</span></span>
+      <span>Design System · v1.9.2<span class="eyebrow-date"> · 2026.07</span></span>
       <span class="hero-links">
         <nav class="lang-switch" aria-label="Language" data-lang-switch>
           <button class="lang-trigger" type="button" aria-expanded="false" data-lang-trigger>English</button>
@@ -210,8 +210,8 @@
 <span class="c"># Codex plugin marketplace</span>
 codex plugin marketplace add tw93/kami
 codex plugin add kami@kami</pre>
-    <p class="section-lede" style="font-size:14px;">Generic agents (OpenCode, Pi, and others reading from <code>~/.agents/</code>): <code>npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y</code>. The subpath points at the self-contained skill package; a bare <code>tw93/kami</code> installs only SKILL.md.</p>
-    <p class="section-lede" style="font-size:14px;">Claude Desktop: download <a href="https://github.com/tw93/kami/releases/latest/download/kami.zip" style="color:var(--brand); text-decoration:none; font-weight:500;">kami.zip</a>, then upload it in Customize &gt; Skills &gt; "+" &gt; Create skill.</p>
+    <p class="section-lede" style="font-size:14px;">Generic agents that read from <code>~/.agents/</code>: <code>npx skills add tw93/kami/plugins/kami -a universal -g -y</code>. The plugin path exposes the generated lightweight skill bundle; a bare <code>tw93/kami</code> installs only SKILL.md.</p>
+    <p class="section-lede" style="font-size:14px;">Claude Desktop: download the release asset <a href="https://github.com/tw93/kami/releases/latest/download/kami.zip" style="color:var(--brand); text-decoration:none; font-weight:500;">kami.zip</a>, not GitHub's Source code ZIP, then upload it in Customize &gt; Skills &gt; "+" &gt; Create skill.</p>
   </section>
 
   <!-- ============ 02 MANIFESTO ============ -->
@@ -333,7 +333,7 @@ codex plugin add kami@kami</pre>
       </div>
       <div class="type-row">
         <div class="type-label">Label</div>
-        <div class="type-sample label">Design System · v1.9.1</div>
+        <div class="type-sample label">Design System · v1.9.2</div>
         <div class="type-specs"><b>7.5-8 pt</b><br>weight 600<br>line 1.35</div>
       </div>
     </div>
@@ -397,7 +397,7 @@ codex plugin add kami@kami</pre>
 
     <div class="comp-grid">
       <div class="comp">
-        <h4>Buttons</h4>
+        <h3>Buttons</h3>
         <p class="hint">ring shadow instead of hard drop · 8pt radius</p>
         <div class="demo" style="display:flex; gap:10px; flex-wrap:wrap;">
           <span class="btn btn-primary">Primary CTA</span>
@@ -406,7 +406,7 @@ codex plugin add kami@kami</pre>
         </div>
       </div>
       <div class="comp">
-        <h4>Tags, three levels</h4>
+        <h3>Tags, three levels</h3>
         <p class="hint">solid hex · pick from weak to strong</p>
         <div class="demo" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
           <span class="tag calm">Light 0.08</span>
@@ -415,12 +415,12 @@ codex plugin add kami@kami</pre>
         </div>
       </div>
       <div class="comp">
-        <h4>Quote</h4>
+        <h3>Quote</h3>
         <p class="hint">left 2pt brand solid + olive text</p>
         <blockquote class="quote">A thousand no's for every yes, prefer clarity over decoration.</blockquote>
       </div>
       <div class="comp">
-        <h4>Metric</h4>
+        <h3>Metric</h3>
         <p class="hint">serif number + sans label · tabular-nums</p>
         <div class="metrics demo">
           <div class="metric"><span class="metric-value">8</span><span class="metric-label">Doc types</span></div>
@@ -429,14 +429,14 @@ codex plugin add kami@kami</pre>
         </div>
       </div>
       <div class="comp">
-        <h4>Section Title</h4>
+        <h3>Section Title</h3>
         <p class="hint">serif 500 · 15pt · size-led hierarchy, no decoration</p>
         <div class="demo">
           <span class="sample-section-title">Selected Works · Projects</span>
         </div>
       </div>
       <div class="comp">
-        <h4>Dash List</h4>
+        <h3>Dash List</h3>
         <p class="hint">dash instead of bullet · editorial tone</p>
         <ul class="dash demo">
           <li>Warm parchment, never pure white</li>
@@ -445,7 +445,7 @@ codex plugin add kami@kami</pre>
         </ul>
       </div>
       <div class="comp">
-        <h4>Code Block</h4>
+        <h3>Code Block</h3>
         <p class="hint">ivory bg + 0.5pt border + 6pt radius</p>
 <pre class="code"><span class="c">// warmth from restraint, not from color</span>
 canvas   = parchment; accent = <span class="k">ink_blue</span>
@@ -454,7 +454,7 @@ document = <span class="k">serif</span> × hierarchy + generous_space
 beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
       </div>
       <div class="comp">
-        <h4>Featured Card</h4>
+        <h3>Featured Card</h3>
         <p class="hint">whisper shadow + 16pt radius</p>
         <div class="demo" style="background:var(--ivory); border-radius:16px; padding:18px 20px; box-shadow: 0 4px 24px rgba(0,0,0,0.05); border: 1px solid var(--border-cream);">
           <p style="font-family:var(--serif); font-weight:500; font-size:15px; margin:0 0 6px; color:var(--near-black);">Tesla Company Profile · One-Pager</p>
@@ -474,7 +474,7 @@ beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
     <div class="section-head">
       <p class="section-num">07 · Diagrams</p>
       <h2 class="section-title">Inline Charts</h2>
-      <p class="section-lede">Seventeen inline SVG diagram types covering architecture, process, and data chart scenarios. Tell Claude which type you need and it embeds directly into the document, colors and fonts following the Kami design language.</p>
+      <p class="section-lede">Eighteen inline SVG diagram types covering architecture, process, and data chart scenarios. Tell Claude which type you need and it embeds directly into the document, colors and fonts following the Kami design language.</p>
     </div>
     <div class="chart-showcase">
       <!-- Architecture mini -->
@@ -600,35 +600,35 @@ beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
 
     <div class="anti">
       <div class="no">
-        <h5>Don't</h5>
+        <h3>Don't</h3>
         <p>Use <code>#ffffff</code> pure white or <code>#f3f4f6</code> cool gray as page background. It makes the page feel brittle and weakens the warm parchment character.</p>
       </div>
       <div class="yes">
-        <h5>Do</h5>
+        <h3>Do</h3>
         <p>Always use <code>#f5f4ed</code> parchment. Set <code>@page background</code> to the same color to avoid white edges when printing.</p>
       </div>
       <div class="no">
-        <h5>Don't</h5>
+        <h3>Don't</h3>
         <p>Use <code>rgba(27,54,93,0.18)</code> for tags. WeasyPrint renders padding and glyph areas at different opacity, creating double rectangles.</p>
       </div>
       <div class="yes">
-        <h5>Do</h5>
+        <h3>Do</h3>
         <p>Use the tint lookup table for equivalent solid hex <code>#E4ECF5</code>. The rendering stays clean and the color remains stable.</p>
       </div>
       <div class="no">
-        <h5>Don't</h5>
+        <h3>Don't</h3>
         <p>Set headlines to <code>font-weight: 600</code> or heavier synthetic bold. Synthetic bold blurs strokes and degrades typographic quality.</p>
       </div>
       <div class="yes">
-        <h5>Do</h5>
+        <h3>Do</h3>
         <p>Body 400, headings 500 (real W05). For more presence, use size or a brand left bar, never synthetic bold.</p>
       </div>
       <div class="no">
-        <h5>Don't</h5>
+        <h3>Don't</h3>
         <p>Use hard drop shadow <code>0 2px 8px rgba(0,0,0,0.3)</code>. Visually heavy and likely to print as dark blobs.</p>
       </div>
       <div class="yes">
-        <h5>Do</h5>
+        <h3>Do</h3>
         <p>Ring shadow <code>0 0 0 1pt</code> or whisper <code>rgba 0.05</code>, or simply alternate light and dark sections.</p>
       </div>
     </div>
@@ -659,11 +659,11 @@ beauty   = constraints × <span class="k">intention</span> ÷ noise</pre>
       </div>
       <div class="faq-pair">
         <dt>What can it produce?</dt>
-        <dd>Eight document templates: one-pagers, long documents, letters, portfolios, resumes, slides, equity reports, and changelogs, plus a landing-page system (EN + CN + KO). Plus 17 inline SVG diagram types for visual explanations. Outputs are HTML that can be exported to PDF, PNG, or editable PPTX slide decks.</dd>
+        <dd>Eight document templates: one-pagers, long documents, letters, portfolios, resumes, slides, equity reports, and changelogs, plus a landing-page system (EN + CN + KO). Plus 18 inline SVG diagram types for visual explanations. Outputs are HTML that can be exported to PDF, PNG, or editable PPTX slide decks.</dd>
       </div>
       <div class="faq-pair">
         <dt>How do I set it up?</dt>
-        <dd>Claude Code (v2.1.142+): <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin marketplace add tw93/kami</code> then <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin install kami@kami</code>. Codex: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin marketplace add tw93/kami</code> then <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin add kami@kami</code>. Generic agents like OpenCode: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami/plugins/kami/skills/kami -a '*' -g -y</code>. Claude Desktop: download kami.zip from GitHub Releases and upload it in Customize &gt; Skills. No slash command needed, the skill auto-triggers from natural requests.</dd>
+        <dd>Claude Code (v2.1.142+): <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin marketplace add tw93/kami</code> then <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">/plugin install kami@kami</code>. Codex: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin marketplace add tw93/kami</code> then <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">codex plugin add kami@kami</code>. Generic agents that read <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">~/.agents</code>: <code style="font-family:var(--mono); font-size:0.9em; color:var(--brand);">npx skills add tw93/kami/plugins/kami -a universal -g -y</code>. Claude Desktop: download the release asset kami.zip from GitHub Releases, not the Source code ZIP, and upload it in Customize &gt; Skills. No slash command needed, the skill auto-triggers from natural requests.</dd>
       </div>
       <div class="faq-pair">
         <dt>What languages does it support?</dt>
