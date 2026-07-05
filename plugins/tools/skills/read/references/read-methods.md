@@ -117,6 +117,16 @@ python3 "$READ_SCRIPT_DIR/fetch_feishu.py" "{url}"
 Supports: docx and wiki pages. Legacy `/docs/` pages are not supported by this script; convert them to docx first, or use a public-page fallback if the document is accessible without the API. App needs `docx:document:readonly` and `wiki:wiki:readonly` permissions.
 Output: YAML frontmatter (title, document_id, url) + Markdown body.
 
+Do not tell every user to install `lark-cli` up front. Use it as the user-login fallback when the API helper fails because app credentials are missing, or when the user explicitly prefers OAuth login over `FEISHU_APP_ID` / `FEISHU_APP_SECRET`:
+
+```bash
+npm install -g @larksuite/cli  # one-time setup if lark-cli is absent
+lark-cli auth login            # one-time login
+lark-cli docs +fetch --doc "{url}" --format json
+```
+
+`lark-cli docs +fetch` returns structured document JSON, not final Markdown. Extract and convert the useful content before answering; do not return raw JSON.
+
 ## WeChat Public Account
 
 Use the proxy cascade (r.jina.ai / defuddle.md). Works for most articles without any extra tools.
