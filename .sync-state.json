@@ -15,7 +15,7 @@
     "sha": "03369ee6d7cafbfcecc4346539b05b3dc0a603bb"
   },
   "hunt": {
-    "sha": "816f8ea363d67f908fa7e8c662a69c035fd01484"
+    "sha": "b6fd6252bfb44d4b043fa3add91bbe2aedf08f69"
   },
   "ocr": {
     "sha": "63b0f02d2715e183e0405bfef12b0f18e51b86de"
@@ -39,10 +39,10 @@
     "sha": "2454c95dc305c158b21a0cdafeb728879dd0359a"
   },
   "think": {
-    "sha": "816f8ea363d67f908fa7e8c662a69c035fd01484"
+    "sha": "b6fd6252bfb44d4b043fa3add91bbe2aedf08f69"
   },
   "core": {
-    "sha": "816f8ea363d67f908fa7e8c662a69c035fd01484"
+    "sha": "b6fd6252bfb44d4b043fa3add91bbe2aedf08f69"
   },
   "noai": {
     "sha": "91f3d394db8419c20d67ebe22a96cf8fee0a404b"
@@ -66,13 +66,13 @@
     "sha": "1bc6113180ec7a1b56f3e9027a404a29bafade27"
   },
   "learn": {
-    "sha": "816f8ea363d67f908fa7e8c662a69c035fd01484"
+    "sha": "b6fd6252bfb44d4b043fa3add91bbe2aedf08f69"
   },
   "teach": {
     "sha": "2454c95dc305c158b21a0cdafeb728879dd0359a"
   },
   "read": {
-    "sha": "816f8ea363d67f908fa7e8c662a69c035fd01484"
+    "sha": "b6fd6252bfb44d4b043fa3add91bbe2aedf08f69"
   },
   "write-skill": {
     "sha": "8370e760d0251a3738e006aeacec6d1cb31dd208"
@@ -87,7 +87,7 @@
     "sha": "b70ff9f9806dc6a04a8169340829cb75103af0fe"
   },
   "kami": {
-    "sha": "098515e6f3106607070ad9cb97a21d3b8bf53c87"
+    "sha": "9d0fab49f6b8c383132e4e5e7c7357f39ea72442"
   },
   "goal-gen": {
     "sha": "f29e0189f2ea03392c50b4f1c7230886bd838a13"
@@ -102,7 +102,7 @@
     "sha": "0877403d1e867fd9d574117e9b34ade404f36d2a"
   },
   "archify": {
-    "sha": "8d2f3178262555d9c660da7844e3d40a59da649e"
+    "sha": "fa7fbce7fba812fbb8ac813408602412806fe40f"
   },
   "grilling": {
     "sha": "272f99b22574f50e4266791c86b9302682970e23"
