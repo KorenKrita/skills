@@ -40,13 +40,13 @@ When distilling a new lesson into this skill, fold it into an existing principle
    - Contains Chinese characters (default prose) → load `references/write-zh-prose.md` (quick rules); load `references/write-zh.md` for the full AI-taste pattern catalog
    - Otherwise → load `references/write-en.md`
 
-Read the loaded reference file. Then edit. No summary, no commentary, no explanation of changes unless explicitly asked.
+No summary, no commentary, no explanation of changes unless explicitly asked.
 
 ## Durable Context Preflight
 
-See [rules/durable-context.md](../../rules/durable-context.md) for when to read durable context, the read-order budget, and the memory-type mapping.
+See [references/durable-context.md](references/durable-context.md) for when to read durable context, the read-order budget, and the memory-type mapping.
 
-For `/write`, voice and format constraints are `decision`, `preference`, and `principle` entries; editing checks are `pattern` and `learning`. The supplied text, audience, project docs, current release state, and source material override memory. Durable preferences can set brevity, tone, and social-post shape. They do not override the hard rule to edit in place, keep meaning intact, and avoid change lists unless the user explicitly asks.
+For `/write`: the supplied text and current release state override memory. Durable preferences can set brevity, tone, and social-post shape; they do not override the hard rule to edit in place, keep meaning intact, and avoid change lists unless the user explicitly asks.
 
 ## Hard Rules
 
@@ -144,19 +144,18 @@ Before drafting, gather style references:
 - **Extract from `git log <last-tag>..HEAD`** rather than from memory. Read every `feat:` and `fix:` commit; do not omit small items just because they look minor in commit form (iOS wrapper support, Dock cleanup, AV-vendor protection boundary are not "minor" from a user point of view).
 - **One sentence per item, naming the user-visible change**, not the implementation. "Use `CKDownloadQueue` observer for App Store updates" is not a release note; "App Store updates now run inside the app instead of opening App Store" is.
 - **Bilingual structure**: when the project ships bilingual release notes, put the English block and the Chinese block as two parallel sections inside the same release item; do not interleave per bullet. For HTML-capable update-feed CDATA, separate language blocks with headings so the rendered update window does not collapse them together.
-- **No em-dash** in release prose (covered by the Hard Rule). Use Chinese full-width punctuation in Chinese blocks, ASCII in English blocks.
+- **Punctuation**: Chinese full-width in Chinese blocks, ASCII in English blocks.
 
 ## Public Reply Mode (GitHub issue / PR)
 
 Activate when: "回复 issue", "reply to PR", "comment on #N", "回 issue", or the user asks for the text of a GitHub issue / PR comment.
 
-Five hard rules for the reply body:
+Four hard rules for the reply body:
 
 1. **Open with `@<reporter>` + one thanks line.** Match the reporter's language (Chinese → "感谢反馈" / English → "thanks for the detailed report"). No exclamation mark. No emoji. No "🙏".
 2. **Then state the cause in one sentence, the impact in one sentence.** No multi-paragraph background, no internal symbol names, no walk-through of the fix.
-3. **Then state the ship state**, exactly one of: already shipped in v<X.Y.Z>, fixed on `main` and going out in the next release, planned for v<X.Y.Z>, not planned (with one-line reason and an alternative path). Do not write "already shipped" without release evidence in the current turn.
+3. **Then state the ship state**, exactly one of: already shipped in v<X.Y.Z>, fixed on `main` and going out in the next release, planned for v<X.Y.Z>, not planned (with one-line reason and an alternative path). Every sentence must be true at the moment of posting: no "already shipped" without release evidence in the current turn, no "landed on main" while the change sits uncommitted, no implied verification (built a branch, ran an artifact) that did not happen.
 4. **Two paragraphs maximum**, separated by one blank line. No bullet lists, no section headers, no code blocks except a one-line command when actually needed.
-5. **No em-dash.** Use commas, periods, colons. (Covered by the Hard Rule, surfaced again because issue replies attract this pattern.)
 
 The reply is the final user-facing text, not an agent log. Do not write "刚才我判断错了", "前面回复有误", "I re-read it and changed the comment", or any meta narration about your own process. If editing an existing maintainer comment, replace it with the clean final wording as if it were the only comment the user will read.
 
