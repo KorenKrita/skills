@@ -1,10 +1,8 @@
-// Robustness net for the no-ajv path. validator.mjs deliberately supports
-// running without ajv (skips schema validation so malformed input still reaches
-// the renderers' friendly layout checks). CI always installs ajv, so this is
-// the one path the rest of the suite never exercises — and it is exactly where
-// the v2.5.0 review found raw TypeErrors and silent `<rect x="NaN">` output.
+// Installation contract: the shipped skill performs full JSON Schema
+// validation without node_modules. AJV is a build-time dependency only; its
+// standalone validators are committed and included in the distribution.
 //
-// Contract under degraded mode: a malformed-but-JSON-legal document must EXIT
+// A malformed-but-JSON-legal document must EXIT
 // NON-ZERO with a friendly message — never crash (TypeError / is not a
 // function) and never write NaN/undefined into the HTML. A random VALID
 // perturbation of an example must still render (exit 0, no NaN).
@@ -31,17 +29,15 @@ const EXAMPLES = {
   architecture: 'web-app.architecture.json',
 };
 
-// Hide ajv so validator.mjs takes the degraded branch. We point NODE_PATH at an
-// empty dir AND set a resolution-blocking env? Simplest robust approach: render
-// in a temp copy of the skill with node_modules/ajv renamed aside. But that is
-// heavy. Instead we rely on validator.mjs catching ERR_MODULE_NOT_FOUND — we
-// can't unload an installed ajv per-process. So we detect availability and, if
-// ajv IS installed, still assert the stronger property that holds in BOTH
-// modes: malformed input never crashes and never emits NaN (ajv just makes the
-// message a schema error instead of a layout error). This keeps the test green
-// on CI while still covering the crash/NaN contract end-to-end.
-
-const ajvInstalled = fs.existsSync(path.join(skillRoot, 'node_modules', 'ajv'));
+const installedRoot = path.join(tmp, 'installed-skill');
+fs.cpSync(skillRoot, installedRoot, {
+  recursive: true,
+  filter(source) {
+    const rel = path.relative(skillRoot, source);
+    return rel !== 'node_modules' && !rel.startsWith(`node_modules${path.sep}`)
+      && rel !== 'test' && !rel.startsWith(`test${path.sep}`);
+  },
+});
 
 function render(mode, doc) {
   const input = path.join(tmp, `in-${Math.random().toString(36).slice(2)}.json`);
@@ -51,7 +47,7 @@ function render(mode, doc) {
   let code = 0;
   let stderr = '';
   try {
-    execFileSync('node', [path.join(skillRoot, `renderers/${mode}/render-${mode}.mjs`), input, out],
+    execFileSync('node', [path.join(installedRoot, `renderers/${mode}/render-${mode}.mjs`), input, out],
       { stdio: ['ignore', 'ignore', 'pipe'] });
   } catch (err) {
     code = err.status ?? 1;
@@ -136,9 +132,25 @@ test('property: shuffling node/state order still renders (order-independence)', 
   }
 });
 
-if (!ajvInstalled) {
-  test('(degraded mode active: ajv not installed — schema validation skipped)', () => {
-    assert.ok(true);
+test('installed skill rejects unknown fields without node_modules', () => {
+  const doc = JSON.parse(fs.readFileSync(path.join(skillRoot, 'examples', EXAMPLES.workflow), 'utf8'));
+  doc.nodes[0].colour = 'cyan';
+  const { code, stderr } = render('workflow', doc);
+  assert.notEqual(code, 0);
+  assert.match(stderr, /workflow schema validation failed/);
+  assert.match(stderr, /\/nodes\/0 \(id\/label: "user"\) must NOT have additional properties/);
+  assert.match(stderr, /"additionalProperty":"colour"/);
+  assert.doesNotMatch(stderr, /ajv is not installed|skipping JSON-schema validation/);
+});
+
+for (const mode of Object.keys(EXAMPLES)) {
+  test(`installed skill retains full ${mode} schema without node_modules`, () => {
+    const doc = JSON.parse(fs.readFileSync(path.join(skillRoot, 'examples', EXAMPLES[mode]), 'utf8'));
+    doc.unknownField = true;
+    const { code, stderr } = render(mode, doc);
+    assert.notEqual(code, 0);
+    assert.match(stderr, new RegExp(`${mode} schema validation failed`));
+    assert.match(stderr, /"additionalProperty":"unknownField"/);
   });
 }
 

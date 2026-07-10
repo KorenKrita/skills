@@ -7,10 +7,8 @@ template.
 node archify/renderers/workflow/render-workflow.mjs input.workflow.json output.html
 ```
 
-Run `npm install` once in the skill folder first — the renderer validates the
-input against `archify/schemas/workflow.schema.json` via ajv. Without it, the
-renderer prints a warning and skips schema validation; its own layout checks
-still run.
+The renderer validates input against `archify/schemas/workflow.schema.json`
+with the bundled standalone validator. No dependency installation is required.
 
 If `output.html` is omitted, the renderer uses `meta.output` from the JSON file
 or falls back to `workflow.html` in the current working directory.
