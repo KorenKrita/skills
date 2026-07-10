@@ -160,6 +160,8 @@ Read `references/diagrams.md` before drawing - it has the selection guide, kami 
 
 For a **full-system architecture board** (platform panorama, control plane, roadmap, or owner map in one artifact), do not inflate the single architecture figure past its node budget. Start from `assets/diagrams/architecture-board.html` and follow the «Architecture boards» section in `references/diagrams.md`: five fixed information layers, bands over cards, lines never on module edges, and a structure outline before any rendering.
 
+For a **repo-maintained diagram** (README or docs-site architecture figure, "给项目画张架构图", or updating a diagram that already lives in the user's repository), follow «Maintained diagram assets» in `references/diagrams.md`: run the evidence pass first (existing `prompt.md`, `index.html`, current PNG, then the facts that define objects and boundaries), keep the trio (`index.html` + same-name PNG + `prompt.md`) consistent, encode shipped / in-build / future maturity, and re-export the PNG after every HTML change. Never redraw an existing diagram from memory, and never hand-edit the PNG.
+
 Before drawing, always ask: **would a well-written paragraph teach the reader less than this diagram?** If no, don't draw.
 
 **Auto-select charts from data.** When content contains numerical data, choose the chart type and embed it without waiting for the user to specify. Decision tree (first match wins):
@@ -357,7 +359,7 @@ Pick the tier that matches the task. Default to the lowest tier that covers the 
 | **Deck (>20 slides)** | Long presentation needing Part Divider, Code Cards, section headers. | Full design spec + Deck Recipe (design.md section 8) |
 | **Troubleshoot** | Rendering bug, font issue, page overflow. | `production.md` (+ design spec if CSS is the cause) |
 | **Anti-patterns** | Reviewing AI-generated drafts before shipping. | `anti-patterns.md` (six-category checklist) |
-| **Diagram** | Embedding SVG in a doc. | `diagrams.md` only (has its own token map) |
+| **Diagram** | Embedding SVG in a doc, or maintaining a repo-owned diagram (trio: HTML + PNG + prompt.md). | `diagrams.md` only (has its own token map) |
 
 You can always escalate mid-task if the work turns out to need more than the initial tier.
 
@@ -445,6 +447,14 @@ python3 scripts/build.py --check-density   # flags >25% (WARN) / >50% (SPARSE) t
 ```
 
 If a body page (not cover, not last page) gets a SPARSE warning, treat it as a draft defect and re-author with the merge rule.
+
+## Step 4.2 · Resume recruiter pass (resume only)
+
+Mechanical checks (`--check-placeholders`, `--check-resume-balance`, `--check-density`) validate structure and layout, not prose. A resume can pass all of them and still read broken. After filling and before building, reread every project card the way a recruiter would, against the row definitions in `references/resume-writing.md` ("What goes in each row"): Role carries your position in the project, not background alone; Actions are verb-led, one concrete approach per sentence; Impact reads as an outcome, not a restatement of the process. One cross-row check on top: no row repeats another row's information.
+
+Fix a failing row by rewriting from the source material. If the source cannot support a row (for example, no outcome fact exists), ask the user for the missing fact. Do not pad, and do not fall back to generic claims ("保障稳定运行", "improved efficiency").
+
+This pass is internal: run it silently; surface it only when a row cannot be fixed without new information from the user.
 
 ## Step 4.5 · Auto-select output format
 
