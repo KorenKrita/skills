@@ -14,9 +14,6 @@
       "scripts/hitl-loop.template.sh"
     ]
   },
-  "zoom-out": {
-    "sha": "694fa30311e02c2639942308513555e61ee84a6f"
-  },
   "prototype": {
     "sha": "d574778f94cf620fcc8ce741584093bc650a61d3",
     "files": [
@@ -609,9 +606,6 @@
       "SKILL.md"
     ]
   },
-  "decision-mapping": {
-    "sha": "0877403d1e867fd9d574117e9b34ade404f36d2a"
-  },
   "archify": {
     "sha": "6486a5d89f08affc929bc3082ff9414d46200f5e",
     "files": [
@@ -747,6 +741,12 @@
   },
   "thermo-nuclear-code-quality-review": {
     "sha": "0dda29e839d15464a137af9935665a5a47ee09b8",
+    "files": [
+      "SKILL.md"
+    ]
+  },
+  "wayfinder": {
+    "sha": "d574778f94cf620fcc8ce741584093bc650a61d3",
     "files": [
       "SKILL.md"
     ]
