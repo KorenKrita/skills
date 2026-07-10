@@ -2,6 +2,14 @@
   "name": "korenkrita-skills",
   "private": true,
   "type": "module",
+  "keywords": [
+    "pi-package"
+  ],
+  "pi": {
+    "skills": [
+      "./plugins/*/skills"
+    ]
+  },
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
