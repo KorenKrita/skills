@@ -1,0 +1,43 @@
+import { dirname } from "node:path"
+
+export interface SparseCheckoutPlan {
+  readonly checkoutWholeRepo: boolean
+  readonly directories: readonly string[]
+}
+
+export function toSparseDir(path: string): string {
+  if (path === "." || path === "") return "."
+  const normalized = path.replace(/\/+$/, "")
+  const lastSegment = normalized.split("/").pop() ?? ""
+  return lastSegment.includes(".") ? dirname(normalized) : normalized
+}
+
+export function planSparseCheckout(paths: readonly string[]): SparseCheckoutPlan {
+  const directories = [...new Set(paths.map(toSparseDir))]
+  if (directories.includes(".")) {
+    return { checkoutWholeRepo: true, directories: [] }
+  }
+  return { checkoutWholeRepo: false, directories }
+}
+
+export function findRemovedFiles(
+  previousUpstreamFiles: readonly string[],
+  currentUpstreamFiles: readonly string[],
+): string[] {
+  const current = new Set(currentUpstreamFiles)
+  return previousUpstreamFiles.filter((file) => !current.has(file))
+}
+
+export function findNewFileConflicts(
+  existingFiles: readonly string[],
+  previousUpstreamFiles: readonly string[] | undefined,
+  currentUpstreamFiles: readonly string[],
+): string[] {
+  if (!previousUpstreamFiles) return []
+
+  const existing = new Set(existingFiles)
+  const previous = new Set(previousUpstreamFiles)
+  return currentUpstreamFiles.filter(
+    (file) => !previous.has(file) && existing.has(file),
+  )
+}

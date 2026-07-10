@@ -36,7 +36,7 @@
 
 ## 上游同步
 
-仓库通过 GitHub Actions 每天自动检查上游更新，以 PR 形式提交变更供审核。
+仓库通过 GitHub Actions 每天按文件内容审计全部上游（不只比较 commit SHA），以 PR 形式提交变更供审核。同步会保留本地额外文件，并根据同步状态中的文件清单删除上游已删除文件。
 
 上游来源：
 - [mattpocock/skills](https://github.com/mattpocock/skills)

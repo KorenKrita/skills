@@ -1,9 +1,14 @@
 import { Effect } from "effect"
 import { execSync } from "node:child_process"
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync, rmSync } from "node:fs"
-import { join, dirname } from "node:path"
+import { join } from "node:path"
 import { parse as parseYaml } from "yaml"
 import { applyPatches, type Patch } from "./patch-engine.js"
+import {
+  findNewFileConflicts,
+  findRemovedFiles,
+  planSparseCheckout,
+} from "./sync-utils.js"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -27,8 +32,13 @@ interface SkillOverride {
   extra_mappings?: ExtraMapping[]
 }
 
+interface SyncStateEntry {
+  sha: string
+  files?: string[]
+}
+
 interface SyncState {
-  [skillName: string]: { sha: string }
+  [skillName: string]: SyncStateEntry
 }
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -36,6 +46,7 @@ interface SyncState {
 const ROOT = new URL("../", import.meta.url).pathname.replace(/\/$/, "")
 const SYNC_STATE_PATH = join(ROOT, ".sync-state.json")
 const OVERRIDES_PATH = join(ROOT, "overrides.yaml")
+const FORCE_SYNC = process.argv.includes("--force")
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -68,19 +79,23 @@ function getUpstreamLatestSha(repo: string, ref: string): string | null {
   }
 }
 
-function toSparseDir(p: string): string {
-  const lastSegment = p.split("/").pop() ?? ""
-  return lastSegment.includes(".") ? dirname(p) : p
+function shellQuote(value: string): string {
+  return `'${value.replace(/'/g, `'\\''`)}'`
 }
 
 function cloneUpstream(repo: string, ref: string, paths: string[]): string {
   const tempDir = join(ROOT, ".tmp-upstream")
   if (existsSync(tempDir)) rmSync(tempDir, { recursive: true })
 
-  const dirs = [...new Set(paths.map(toSparseDir))]
-  exec(`git clone --depth 1 --branch ${ref} --filter=blob:none --sparse https://github.com/${repo}.git ${tempDir}`)
-  exec(`git -C ${tempDir} sparse-checkout set ${dirs.join(" ")}`)
-  exec(`git -C ${tempDir} checkout`)
+  const plan = planSparseCheckout(paths)
+  exec(`git clone --depth 1 --branch ${shellQuote(ref)} --filter=blob:none --sparse https://github.com/${repo}.git ${shellQuote(tempDir)}`)
+  if (plan.checkoutWholeRepo) {
+    exec(`git -C ${shellQuote(tempDir)} sparse-checkout disable`)
+  } else {
+    const directories = plan.directories.map(shellQuote).join(" ")
+    exec(`git -C ${shellQuote(tempDir)} sparse-checkout set -- ${directories}`)
+  }
+  exec(`git -C ${shellQuote(tempDir)} checkout`)
 
   return tempDir
 }
@@ -142,6 +157,36 @@ function collectFiles(dir: string, prefix = ""): string[] {
 function getExistingFiles(dir: string): string[] {
   if (!existsSync(dir)) return []
   return collectFiles(dir)
+}
+
+function removeDeletedUpstreamFiles(
+  destDir: string,
+  previousUpstreamFiles: readonly string[] | undefined,
+  currentUpstreamFiles: readonly string[],
+): string[] {
+  if (!previousUpstreamFiles) return []
+
+  const removedFiles = findRemovedFiles(previousUpstreamFiles, currentUpstreamFiles)
+  for (const file of removedFiles) {
+    const target = join(destDir, file)
+    rmSync(target, { force: true })
+  }
+  return removedFiles
+}
+
+function cleanPaths(paths: string[]): void {
+  for (const path of paths) {
+    try {
+      exec(`git restore --staged --worktree -- ${shellQuote(path)}`)
+    } catch {
+      // The path may only contain newly created, untracked files.
+    }
+    try {
+      exec(`git clean -fd -- ${shellQuote(path)}`)
+    } catch {
+      // Best-effort cleanup; the caller will surface any remaining dirty state.
+    }
+  }
 }
 
 // ─── PR Creation ─────────────────────────────────────────────────────────────
@@ -223,13 +268,15 @@ const program = Effect.gen(function* () {
       continue
     }
 
-    const lastSha = syncState[skillName]?.sha
-    if (lastSha === latestSha) {
+    const previousState = syncState[skillName]
+    const lastSha = previousState?.sha
+    if (lastSha === latestSha && !FORCE_SYNC) {
       console.log(`✓ ${skillName}: 无变更`)
       continue
     }
 
-    console.log(`🔄 ${skillName}: 检测到上游更新 (${lastSha?.slice(0, 7) ?? "首次"} → ${latestSha.slice(0, 7)})`)
+    const reason = FORCE_SYNC && lastSha === latestSha ? "强制审计" : "检测到上游更新"
+    console.log(`🔄 ${skillName}: ${reason} (${lastSha?.slice(0, 7) ?? "首次"} → ${latestSha.slice(0, 7)})`)
 
     const destDir = join(ROOT, "plugins", plugin, "skills", skillName)
     const existingLocalFiles = getExistingFiles(destDir)
@@ -240,10 +287,20 @@ const program = Effect.gen(function* () {
       continue
     }
 
-    // Check for name conflicts (upstream new file collides with local file)
-    const localOnlyFiles = existingLocalFiles.filter((f) => !upstreamFiles.includes(f))
-    const newUpstreamFiles = upstreamFiles.filter((f) => !existingLocalFiles.includes(f))
-    const conflicts = newUpstreamFiles.filter((f) => localOnlyFiles.includes(f))
+    const removedFiles = removeDeletedUpstreamFiles(
+      destDir,
+      previousState?.files,
+      upstreamFiles,
+    )
+
+    // A conflict only exists when a file was local-only in the previous manifest
+    // and is newly introduced by upstream. Existing upstream-managed files are
+    // expected to be overwritten on every sync.
+    const conflicts = findNewFileConflicts(
+      existingLocalFiles,
+      previousState?.files,
+      upstreamFiles,
+    )
 
     // Apply patches to SKILL.md
     let patchFailed = false
@@ -279,6 +336,9 @@ const program = Effect.gen(function* () {
     body += `- 分支: \`${source.ref}\`\n`
     body += `- SHA: \`${latestSha.slice(0, 12)}\`\n`
     body += `- 文件: ${upstreamFiles.join(", ")}\n`
+    if (removedFiles.length > 0) {
+      body += `- 上游已删除: ${removedFiles.join(", ")}\n`
+    }
 
     if (patches.length > 0) {
       body += `\n## 补丁结果\n\n${patchReport}\n`
@@ -302,13 +362,15 @@ const program = Effect.gen(function* () {
       const result = createPr(skillName, source.repo, branch, patchFailed, body, stagePaths)
       if (result === "created") {
         console.log(`  📬 PR 已创建${patchFailed ? " (Draft)" : ""}`)
-        syncState[skillName] = { sha: latestSha }
-        updated = true
       } else if (result === "no-changes") {
-        console.log(`  ⏭️  ${skillName}: 文件内容无变化，跳过`)
+        console.log(`  ⏭️  ${skillName}: 文件内容无变化，记录最新状态`)
       } else {
-        console.log(`  ⏭️  ${skillName}: 分支已存在，跳过`)
+        console.log(`  ⏭️  ${skillName}: 分支已存在，记录最新状态`)
+        cleanPaths(stagePaths)
       }
+
+      syncState[skillName] = { sha: latestSha, files: upstreamFiles }
+      updated = true
     } catch (e) {
       console.log(`  ❌ PR 创建失败: ${e}`)
     }

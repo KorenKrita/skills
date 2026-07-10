@@ -24,7 +24,8 @@ jobs:
       - run: npm ci
 
       - name: 执行同步
-        run: npx tsx scripts/sync.ts
+        # 每次都按文件内容审计，避免 SHA 已更新但 PR 未合并、手动改动或旧同步器缺陷造成漂移。
+        run: npx tsx scripts/sync.ts --force
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
