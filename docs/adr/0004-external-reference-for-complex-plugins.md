@@ -1,26 +1,32 @@
-# ADR-0004: 复杂 plugin 用外部引用而非拆散收录
+# ADR-0004: 同步可独立运行的 packaged Skill payload
 
 ## Status: Accepted
 
 ## Context
 
-某些上游 plugin（ui-ux-pro-max、原本的 kami）包含 7+ skill、CLI 工具、共享资源等，内部 skill 之间有依赖关系。
+部分上游仓库同时包含 Skill 运行资源、网站、showcase、字体全集、CI、发布包和 Marketplace metadata。直接 vendoring 整仓会增加体积、递归发现冲突和无关维护文件。
 
-备选方案：
-- A) 拆散——只提取我们需要的 skill 放进本地 plugin
-- B) 外部引用——在 marketplace.json 中用 GitHub source 指向原仓库
+Kami 是主要案例：上游仓库约 76MB，同时提供约 1.2MB 的 `plugins/kami/skills/kami` packaged payload。
 
 ## Decision
 
-当 plugin 满足以下任一条件时用外部引用（B）：
-- 有自己的 plugin.json 且声明了 components
-- skill 之间共享 CLI/scripts/资源且无法独立运行
-- 维护成本高于收益
+优先同步上游明确提供、可独立运行的 packaged Skill payload：
 
-当 skill 可独立运行且只有 SKILL.md + 资源文件时，拆散收录（A）。
+- payload 必须包含 SKILL.md 引用的 scripts、references、templates、assets 和必要 metadata；
+- 大型可下载字体、网站、showcase、CI、dist 和嵌套 plugin 外壳不进入本仓库；
+- 没有独立 payload、内部资源无法拆分的上游能力，需要单独评估后再引入；
+- Marketplace 不使用外部 plugin reference。
+
+Kami 同步路径固定为：
+
+```text
+tw93/kami/plugins/kami/skills/kami
+→ plugins/creative/skills/kami
+```
 
 ## Consequences
 
-- 外部引用的 plugin 更新由原作者推送，我们不维护
-- 用户从我们的 marketplace 安装时自动从原仓库拉取
-- 无法对外部引用的 plugin 做 patch
+- Pi 递归扫描只发现一份 Kami。
+- Kami 的运行脚本、模板、参考和按需字体下载保持完整。
+- 仓库不再携带上游网站、showcase、字体全集和发布产物。
+- 上游 payload 路径或引用发生变化时，同步 patch 和文件清单会显式失败或产生差异。

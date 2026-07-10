@@ -21,6 +21,12 @@ interface OverridesConfig {
 interface ExtraMapping {
   from: string
   to: string
+  patches?: Patch[]
+}
+
+interface TargetPatchSet {
+  target: string
+  patches: Patch[]
 }
 
 interface SkillOverride {
@@ -32,7 +38,9 @@ interface SkillOverride {
   plugin: string
   patches: Patch[]
   patch_targets?: string[]
+  target_patches?: TargetPatchSet[]
   extra_mappings?: ExtraMapping[]
+  exclude_files?: string[]
 }
 
 interface SyncStateEntry {
@@ -103,10 +111,11 @@ function cloneUpstream(repo: string, ref: string, paths: string[]): string {
   return tempDir
 }
 
-function copyTreeToDir(srcDir: string, destDir: string): string[] {
+function copyTreeToDir(srcDir: string, destDir: string, excludeFiles: readonly string[] = []): string[] {
   if (!existsSync(srcDir)) return []
 
-  const files = collectFiles(srcDir)
+  const excluded = new Set(excludeFiles)
+  const files = collectFiles(srcDir).filter((file) => !excluded.has(file))
   mkdirSync(destDir, { recursive: true })
 
   for (const file of files) {
@@ -116,17 +125,26 @@ function copyTreeToDir(srcDir: string, destDir: string): string[] {
   return files
 }
 
-function fetchUpstreamFiles(repo: string, ref: string, path: string, destDir: string, extraMappings?: ExtraMapping[]): string[] {
+function fetchUpstreamFiles(
+  repo: string,
+  ref: string,
+  path: string,
+  destDir: string,
+  extraMappings?: ExtraMapping[],
+  excludeFiles?: string[],
+): string[] {
   const allPaths = [path, ...(extraMappings ?? []).map(m => m.from)]
   const tempDir = cloneUpstream(repo, ref, allPaths)
 
   const srcDir = join(tempDir, path)
-  const files = copyTreeToDir(srcDir, destDir)
+  const files = copyTreeToDir(srcDir, destDir, excludeFiles)
 
   if (extraMappings) {
     for (const mapping of extraMappings) {
       const src = join(tempDir, mapping.from)
-      if (!existsSync(src)) continue
+      if (!existsSync(src)) {
+        throw new Error(`上游额外映射不存在: ${mapping.from}`)
+      }
       const dest = join(ROOT, mapping.to)
       copyFilePreservingMode(src, dest)
     }
@@ -322,7 +340,15 @@ const program = Effect.gen(function* () {
   }
 
   for (const [skillName, config] of Object.entries(overrides.skills)) {
-    const { source, plugin, patches, patch_targets, extra_mappings } = config
+    const {
+      source,
+      plugin,
+      patches,
+      patch_targets,
+      target_patches,
+      extra_mappings,
+      exclude_files,
+    } = config
     const latestSha = getUpstreamLatestSha(source.repo, source.ref)
 
     if (!latestSha) {
@@ -342,7 +368,14 @@ const program = Effect.gen(function* () {
 
     const destDir = join(ROOT, "plugins", plugin, "skills", skillName)
     const existingLocalFiles = getExistingFiles(destDir)
-    const upstreamFiles = fetchUpstreamFiles(source.repo, source.ref, source.path, destDir, extra_mappings)
+    const upstreamFiles = fetchUpstreamFiles(
+      source.repo,
+      source.ref,
+      source.path,
+      destDir,
+      extra_mappings,
+      exclude_files,
+    )
 
     if (upstreamFiles.length === 0) {
       console.log(`⚠️  ${skillName}: 上游路径为空，跳过`)
@@ -364,33 +397,60 @@ const program = Effect.gen(function* () {
       upstreamFiles,
     )
 
-    // Apply patches to SKILL.md
+    // Apply patches to skill files and separately mapped plugin resources.
     let patchFailed = false
     let patchReport = ""
+    const reports: string[] = []
+    const patchSets: TargetPatchSet[] = [
+      ...(patches.length > 0
+        ? (patch_targets ?? ["SKILL.md"]).map((target) => ({ target, patches }))
+        : []),
+      ...(target_patches ?? []),
+    ]
 
-    if (patches.length > 0) {
-      const reports: string[] = []
-      for (const target of patch_targets ?? ["SKILL.md"]) {
-        const patchPath = join(destDir, target)
-        if (!existsSync(patchPath)) {
-          patchFailed = true
-          reports.push(`- ❌ [${target}] 补丁目标不存在`)
-          continue
-        }
-
-        const content = readFileSync(patchPath, "utf-8")
-        const { final, results } = yield* applyPatches(content, patches)
-        writeFileSync(patchPath, final)
-
-        for (const result of results) {
-          if (!result.ok) patchFailed = true
-          reports.push(
-            `- ${result.ok ? "✅" : "❌"} [${target} / ${result.patch.type}] ${result.msg}`,
-          )
-        }
+    for (const patchSet of patchSets) {
+      const patchPath = join(destDir, patchSet.target)
+      if (!existsSync(patchPath)) {
+        patchFailed = true
+        reports.push(`- ❌ [${patchSet.target}] 补丁目标不存在`)
+        continue
       }
-      patchReport = reports.join("\n")
+
+      const content = readFileSync(patchPath, "utf-8")
+      const { final, results } = yield* applyPatches(content, patchSet.patches)
+      writeFileSync(patchPath, final)
+
+      for (const result of results) {
+        if (!result.ok) patchFailed = true
+        reports.push(
+          `- ${result.ok ? "✅" : "❌"} [${patchSet.target} / ${result.patch.type}] ${result.msg}`,
+        )
+      }
     }
+
+    for (const mapping of extra_mappings ?? []) {
+      if (!mapping.patches || mapping.patches.length === 0) continue
+
+      const patchPath = join(ROOT, mapping.to)
+      if (!existsSync(patchPath)) {
+        patchFailed = true
+        reports.push(`- ❌ [${mapping.to}] 补丁目标不存在`)
+        continue
+      }
+
+      const content = readFileSync(patchPath, "utf-8")
+      const { final, results } = yield* applyPatches(content, mapping.patches)
+      writeFileSync(patchPath, final)
+
+      for (const result of results) {
+        if (!result.ok) patchFailed = true
+        reports.push(
+          `- ${result.ok ? "✅" : "❌"} [${mapping.to} / ${result.patch.type}] ${result.msg}`,
+        )
+      }
+    }
+
+    patchReport = reports.join("\n")
 
     // Build PR body
     let body = `## 上游变更\n\n`
@@ -402,7 +462,7 @@ const program = Effect.gen(function* () {
       body += `- 上游已删除: ${removedFiles.join(", ")}\n`
     }
 
-    if (patches.length > 0) {
+    if (patchReport) {
       body += `\n## 补丁结果\n\n${patchReport}\n`
     }
 

@@ -1,34 +1,40 @@
 # KorenKrita Skills
 
-个人 skill 聚合仓库。通过一个 marketplace 统一管理和分发来自多个上游的 Claude Code skill。
+个人 Skill 订阅仓库，通过一个 Marketplace 分发三个 Claude Code plugin，并作为一个 Pi Package 加载全部 Skill。
 
 ## 项目结构
 
-```
-plugins/<plugin>/skills/<skill>/SKILL.md   ← skill 文件
-plugins/<plugin>/commands/*.md              ← slash commands
-plugins/<plugin>/agents/*.md               ← subagents
-plugins/<plugin>/hooks/                    ← lifecycle hooks
-overrides.yaml                             ← 上游来源 + patch 规则
-marketplace.yaml                           ← plugin 分组配置
-.claude-plugin/marketplace.json            ← CI 生成的 marketplace 入口
-.sync-state.json                           ← CI 维护的版本追踪
+```text
+plugins/base/skills/<skill>/SKILL.md      Matt Pocock active 主体（22）
+plugins/plus/skills/<skill>/SKILL.md      工程、思考与工具增强（13）
+plugins/plus/agents/*.md                  plus 的 Claude Code subagents
+plugins/plus/hooks/                       独立 Claude Code hooks
+plugins/creative/skills/<skill>/SKILL.md  设计、写作与视觉能力（7）
+overrides.yaml                            上游来源、改名、排除和 patch
+marketplace.yaml                          三个 plugin 的 Marketplace 元数据
+.claude-plugin/marketplace.json           生成产物
+.sync-state.json                          上游 SHA 与文件清单
 ```
 
 ## 开发命令
 
 ```bash
-npm test              # 跑测试
-npm run build:marketplace   # 重新生成 marketplace.json
-npm run sync          # 手动触发上游同步（本地模拟 CI）
+npm ci
+npm test
+npm run build:marketplace
+npm run sync
 ```
 
 ## 关键规则
 
-- 上游 skill 的修改全部通过 overrides.yaml 的 patch 规则声明，不手动改上游文件
-- 自己写的 skill 直接放对应 plugin 目录下 commit，不需要在 overrides.yaml 声明
-- `.claude-plugin/marketplace.json` 是生成产物，不手动编辑——改 marketplace.yaml 后跑 build
-- `.sync-state.json` 是 CI 维护的，不手动编辑
+- 上游 Skill 的修改通过 `overrides.yaml` 声明，不直接维护漂移副本。
+- 本地 Skill 直接放入目标 plugin；当前本地 Skill 是 `plus/fan-out`。
+- Skill 目录名必须等于 `SKILL.md` frontmatter 的 `name`。
+- 同一个 Skill name 在整个仓库只出现一次，避免 Pi 递归发现 collision。
+- `.claude-plugin/marketplace.json` 由 `marketplace.yaml` 生成。
+- `.sync-state.json` 由同步流程维护；结构迁移时必须与 overrides key 和上游文件清单一起迁移。
+- `base` 保持 Matt active 22 的 canonical name 和内部引用。
+- `plus/agents`、`plus/hooks` 仅对 Claude Code 生效；Pi 只加载 `plugins/*/skills`。
 
 ## Agent skills
 
@@ -38,8 +44,8 @@ Issues live in GitHub Issues (KorenKrita/skills). See `docs/agents/issue-tracker
 
 ### Triage labels
 
-Uses default label vocabulary. See `docs/agents/triage-labels.md`.
+See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 
-Single-context layout. See `docs/agents/domain.md`.
+See `docs/agents/domain.md`.

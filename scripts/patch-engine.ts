@@ -7,6 +7,7 @@ export type Patch =
   | { readonly type: "set_frontmatter"; readonly field: string; readonly value: string | boolean | number }
   | { readonly type: "append_to_frontmatter"; readonly field: string; readonly text: string }
   | { readonly type: "replace"; readonly pattern: string; readonly with: string }
+  | { readonly type: "replace_all"; readonly pattern: string; readonly with: string }
   | { readonly type: "append_content"; readonly text: string }
 
 export interface PatchResult {
@@ -120,6 +121,13 @@ function applySingle(content: string, patch: Patch): Effect.Effect<string, Patch
       return Effect.succeed(reassemble(fields, newBody))
     }
 
+    case "replace_all": {
+      if (!content.includes(patch.pattern)) {
+        return new PatchFailure({ patch, msg: `未找到匹配: "${patch.pattern.slice(0, 50)}"` })
+      }
+      return Effect.succeed(content.split(patch.pattern).join(patch.with))
+    }
+
     case "append_content": {
       const newBody = body.trimEnd() + "\n\n" + patch.text + "\n"
       return Effect.succeed(reassemble(fields, newBody))
@@ -171,6 +179,8 @@ function patchMsg(patch: Patch): string {
       return `追加到 ${patch.field}`
     case "replace":
       return `替换成功`
+    case "replace_all":
+      return `全部替换成功`
     case "append_content":
       return `正文末尾追加 ${patch.text.length} 字符`
   }

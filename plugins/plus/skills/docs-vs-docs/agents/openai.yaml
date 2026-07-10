@@ -1,0 +1,4 @@
+interface:
+  display_name: "Hai Audit Docs Internally"
+  short_description: "Find conflicts inside documentation"
+  default_prompt: "Use $docs-vs-docs to find internal conflicts and stale sections in these docs."

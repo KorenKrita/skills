@@ -1,25 +1,174 @@
 {
+  "ask-matt": {
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
+    "files": [
+      "SKILL.md"
+    ]
+  },
+  "code-review": {
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
+    "files": [
+      "SKILL.md"
+    ]
+  },
+  "codebase-design": {
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
+    "files": [
+      "DEEPENING.md",
+      "DESIGN-IT-TWICE.md",
+      "SKILL.md"
+    ]
+  },
+  "diagnosing-bugs": {
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
+    "files": [
+      "SKILL.md",
+      "scripts/hitl-loop.template.sh"
+    ]
+  },
+  "domain-modeling": {
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
+    "files": [
+      "ADR-FORMAT.md",
+      "CONTEXT-FORMAT.md",
+      "SKILL.md"
+    ]
+  },
+  "grill-with-docs": {
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
+    "files": [
+      "SKILL.md"
+    ]
+  },
+  "implement": {
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
+    "files": [
+      "SKILL.md"
+    ]
+  },
+  "improve-codebase-architecture": {
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
+    "files": [
+      "HTML-REPORT.md",
+      "SKILL.md"
+    ]
+  },
+  "prototype": {
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
+    "files": [
+      "LOGIC.md",
+      "SKILL.md",
+      "UI.md"
+    ]
+  },
+  "research": {
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
+    "files": [
+      "SKILL.md"
+    ]
+  },
+  "resolving-merge-conflicts": {
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
+    "files": [
+      "SKILL.md"
+    ]
+  },
+  "setup-matt-pocock-skills": {
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
+    "files": [
+      "SKILL.md",
+      "domain.md",
+      "issue-tracker-github.md",
+      "issue-tracker-gitlab.md",
+      "issue-tracker-local.md",
+      "triage-labels.md"
+    ]
+  },
   "tdd": {
-    "sha": "d574778f94cf620fcc8ce741584093bc650a61d3",
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
     "files": [
       "SKILL.md",
       "mocking.md",
       "tests.md"
     ]
   },
-  "debug": {
-    "sha": "d574778f94cf620fcc8ce741584093bc650a61d3",
+  "to-spec": {
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
     "files": [
-      "SKILL.md",
-      "scripts/hitl-loop.template.sh"
+      "SKILL.md"
     ]
   },
-  "prototype": {
-    "sha": "d574778f94cf620fcc8ce741584093bc650a61d3",
+  "to-tickets": {
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
     "files": [
-      "LOGIC.md",
+      "SKILL.md"
+    ]
+  },
+  "triage": {
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
+    "files": [
+      "AGENT-BRIEF.md",
+      "OUT-OF-SCOPE.md",
+      "SKILL.md"
+    ]
+  },
+  "wayfinder": {
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
+    "files": [
+      "SKILL.md"
+    ]
+  },
+  "grill-me": {
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
+    "files": [
+      "SKILL.md"
+    ]
+  },
+  "grilling": {
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
+    "files": [
+      "SKILL.md"
+    ]
+  },
+  "handoff": {
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
+    "files": [
+      "SKILL.md"
+    ]
+  },
+  "teach": {
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
+    "files": [
+      "GLOSSARY-FORMAT.md",
+      "LEARNING-RECORD-FORMAT.md",
+      "MISSION-FORMAT.md",
+      "RESOURCES-FORMAT.md",
+      "SKILL.md"
+    ]
+  },
+  "writing-great-skills": {
+    "sha": "391a2701dd948f94f56a39f7533f8eea9a859c87",
+    "files": [
+      "GLOSSARY.md",
+      "SKILL.md"
+    ]
+  },
+  "docs-vs-code": {
+    "sha": "f9af2306f5bced6a199dc6ba155ea3cd318ee570",
+    "files": [
       "SKILL.md",
-      "UI.md"
+      "SKILL.zh_CN.md",
+      "references/checklist.md",
+      "references/output-template.md"
+    ]
+  },
+  "docs-vs-docs": {
+    "sha": "f9af2306f5bced6a199dc6ba155ea3cd318ee570",
+    "files": [
+      "SKILL.md",
+      "SKILL.zh_CN.md",
+      "agents/openai.yaml",
+      "references/output-template.md"
     ]
   },
   "improve": {
@@ -32,7 +181,13 @@
     ]
   },
   "ocr": {
-    "sha": "37ac8658dcaa5580b8acc15246fd66d7d700a8a7",
+    "sha": "4cc2fe8568929faad40be03a58452830d6a5ece5",
+    "files": [
+      "SKILL.md"
+    ]
+  },
+  "nuclear-review": {
+    "sha": "0dda29e839d15464a137af9935665a5a47ee09b8",
     "files": [
       "SKILL.md"
     ]
@@ -74,49 +229,48 @@
       "references/output-template.md"
     ]
   },
-  "grill-me": {
-    "sha": "d574778f94cf620fcc8ce741584093bc650a61d3",
+  "read": {
+    "sha": "b24260d6d85efae6b4dc17c0038e1aa5b063b1cd",
+    "files": [
+      "SKILL.md",
+      "references/read-methods.md",
+      "scripts/fetch.sh",
+      "scripts/fetch_feishu.py",
+      "scripts/fetch_local.py",
+      "scripts/fetch_weixin.py"
+    ]
+  },
+  "nopua": {
+    "sha": "bf4b2b6c1a509375c499fb2fb6454e9afd08913d",
     "files": [
       "SKILL.md"
     ]
   },
-  "grill-with-docs": {
-    "sha": "d574778f94cf620fcc8ce741584093bc650a61d3",
-    "files": [
-      "SKILL.md"
-    ]
-  },
-  "noai": {
-    "sha": "91f3d394db8419c20d67ebe22a96cf8fee0a404b",
+  "goal-gen": {
+    "sha": "f29e0189f2ea03392c50b4f1c7230886bd838a13",
     "files": [
       ".gitignore",
       "LICENSE",
       "README.md",
-      "SKILL.md"
+      "SKILL.md",
+      "agents/interface.yaml",
+      "manifest.json",
+      "references/default-goal-strategy.md",
+      "references/goal-command-playbook.md",
+      "references/interview-checklist.md",
+      "scripts/lint_goal_command.py"
     ]
   },
-  "rewrite": {
-    "sha": "d574778f94cf620fcc8ce741584093bc650a61d3",
+  "ui": {
+    "sha": "b24260d6d85efae6b4dc17c0038e1aa5b063b1cd",
     "files": [
-      "SKILL.md"
-    ]
-  },
-  "step": {
-    "sha": "d574778f94cf620fcc8ce741584093bc650a61d3",
-    "files": [
-      "SKILL.md"
-    ]
-  },
-  "collect": {
-    "sha": "d574778f94cf620fcc8ce741584093bc650a61d3",
-    "files": [
-      "SKILL.md"
-    ]
-  },
-  "build": {
-    "sha": "d574778f94cf620fcc8ce741584093bc650a61d3",
-    "files": [
-      "SKILL.md"
+      "SKILL.md",
+      "references/design-aesthetic-quality.md",
+      "references/design-data-viz.md",
+      "references/design-reference.md",
+      "references/design-tokens.md",
+      "references/design-traps.md",
+      "references/durable-context.md"
     ]
   },
   "web": {
@@ -247,362 +401,11 @@
       "scripts/fetch_unsplash_images.py"
     ]
   },
-  "ui": {
-    "sha": "ff037c6cfd2e7f043e4ccdf582c40fbffd256e28",
+  "humanizer-zh": {
+    "sha": "91f3d394db8419c20d67ebe22a96cf8fee0a404b",
     "files": [
-      "SKILL.md",
-      "references/design-aesthetic-quality.md",
-      "references/design-data-viz.md",
-      "references/design-reference.md",
-      "references/design-tokens.md",
-      "references/design-traps.md",
-      "references/durable-context.md",
-      "scripts/check-update.sh"
-    ]
-  },
-  "teach": {
-    "sha": "d574778f94cf620fcc8ce741584093bc650a61d3",
-    "files": [
-      "GLOSSARY-FORMAT.md",
-      "LEARNING-RECORD-FORMAT.md",
-      "MISSION-FORMAT.md",
-      "RESOURCES-FORMAT.md",
-      "SKILL.md"
-    ]
-  },
-  "write-skill": {
-    "sha": "d574778f94cf620fcc8ce741584093bc650a61d3",
-    "files": [
-      "GLOSSARY.md",
-      "SKILL.md"
-    ]
-  },
-  "docs-vs-code": {
-    "sha": "f9af2306f5bced6a199dc6ba155ea3cd318ee570",
-    "files": [
-      "SKILL.md",
-      "SKILL.zh_CN.md",
-      "references/checklist.md",
-      "references/output-template.md"
-    ]
-  },
-  "docs-vs-docs": {
-    "sha": "f9af2306f5bced6a199dc6ba155ea3cd318ee570",
-    "files": [
-      "SKILL.md",
-      "SKILL.zh_CN.md",
-      "agents/openai.yaml",
-      "references/output-template.md"
-    ]
-  },
-  "nopua": {
-    "sha": "bf4b2b6c1a509375c499fb2fb6454e9afd08913d",
-    "files": [
-      "SKILL.md"
-    ]
-  },
-  "kami": {
-    "sha": "9a9fcd9c7896c339c9f7c7cc512fe990222b9aa0",
-    "files": [
-      ".agents/plugins/marketplace.json",
-      ".claude/launch.json",
-      ".claude-plugin/marketplace.json",
-      ".github/FUNDING.yml",
-      ".github/workflows/check.yml",
-      ".github/workflows/release.yml",
-      ".gitignore",
-      "AGENTS.md",
-      "CHEATSHEET.md",
-      "CLAUDE.md",
       "LICENSE",
       "README.md",
-      "SKILL.md",
-      "VERSION",
-      "assets/demos/demo-agent-slides.html",
-      "assets/demos/demo-agent-slides.pdf",
-      "assets/demos/demo-agent-slides.png",
-      "assets/demos/demo-changelog.html",
-      "assets/demos/demo-changelog.pdf",
-      "assets/demos/demo-changelog.png",
-      "assets/demos/demo-kaku.html",
-      "assets/demos/demo-kaku.pdf",
-      "assets/demos/demo-kaku.png",
-      "assets/demos/demo-kami-print.html",
-      "assets/demos/demo-kami-print.pdf",
-      "assets/demos/demo-kami-print.png",
-      "assets/demos/demo-letter.html",
-      "assets/demos/demo-letter.pdf",
-      "assets/demos/demo-letter.png",
-      "assets/demos/demo-mole-clean.jpg",
-      "assets/demos/demo-mole.html",
-      "assets/demos/demo-mole.pdf",
-      "assets/demos/demo-mole.png",
-      "assets/demos/demo-musk-resume.html",
-      "assets/demos/demo-musk-resume.pdf",
-      "assets/demos/demo-musk-resume.png",
-      "assets/demos/demo-resume-ko.html",
-      "assets/demos/demo-resume-ko.pdf",
-      "assets/demos/demo-resume-ko.png",
-      "assets/demos/demo-tesla.html",
-      "assets/demos/demo-tesla.pdf",
-      "assets/demos/demo-tesla.png",
-      "assets/demos/demo-waza.html",
-      "assets/demos/demo-waza.pdf",
-      "assets/demos/demo-waza.png",
-      "assets/demos/images/kaku-action.jpg",
-      "assets/demos/images/kaku-hero.jpg",
-      "assets/diagrams/architecture-board.html",
-      "assets/diagrams/architecture.html",
-      "assets/diagrams/bar-chart.html",
-      "assets/diagrams/candlestick.html",
-      "assets/diagrams/class.html",
-      "assets/diagrams/donut-chart.html",
-      "assets/diagrams/er.html",
-      "assets/diagrams/flowchart.html",
-      "assets/diagrams/layer-stack.html",
-      "assets/diagrams/line-chart.html",
-      "assets/diagrams/quadrant.html",
-      "assets/diagrams/sequence.html",
-      "assets/diagrams/src/class.mmd",
-      "assets/diagrams/src/er.mmd",
-      "assets/diagrams/src/sequence.mmd",
-      "assets/diagrams/state-machine.html",
-      "assets/diagrams/swimlane.html",
-      "assets/diagrams/timeline.html",
-      "assets/diagrams/tree.html",
-      "assets/diagrams/venn.html",
-      "assets/diagrams/waterfall.html",
-      "assets/fonts/JetBrainsMono.woff2",
-      "assets/fonts/LICENSE-SourceHanSerifK.txt",
-      "assets/fonts/SourceHanSerifKR-Medium.otf",
-      "assets/fonts/SourceHanSerifKR-Regular.otf",
-      "assets/fonts/TsangerJinKai02-W04.ttf",
-      "assets/fonts/TsangerJinKai02-W05.ttf",
-      "assets/illustrations/travel-3d-representations.png",
-      "assets/illustrations/travel-spatialvla.png",
-      "assets/illustrations/travel-tesla-optimus.png",
-      "assets/images/logo.svg",
-      "assets/showcase/kami-landing.png",
-      "assets/showcase/luo-landing.png",
-      "assets/showcase/mole-landing.png",
-      "assets/templates/changelog-en.html",
-      "assets/templates/changelog-ko.html",
-      "assets/templates/changelog.html",
-      "assets/templates/equity-report-en.html",
-      "assets/templates/equity-report-ko.html",
-      "assets/templates/equity-report.html",
-      "assets/templates/landing-page-en.html",
-      "assets/templates/landing-page-ko.html",
-      "assets/templates/landing-page-llms-full.txt.example",
-      "assets/templates/landing-page-llms.txt.example",
-      "assets/templates/landing-page-robots.txt.example",
-      "assets/templates/landing-page-sitemap.xml.example",
-      "assets/templates/landing-page-vercel.json.example",
-      "assets/templates/landing-page.html",
-      "assets/templates/letter-en.html",
-      "assets/templates/letter-ko.html",
-      "assets/templates/letter.html",
-      "assets/templates/long-doc-en.html",
-      "assets/templates/long-doc-ko.html",
-      "assets/templates/long-doc.html",
-      "assets/templates/marp/slides-marp-en.css",
-      "assets/templates/marp/slides-marp-en.md",
-      "assets/templates/marp/slides-marp.css",
-      "assets/templates/marp/slides-marp.md",
-      "assets/templates/one-pager-en.html",
-      "assets/templates/one-pager-ko.html",
-      "assets/templates/one-pager.html",
-      "assets/templates/portfolio-en.html",
-      "assets/templates/portfolio-ko.html",
-      "assets/templates/portfolio.html",
-      "assets/templates/resume-en.html",
-      "assets/templates/resume-ko.html",
-      "assets/templates/resume.html",
-      "assets/templates/slides-en.py",
-      "assets/templates/slides-weasy-en.html",
-      "assets/templates/slides-weasy-ko.html",
-      "assets/templates/slides-weasy.html",
-      "assets/templates/slides.py",
-      "dist/kami.zip",
-      "index-en.html",
-      "index-ja.html",
-      "index-ko.html",
-      "index-tw.html",
-      "index-zh.html",
-      "index.html",
-      "llms.txt",
-      "plugins/kami/.claude-plugin/plugin.json",
-      "plugins/kami/.codex-plugin/plugin.json",
-      "plugins/kami/skills/kami/CHEATSHEET.md",
-      "plugins/kami/skills/kami/LICENSE",
-      "plugins/kami/skills/kami/SKILL.md",
-      "plugins/kami/skills/kami/VERSION",
-      "plugins/kami/skills/kami/assets/diagrams/architecture-board.html",
-      "plugins/kami/skills/kami/assets/diagrams/architecture.html",
-      "plugins/kami/skills/kami/assets/diagrams/bar-chart.html",
-      "plugins/kami/skills/kami/assets/diagrams/candlestick.html",
-      "plugins/kami/skills/kami/assets/diagrams/class.html",
-      "plugins/kami/skills/kami/assets/diagrams/donut-chart.html",
-      "plugins/kami/skills/kami/assets/diagrams/er.html",
-      "plugins/kami/skills/kami/assets/diagrams/flowchart.html",
-      "plugins/kami/skills/kami/assets/diagrams/layer-stack.html",
-      "plugins/kami/skills/kami/assets/diagrams/line-chart.html",
-      "plugins/kami/skills/kami/assets/diagrams/quadrant.html",
-      "plugins/kami/skills/kami/assets/diagrams/sequence.html",
-      "plugins/kami/skills/kami/assets/diagrams/src/class.mmd",
-      "plugins/kami/skills/kami/assets/diagrams/src/er.mmd",
-      "plugins/kami/skills/kami/assets/diagrams/src/sequence.mmd",
-      "plugins/kami/skills/kami/assets/diagrams/state-machine.html",
-      "plugins/kami/skills/kami/assets/diagrams/swimlane.html",
-      "plugins/kami/skills/kami/assets/diagrams/timeline.html",
-      "plugins/kami/skills/kami/assets/diagrams/tree.html",
-      "plugins/kami/skills/kami/assets/diagrams/venn.html",
-      "plugins/kami/skills/kami/assets/diagrams/waterfall.html",
-      "plugins/kami/skills/kami/assets/fonts/JetBrainsMono.woff2",
-      "plugins/kami/skills/kami/assets/fonts/LICENSE-SourceHanSerifK.txt",
-      "plugins/kami/skills/kami/assets/images/logo.svg",
-      "plugins/kami/skills/kami/assets/templates/changelog-en.html",
-      "plugins/kami/skills/kami/assets/templates/changelog-ko.html",
-      "plugins/kami/skills/kami/assets/templates/changelog.html",
-      "plugins/kami/skills/kami/assets/templates/equity-report-en.html",
-      "plugins/kami/skills/kami/assets/templates/equity-report-ko.html",
-      "plugins/kami/skills/kami/assets/templates/equity-report.html",
-      "plugins/kami/skills/kami/assets/templates/landing-page-en.html",
-      "plugins/kami/skills/kami/assets/templates/landing-page-ko.html",
-      "plugins/kami/skills/kami/assets/templates/landing-page-llms-full.txt.example",
-      "plugins/kami/skills/kami/assets/templates/landing-page-llms.txt.example",
-      "plugins/kami/skills/kami/assets/templates/landing-page-robots.txt.example",
-      "plugins/kami/skills/kami/assets/templates/landing-page-sitemap.xml.example",
-      "plugins/kami/skills/kami/assets/templates/landing-page-vercel.json.example",
-      "plugins/kami/skills/kami/assets/templates/landing-page.html",
-      "plugins/kami/skills/kami/assets/templates/letter-en.html",
-      "plugins/kami/skills/kami/assets/templates/letter-ko.html",
-      "plugins/kami/skills/kami/assets/templates/letter.html",
-      "plugins/kami/skills/kami/assets/templates/long-doc-en.html",
-      "plugins/kami/skills/kami/assets/templates/long-doc-ko.html",
-      "plugins/kami/skills/kami/assets/templates/long-doc.html",
-      "plugins/kami/skills/kami/assets/templates/marp/slides-marp-en.css",
-      "plugins/kami/skills/kami/assets/templates/marp/slides-marp-en.md",
-      "plugins/kami/skills/kami/assets/templates/marp/slides-marp.css",
-      "plugins/kami/skills/kami/assets/templates/marp/slides-marp.md",
-      "plugins/kami/skills/kami/assets/templates/one-pager-en.html",
-      "plugins/kami/skills/kami/assets/templates/one-pager-ko.html",
-      "plugins/kami/skills/kami/assets/templates/one-pager.html",
-      "plugins/kami/skills/kami/assets/templates/portfolio-en.html",
-      "plugins/kami/skills/kami/assets/templates/portfolio-ko.html",
-      "plugins/kami/skills/kami/assets/templates/portfolio.html",
-      "plugins/kami/skills/kami/assets/templates/resume-en.html",
-      "plugins/kami/skills/kami/assets/templates/resume-ko.html",
-      "plugins/kami/skills/kami/assets/templates/resume.html",
-      "plugins/kami/skills/kami/assets/templates/slides-en.py",
-      "plugins/kami/skills/kami/assets/templates/slides-weasy-en.html",
-      "plugins/kami/skills/kami/assets/templates/slides-weasy-ko.html",
-      "plugins/kami/skills/kami/assets/templates/slides-weasy.html",
-      "plugins/kami/skills/kami/assets/templates/slides.py",
-      "plugins/kami/skills/kami/references/anti-patterns.md",
-      "plugins/kami/skills/kami/references/brand-profile.md",
-      "plugins/kami/skills/kami/references/brand.example.md",
-      "plugins/kami/skills/kami/references/checks_thresholds.json",
-      "plugins/kami/skills/kami/references/design.md",
-      "plugins/kami/skills/kami/references/diagrams.md",
-      "plugins/kami/skills/kami/references/mermaid-theme.json",
-      "plugins/kami/skills/kami/references/mermaid.md",
-      "plugins/kami/skills/kami/references/production.md",
-      "plugins/kami/skills/kami/references/resume-writing.md",
-      "plugins/kami/skills/kami/references/tokens.json",
-      "plugins/kami/skills/kami/references/writing.md",
-      "plugins/kami/skills/kami/scripts/build.py",
-      "plugins/kami/skills/kami/scripts/build_metadata.py",
-      "plugins/kami/skills/kami/scripts/check-update.sh",
-      "plugins/kami/skills/kami/scripts/checks.py",
-      "plugins/kami/skills/kami/scripts/draft-release-notes.py",
-      "plugins/kami/skills/kami/scripts/ensure-fonts.sh",
-      "plugins/kami/skills/kami/scripts/highlight.py",
-      "plugins/kami/skills/kami/scripts/lint.py",
-      "plugins/kami/skills/kami/scripts/mermaid_normalize.py",
-      "plugins/kami/skills/kami/scripts/optional_deps.py",
-      "plugins/kami/skills/kami/scripts/package-skill.sh",
-      "plugins/kami/skills/kami/scripts/shared.py",
-      "plugins/kami/skills/kami/scripts/site_facts.py",
-      "plugins/kami/skills/kami/scripts/tests/test_build.py",
-      "plugins/kami/skills/kami/scripts/tokens.py",
-      "plugins/kami/skills/kami/scripts/verify.py",
-      "references/anti-patterns.md",
-      "references/brand-profile.md",
-      "references/brand.example.md",
-      "references/checks_thresholds.json",
-      "references/design.md",
-      "references/diagrams.md",
-      "references/mermaid-theme.json",
-      "references/mermaid.md",
-      "references/production.md",
-      "references/resume-writing.md",
-      "references/tokens.json",
-      "references/writing.md",
-      "robots.txt",
-      "scripts/build.py",
-      "scripts/build_metadata.py",
-      "scripts/check-update.sh",
-      "scripts/checks.py",
-      "scripts/draft-release-notes.py",
-      "scripts/ensure-fonts.sh",
-      "scripts/highlight.py",
-      "scripts/lint.py",
-      "scripts/mermaid_normalize.py",
-      "scripts/optional_deps.py",
-      "scripts/package-skill.sh",
-      "scripts/shared.py",
-      "scripts/site_facts.py",
-      "scripts/tests/test_build.py",
-      "scripts/tokens.py",
-      "scripts/verify.py",
-      "sitemap.xml",
-      "styles.css",
-      "vercel.json"
-    ]
-  },
-  "goal-gen": {
-    "sha": "f29e0189f2ea03392c50b4f1c7230886bd838a13",
-    "files": [
-      ".gitignore",
-      "LICENSE",
-      "README.md",
-      "SKILL.md",
-      "agents/interface.yaml",
-      "manifest.json",
-      "references/default-goal-strategy.md",
-      "references/goal-command-playbook.md",
-      "references/interview-checklist.md",
-      "scripts/lint_goal_command.py"
-    ]
-  },
-  "xiaohei2": {
-    "sha": "3555bcb9ecaba284aec77ee492fdfd21c52faae3",
-    "files": [
-      ".gitignore",
-      "README.md",
-      "SKILL.md",
-      "agents/openai.yaml",
-      "assets/examples/01-meeting-pull-in.png",
-      "assets/examples/02-message-overload.png",
-      "assets/examples/03-production-alert.png",
-      "assets/examples/04-code-review-rework.png",
-      "assets/examples/05-ai-automation-badge.png",
-      "assets/examples/06-ai-resume-filter.png",
-      "assets/examples/07-long-scroll-story-master.png",
-      "references/master-selection.md",
-      "references/object-patterns.md",
-      "references/prompt-template.md",
-      "references/qa-checklist.md",
-      "references/story-extraction.md",
-      "references/style-dna.md",
-      "references/xiaohei-ip.md"
-    ]
-  },
-  "deepen": {
-    "sha": "d574778f94cf620fcc8ce741584093bc650a61d3",
-    "files": [
-      "HTML-REPORT.md",
       "SKILL.md"
     ]
   },
@@ -656,99 +459,152 @@
       "test/render-output-checks.test.mjs"
     ]
   },
-  "grilling": {
-    "sha": "d574778f94cf620fcc8ce741584093bc650a61d3",
+  "kami": {
+    "sha": "f620bfca03d0c526d37bde61aeb688e01eea2e12",
     "files": [
-      "SKILL.md"
-    ]
-  },
-  "hunt": {
-    "sha": "ff037c6cfd2e7f043e4ccdf582c40fbffd256e28",
-    "files": [
+      "CHEATSHEET.md",
+      "LICENSE",
       "SKILL.md",
-      "references/durable-context.md",
-      "references/failure-patterns.md",
-      "references/ime-unicode.md",
-      "references/logging-techniques.md",
-      "references/rendering-debug.md",
-      "scripts/check-update.sh"
-    ]
-  },
-  "think": {
-    "sha": "ff037c6cfd2e7f043e4ccdf582c40fbffd256e28",
-    "files": [
-      "SKILL.md",
-      "references/durable-context.md",
-      "scripts/check-update.sh"
-    ]
-  },
-  "core": {
-    "sha": "ff037c6cfd2e7f043e4ccdf582c40fbffd256e28",
-    "files": [
-      "SKILL.md",
-      "references/durable-context.md",
-      "references/write-en.md",
-      "references/write-product-localization.md",
-      "references/write-zh-bilingual.md",
-      "references/write-zh-prose.md",
-      "references/write-zh-release-notes.md",
-      "references/write-zh.md",
-      "scripts/check-punctuation.sh",
+      "VERSION",
+      "assets/diagrams/architecture-board.html",
+      "assets/diagrams/architecture.html",
+      "assets/diagrams/bar-chart.html",
+      "assets/diagrams/candlestick.html",
+      "assets/diagrams/class.html",
+      "assets/diagrams/donut-chart.html",
+      "assets/diagrams/er.html",
+      "assets/diagrams/flowchart.html",
+      "assets/diagrams/layer-stack.html",
+      "assets/diagrams/line-chart.html",
+      "assets/diagrams/quadrant.html",
+      "assets/diagrams/sequence.html",
+      "assets/diagrams/src/class.mmd",
+      "assets/diagrams/src/er.mmd",
+      "assets/diagrams/src/sequence.mmd",
+      "assets/diagrams/state-machine.html",
+      "assets/diagrams/swimlane.html",
+      "assets/diagrams/timeline.html",
+      "assets/diagrams/tree.html",
+      "assets/diagrams/venn.html",
+      "assets/diagrams/waterfall.html",
+      "assets/fonts/JetBrainsMono.woff2",
+      "assets/fonts/LICENSE-SourceHanSerifK.txt",
+      "assets/images/logo.svg",
+      "assets/templates/changelog-en.html",
+      "assets/templates/changelog-ko.html",
+      "assets/templates/changelog.html",
+      "assets/templates/equity-report-en.html",
+      "assets/templates/equity-report-ko.html",
+      "assets/templates/equity-report.html",
+      "assets/templates/landing-page-en.html",
+      "assets/templates/landing-page-ko.html",
+      "assets/templates/landing-page-llms-full.txt.example",
+      "assets/templates/landing-page-llms.txt.example",
+      "assets/templates/landing-page-robots.txt.example",
+      "assets/templates/landing-page-sitemap.xml.example",
+      "assets/templates/landing-page-vercel.json.example",
+      "assets/templates/landing-page.html",
+      "assets/templates/letter-en.html",
+      "assets/templates/letter-ko.html",
+      "assets/templates/letter.html",
+      "assets/templates/long-doc-en.html",
+      "assets/templates/long-doc-ko.html",
+      "assets/templates/long-doc.html",
+      "assets/templates/marp/slides-marp-en.css",
+      "assets/templates/marp/slides-marp-en.md",
+      "assets/templates/marp/slides-marp.css",
+      "assets/templates/marp/slides-marp.md",
+      "assets/templates/one-pager-en.html",
+      "assets/templates/one-pager-ko.html",
+      "assets/templates/one-pager.html",
+      "assets/templates/portfolio-en.html",
+      "assets/templates/portfolio-ko.html",
+      "assets/templates/portfolio.html",
+      "assets/templates/resume-en.html",
+      "assets/templates/resume-ko.html",
+      "assets/templates/resume.html",
+      "assets/templates/slides-en.py",
+      "assets/templates/slides-weasy-en.html",
+      "assets/templates/slides-weasy-ko.html",
+      "assets/templates/slides-weasy.html",
+      "assets/templates/slides.py",
+      "references/anti-patterns.md",
+      "references/brand-profile.md",
+      "references/brand.example.md",
+      "references/checks_thresholds.json",
+      "references/design.md",
+      "references/diagrams.md",
+      "references/mermaid-theme.json",
+      "references/mermaid.md",
+      "references/production.md",
+      "references/resume-writing.md",
+      "references/tokens.json",
+      "references/writing.md",
+      "scripts/build.py",
+      "scripts/build_metadata.py",
       "scripts/check-update.sh",
-      "scripts/check_punctuation.py"
+      "scripts/checks.py",
+      "scripts/draft-release-notes.py",
+      "scripts/ensure-fonts.sh",
+      "scripts/highlight.py",
+      "scripts/lint.py",
+      "scripts/mermaid_normalize.py",
+      "scripts/optional_deps.py",
+      "scripts/package-skill.sh",
+      "scripts/shared.py",
+      "scripts/site_facts.py",
+      "scripts/tests/test_build.py",
+      "scripts/tokens.py",
+      "scripts/verify.py"
     ]
   },
-  "learn": {
-    "sha": "ff037c6cfd2e7f043e4ccdf582c40fbffd256e28",
+  "ian-xiaohei-illustrations": {
+    "sha": "91b560849e8f883922cc2fa8a358a668caa94105",
     "files": [
       "SKILL.md",
-      "scripts/check-update.sh"
+      "agents/openai.yaml",
+      "assets/examples/01-two-breakpoints.png",
+      "assets/examples/02-minimum-loop.png",
+      "assets/examples/03-sort-by-purpose.png",
+      "assets/examples/04-one-fish-many-uses.png",
+      "assets/examples/05-handoff-path.png",
+      "assets/examples/06-three-sources.png",
+      "assets/examples/07-three-content-jobs.png",
+      "assets/examples/08-handoff-copy-toolbox.png",
+      "assets/examples/09-common-pits-no-title.png",
+      "assets/examples/10-information-well.png",
+      "assets/examples/11-idea-press.png",
+      "assets/examples/12-content-fermentation.png",
+      "assets/examples/13-system-bearing.png",
+      "assets/examples/14-trust-bridge.png",
+      "references/composition-patterns.md",
+      "references/prompt-template.md",
+      "references/qa-checklist.md",
+      "references/style-dna.md",
+      "references/xiaohei-ip.md"
     ]
   },
-  "read": {
-    "sha": "ff037c6cfd2e7f043e4ccdf582c40fbffd256e28",
+  "xiaohei2": {
+    "sha": "3555bcb9ecaba284aec77ee492fdfd21c52faae3",
     "files": [
+      ".gitignore",
+      "README.md",
       "SKILL.md",
-      "references/read-methods.md",
-      "scripts/check-update.sh",
-      "scripts/fetch.sh",
-      "scripts/fetch_feishu.py",
-      "scripts/fetch_local.py",
-      "scripts/fetch_weixin.py"
-    ]
-  },
-  "codebase-design": {
-    "sha": "d574778f94cf620fcc8ce741584093bc650a61d3",
-    "files": [
-      "DEEPENING.md",
-      "DESIGN-IT-TWICE.md",
-      "SKILL.md"
-    ]
-  },
-  "domain-modeling": {
-    "sha": "d574778f94cf620fcc8ce741584093bc650a61d3",
-    "files": [
-      "ADR-FORMAT.md",
-      "CONTEXT-FORMAT.md",
-      "SKILL.md"
-    ]
-  },
-  "resolving-merge-conflicts": {
-    "sha": "d574778f94cf620fcc8ce741584093bc650a61d3",
-    "files": [
-      "SKILL.md"
-    ]
-  },
-  "thermo-nuclear-code-quality-review": {
-    "sha": "0dda29e839d15464a137af9935665a5a47ee09b8",
-    "files": [
-      "SKILL.md"
-    ]
-  },
-  "wayfinder": {
-    "sha": "d574778f94cf620fcc8ce741584093bc650a61d3",
-    "files": [
-      "SKILL.md"
+      "agents/openai.yaml",
+      "assets/examples/01-meeting-pull-in.png",
+      "assets/examples/02-message-overload.png",
+      "assets/examples/03-production-alert.png",
+      "assets/examples/04-code-review-rework.png",
+      "assets/examples/05-ai-automation-badge.png",
+      "assets/examples/06-ai-resume-filter.png",
+      "assets/examples/07-long-scroll-story-master.png",
+      "references/master-selection.md",
+      "references/object-patterns.md",
+      "references/prompt-template.md",
+      "references/qa-checklist.md",
+      "references/story-extraction.md",
+      "references/style-dna.md",
+      "references/xiaohei-ip.md"
     ]
   }
 }

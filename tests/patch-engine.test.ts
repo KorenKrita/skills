@@ -101,6 +101,32 @@ describe("patch-engine", () => {
     )
   })
 
+  describe("replace_all", () => {
+    it.effect("replaces every match across frontmatter and body", () =>
+      Effect.gen(function* () {
+        const source = ZOOM_OUT_SKILL.replace(
+          "description: Tell the agent",
+          "description: zoom-out tells the agent",
+        ) + "\nInvoke zoom-out again.\n"
+        const { final, results } = yield* applyPatches(source, [
+          { type: "replace_all", pattern: "zoom-out", with: "broader-context" },
+        ])
+        expect(results[0]!.ok).toBe(true)
+        expect(final).not.toContain("zoom-out")
+        expect(final.match(/broader-context/g)).toHaveLength(3)
+      }),
+    )
+
+    it.effect("fails when pattern does not exist", () =>
+      Effect.gen(function* () {
+        const { results } = yield* applyPatches(ZOOM_OUT_SKILL, [
+          { type: "replace_all", pattern: "missing-pattern", with: "x" },
+        ])
+        expect(results[0]!.ok).toBe(false)
+      }),
+    )
+  })
+
   describe("append_content", () => {
     it.effect("appends text to end of body", () =>
       Effect.gen(function* () {

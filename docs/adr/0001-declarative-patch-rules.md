@@ -19,4 +19,5 @@
 - 修改意图可读可审计
 - 上游大改时不产生含糊的 git conflict marker，而是明确的"规则应用失败"
 - 用户可以随时调整规则
-- 代价：需要实现 patch engine（已完成，5 种操作类型）
+- 支持 frontmatter 修改、单次/全量文本替换、内容追加、目标文件独立 patch 和 plugin-level extra mapping
+- 代价：上游结构变化导致 patch 失配时，需要人工审核 Draft PR

@@ -3,31 +3,37 @@
 ## Core Concepts
 
 | Term | Definition |
-|------|-----------|
-| **skill** | 一个 SKILL.md 文件 + 可选资源文件（scripts/、references/），Claude Code 的最小能力单元 |
-| **plugin** | 多个 skill 的打包分组，一个可安装单元。目录下包含 `skills/`、可选 `commands/`、`agents/`、`hooks/` |
-| **marketplace** | plugin 的聚合目录，用户订阅一个 marketplace 获取多个 plugin。由 `.claude-plugin/marketplace.json` 定义 |
-| **external reference** | marketplace 中指向外部 GitHub 仓库的 plugin 条目，不复制文件，原作者维护 |
+|---|---|
+| **skill** | 一个 `SKILL.md` 加可选 scripts、references、assets、Skill metadata 的最小能力单元 |
+| **plugin** | Claude Code 的安装单元；本仓库固定为 `base`、`plus`、`creative` 三个 |
+| **base** | Matt Pocock active 22 个 Skill 的 canonical mirror |
+| **plus** | 工程审计、决策方法和通用工具，共 13 个 Skill；附带 Claude Code Agent 与 Hook |
+| **creative** | UI/Web、中文写作优化、文档排版和插画，共 7 个 Skill |
+| **marketplace** | `.claude-plugin/marketplace.json` 定义的三个 plugin 聚合入口 |
 
 ## Sync System
 
 | Term | Definition |
-|------|-----------|
-| **overrides.yaml** | 单一配置文件，声明每个上游 skill 的来源（repo + path）和 patch 规则 |
-| **patch** | 声明式修改规则，默认作用于上游根目录的 SKILL.md；可用 `patch_targets` 对生成的嵌套 SKILL.md 应用同一组规则。类型：set_frontmatter、remove_frontmatter、append_to_frontmatter、replace、append_content |
-| **sync state** | `.sync-state.json`，记录每个 skill 上次同步时的上游 commit SHA 与上游文件清单；文件清单用于删除上游已删除文件，同时保留 local file |
-| **marketplace.yaml** | plugin 分组 + 元数据配置，CI 从中生成 `.claude-plugin/marketplace.json` |
+|---|---|
+| **overrides.yaml** | 声明上游 repo/path/ref、目标 plugin、改名、排除文件和 declarative patches |
+| **patch** | 上游同步后应用的声明式修改；支持 frontmatter、单次/全量文本替换和追加内容 |
+| **target patch** | 对 Skill 内指定文件应用独立 patch，例如双语 SKILL 或 harness metadata |
+| **extra mapping** | 把上游 Skill 目录外的 Agent/Hook 文件同步到 plugin-level 路径，并可单独 patch |
+| **sync state** | `.sync-state.json` 记录上游 SHA 和受管理文件清单，用于更新与删除检测 |
 
 ## Classification
 
 | Term | Definition |
-|------|-----------|
-| **upstream skill** | 来自外部 GitHub 仓库的 skill，由 CI 同步更新，在 overrides.yaml 中声明 |
-| **local skill** | 用户自己写的 skill，不在 overrides.yaml 中，CI 不碰 |
-| **local file** | 用户在某个 upstream skill 目录里额外添加、且不在上次上游文件清单中的文件（如脚本），同步时保留；若上游后来新增同名文件则生成 Draft PR 提醒处理。同步按上游文件清单强制 stage 被 `.gitignore` 命中的文件，并保留 executable mode |
+|---|---|
+| **upstream skill** | 在 `overrides.yaml` 中声明并由 CI 跟随外部仓库更新的 Skill |
+| **local skill** | 仓库内独立维护且不进入 overrides 的 Skill；当前为 `fan-out` |
+| **skill payload** | Skill 运行所需的 SKILL、scripts、references、assets 和 metadata |
+| **plugin asset** | Claude Code 专用的 plugin-level Agent、Hook 或其他资源 |
 
 ## Naming Conventions
 
-- Plugin 名称：简短英文，kebab-case（engineering, thinking, writing, design, learning, tools, visual）
-- Skill 目录名 = skill 调用名 = SKILL.md frontmatter 中的 `name` 字段
-- 改名通过 overrides.yaml 的 key（决定目录名）+ set_frontmatter patch（改 name 字段）实现
+- Plugin：`base`、`plus`、`creative`。
+- Skill 目录名 = Skill 调用名 = frontmatter `name`。
+- 外部 Skill 改名由 overrides key + `set_frontmatter` + 相关 metadata patch 共同完成。
+- `nuclear-review` 的 plugin-level Agent 与 Skill 使用同一个最终名称。
+- 来源名称与运行名称分离；上游原名只保留在 provenance 配置中。

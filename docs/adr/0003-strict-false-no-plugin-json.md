@@ -4,7 +4,7 @@
 
 ## Context
 
-每个本地 plugin 目录（engineering、thinking 等）是否需要自己的 `.claude-plugin/plugin.json`。
+三个本地 plugin 目录（base、plus、creative）是否需要自己的 `.claude-plugin/plugin.json`。
 
 备选方案：
 - A) 每个 plugin 目录有 plugin.json——标准结构，strict:true
@@ -18,4 +18,4 @@
 
 - 减少维护文件数量
 - plugin 元数据集中管理在 marketplace.yaml → CI 生成 marketplace.json
-- 外部引用的 plugin（如 ui-ux-pro-max）已有自己的 plugin.json，必须用 strict:true（默认），否则冲突
+- 当前 Marketplace 只发布 base、plus、creative 三个本地 plugin
