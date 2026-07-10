@@ -79,10 +79,10 @@ skills:
     plugin: engineering
     patches: []
 
-  decision-mapping:
+  wayfinder:
     source:
       repo: mattpocock/skills
-      path: skills/in-progress/decision-mapping
+      path: skills/engineering/wayfinder
       ref: main
     plugin: engineering
     patches: []
@@ -413,6 +413,9 @@ skills:
       path: .
       ref: main
     plugin: visual
+    patch_targets:
+      - SKILL.md
+      - plugins/kami/skills/kami/SKILL.md
     patches:
       - type: replace
         pattern: "**Update check (non-blocking).** At the start of a task, run `bash scripts/check-update.sh`. It does a read-only version check at most once per day and prints one line when a newer kami is available; relay that line to the user, then continue. It sends no data, and fails silently when offline, sandboxed, or without `curl`. Never let it block the work.\n\n"

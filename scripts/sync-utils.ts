@@ -1,4 +1,19 @@
-import { dirname } from "node:path"
+import { chmodSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs"
+import { dirname, join } from "node:path"
+
+export function copyFilePreservingMode(srcPath: string, destPath: string): void {
+  mkdirSync(join(destPath, ".."), { recursive: true })
+  writeFileSync(destPath, readFileSync(srcPath))
+  chmodSync(destPath, statSync(srcPath).mode & 0o777)
+}
+
+export function findOrphanedStateKeys(
+  stateKeys: readonly string[],
+  configuredKeys: readonly string[],
+): string[] {
+  const configured = new Set(configuredKeys)
+  return stateKeys.filter((key) => !configured.has(key))
+}
 
 export interface SparseCheckoutPlan {
   readonly checkoutWholeRepo: boolean

@@ -5,7 +5,9 @@ import { join } from "node:path"
 import { parse as parseYaml } from "yaml"
 import { applyPatches, type Patch } from "./patch-engine.js"
 import {
+  copyFilePreservingMode,
   findNewFileConflicts,
+  findOrphanedStateKeys,
   findRemovedFiles,
   planSparseCheckout,
 } from "./sync-utils.js"
@@ -29,6 +31,7 @@ interface SkillOverride {
   }
   plugin: string
   patches: Patch[]
+  patch_targets?: string[]
   extra_mappings?: ExtraMapping[]
 }
 
@@ -107,10 +110,7 @@ function copyTreeToDir(srcDir: string, destDir: string): string[] {
   mkdirSync(destDir, { recursive: true })
 
   for (const file of files) {
-    const srcPath = join(srcDir, file)
-    const destPath = join(destDir, file)
-    mkdirSync(join(destPath, ".."), { recursive: true })
-    writeFileSync(destPath, readFileSync(srcPath))
+    copyFilePreservingMode(join(srcDir, file), join(destDir, file))
   }
 
   return files
@@ -128,8 +128,7 @@ function fetchUpstreamFiles(repo: string, ref: string, path: string, destDir: st
       const src = join(tempDir, mapping.from)
       if (!existsSync(src)) continue
       const dest = join(ROOT, mapping.to)
-      mkdirSync(join(dest, ".."), { recursive: true })
-      writeFileSync(dest, readFileSync(src))
+      copyFilePreservingMode(src, dest)
     }
   }
 
@@ -174,8 +173,8 @@ function removeDeletedUpstreamFiles(
   return removedFiles
 }
 
-function cleanPaths(paths: string[]): void {
-  for (const path of paths) {
+function cleanPaths(stagePaths: string[], forceAddPaths: string[] = []): void {
+  for (const path of stagePaths) {
     try {
       exec(`git restore --staged --worktree -- ${shellQuote(path)}`)
     } catch {
@@ -184,7 +183,15 @@ function cleanPaths(paths: string[]): void {
     try {
       exec(`git clean -fd -- ${shellQuote(path)}`)
     } catch {
-      // Best-effort cleanup; the caller will surface any remaining dirty state.
+      // Best-effort cleanup; exact ignored files are handled below.
+    }
+  }
+
+  for (const path of forceAddPaths) {
+    try {
+      exec(`git clean -fdx -- ${shellQuote(path)}`)
+    } catch {
+      // The file may be tracked on main or may already have been removed.
     }
   }
 }
@@ -203,13 +210,59 @@ function ensureLabels(labels: string[]): void {
 
 type PrResult = "created" | "no-changes" | "branch-exists"
 
+function remoteBranchExists(branch: string): boolean {
+  try {
+    exec(`git ls-remote --exit-code origin refs/heads/${shellQuote(branch)}`)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function branchHasOpenPr(branch: string): boolean {
+  const count = exec(
+    `gh pr list --state open --head ${shellQuote(branch)} --json number --jq 'length'`,
+  )
+  return Number(count) > 0
+}
+
+function deleteLocalBranch(branch: string): void {
+  try {
+    exec(`git branch -D ${shellQuote(branch)}`)
+  } catch {
+    // The branch may not exist locally.
+  }
+}
+
+function stageSyncChanges(stagePaths: string[], forceAddPaths: string[]): void {
+  for (const path of stagePaths) {
+    exec(`git add -A -- ${shellQuote(path)}`)
+  }
+
+  const chunkSize = 100
+  for (let i = 0; i < forceAddPaths.length; i += chunkSize) {
+    const chunk = forceAddPaths.slice(i, i + chunkSize).map(shellQuote).join(" ")
+    exec(`git add -f -- ${chunk}`)
+  }
+}
+
+function hasStagedChanges(): boolean {
+  try {
+    exec("git diff --cached --quiet")
+    return false
+  } catch {
+    return true
+  }
+}
+
 function createPr(
   skillName: string,
   repo: string,
   branch: string,
   isDraft: boolean,
   body: string,
-  paths: string[],
+  stagePaths: string[],
+  forceAddPaths: string[],
 ): PrResult {
   const title = isDraft
     ? `同步：更新 ${skillName}（来自 ${repo}）[补丁失败]`
@@ -217,26 +270,24 @@ function createPr(
 
   const labelList = isDraft ? ["自动同步", "补丁失败"] : ["自动同步"]
 
-  try {
-    exec(`git ls-remote --exit-code origin refs/heads/${branch}`)
-    return "branch-exists"
-  } catch {
-    // branch doesn't exist on remote — proceed
+  if (remoteBranchExists(branch)) {
+    if (branchHasOpenPr(branch)) return "branch-exists"
+    console.log(`  🧹 ${skillName}: 删除没有 Open PR 的旧同步分支 ${branch}`)
+    exec(`git push origin --delete ${shellQuote(branch)}`)
   }
 
-  exec(`git checkout -b ${branch}`)
-  for (const p of paths) {
-    exec(`git add "${p}"`)
-  }
+  deleteLocalBranch(branch)
+  exec(`git checkout -b ${shellQuote(branch)}`)
+  stageSyncChanges(stagePaths, forceAddPaths)
 
-  const status = exec(`git status --porcelain`)
-  if (!status) {
-    exec(`git checkout main`)
+  if (!hasStagedChanges()) {
+    exec("git checkout main")
+    deleteLocalBranch(branch)
     return "no-changes"
   }
 
   exec(`git -c user.name="github-actions" -c user.email="actions@github.com" commit -m "同步：更新 ${skillName}"`)
-  exec(`git push -u origin ${branch}`)
+  exec(`git push -u origin ${shellQuote(branch)}`)
 
   const bodyFile = join(ROOT, ".tmp-pr-body.md")
   writeFileSync(bodyFile, body)
@@ -248,7 +299,8 @@ function createPr(
   exec(`gh pr create --title "${title}" --body-file "${bodyFile}" ${labelFlag} ${draftFlag}`)
 
   rmSync(bodyFile, { force: true })
-  exec(`git checkout main`)
+  exec("git checkout main")
+  deleteLocalBranch(branch)
   return "created"
 }
 
@@ -259,8 +311,18 @@ const program = Effect.gen(function* () {
   const syncState = readSyncState()
   let updated = false
 
+  const orphanedStateKeys = findOrphanedStateKeys(
+    Object.keys(syncState),
+    Object.keys(overrides.skills),
+  )
+  for (const skillName of orphanedStateKeys) {
+    console.log(`🧹 ${skillName}: 从同步状态中移除已删除的配置`)
+    delete syncState[skillName]
+    updated = true
+  }
+
   for (const [skillName, config] of Object.entries(overrides.skills)) {
-    const { source, plugin, patches, extra_mappings } = config
+    const { source, plugin, patches, patch_targets, extra_mappings } = config
     const latestSha = getUpstreamLatestSha(source.repo, source.ref)
 
     if (!latestSha) {
@@ -307,27 +369,27 @@ const program = Effect.gen(function* () {
     let patchReport = ""
 
     if (patches.length > 0) {
-      const skillMdPath = join(destDir, "SKILL.md")
-      if (existsSync(skillMdPath)) {
-        const content = readFileSync(skillMdPath, "utf-8")
-        const { final, results } = yield* applyPatches(content, patches)
-        writeFileSync(skillMdPath, final)
-
-        const failures = results.filter((r) => !r.ok)
-        if (failures.length > 0) {
+      const reports: string[] = []
+      for (const target of patch_targets ?? ["SKILL.md"]) {
+        const patchPath = join(destDir, target)
+        if (!existsSync(patchPath)) {
           patchFailed = true
-          patchReport = failures
-            .map((f) => `- ❌ [${f.patch.type}] ${f.msg}`)
-            .join("\n")
+          reports.push(`- ❌ [${target}] 补丁目标不存在`)
+          continue
         }
 
-        const successes = results.filter((r) => r.ok)
-        if (successes.length > 0) {
-          patchReport =
-            successes.map((s) => `- ✅ [${s.patch.type}] ${s.msg}`).join("\n") +
-            (patchReport ? "\n" + patchReport : "")
+        const content = readFileSync(patchPath, "utf-8")
+        const { final, results } = yield* applyPatches(content, patches)
+        writeFileSync(patchPath, final)
+
+        for (const result of results) {
+          if (!result.ok) patchFailed = true
+          reports.push(
+            `- ${result.ok ? "✅" : "❌"} [${target} / ${result.patch.type}] ${result.msg}`,
+          )
         }
       }
+      patchReport = reports.join("\n")
     }
 
     // Build PR body
@@ -353,25 +415,41 @@ const program = Effect.gen(function* () {
 
     // Create PR
     const branch = `sync/${skillName}-${latestSha.slice(0, 7)}`
-    const stagePaths = [
-      destDir,
-      ...(extra_mappings ?? []).map(m => join(ROOT, m.to)),
+    const extraMappingPaths = (extra_mappings ?? []).map(m => join(ROOT, m.to))
+    const stagePaths = [destDir, ...extraMappingPaths]
+    const forceAddPaths = [
+      ...upstreamFiles.map(file => join(destDir, file)),
+      ...extraMappingPaths,
     ]
 
     try {
-      const result = createPr(skillName, source.repo, branch, patchFailed, body, stagePaths)
+      const result = createPr(
+        skillName,
+        source.repo,
+        branch,
+        patchFailed,
+        body,
+        stagePaths,
+        forceAddPaths,
+      )
       if (result === "created") {
         console.log(`  📬 PR 已创建${patchFailed ? " (Draft)" : ""}`)
       } else if (result === "no-changes") {
         console.log(`  ⏭️  ${skillName}: 文件内容无变化，记录最新状态`)
       } else {
         console.log(`  ⏭️  ${skillName}: 分支已存在，记录最新状态`)
-        cleanPaths(stagePaths)
+        cleanPaths(stagePaths, forceAddPaths)
       }
 
       syncState[skillName] = { sha: latestSha, files: upstreamFiles }
       updated = true
     } catch (e) {
+      try {
+        exec("git checkout main")
+      } catch {
+        // Already on main or checkout is blocked by an unexpected failure.
+      }
+      cleanPaths(stagePaths, forceAddPaths)
       console.log(`  ❌ PR 创建失败: ${e}`)
     }
   }
