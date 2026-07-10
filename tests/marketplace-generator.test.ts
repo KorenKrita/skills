@@ -11,11 +11,13 @@ const SAMPLE_CONFIG: MarketplaceConfig = {
   },
   plugins: {
     coding: {
+      version: "0.0.1",
       description: "编码过程中的辅助工具",
       category: "engineering",
       keywords: ["tdd", "debug"],
     },
     tools: {
+      version: "0.2.3",
       description: "通用工具",
       category: "productivity",
       keywords: ["handoff"],
@@ -59,6 +61,7 @@ describe("marketplace-generator", () => {
     Effect.gen(function* () {
       const result = yield* generateMarketplace(SAMPLE_CONFIG, SAMPLE_DIRS)
       const coding = result.plugins.find((p) => p.name === "coding")
+      expect(coding!.version).toBe("0.0.1")
       expect(coding!.description).toBe("编码过程中的辅助工具")
       expect(coding!.category).toBe("engineering")
       expect(coding!.keywords).toEqual(["tdd", "debug"])

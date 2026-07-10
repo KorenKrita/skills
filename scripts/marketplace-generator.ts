@@ -13,6 +13,7 @@ export interface MarketplaceConfig {
 }
 
 export interface PluginConfig {
+  readonly version: string
   readonly description: string
   readonly category?: string
   readonly keywords?: readonly string[]
@@ -40,6 +41,7 @@ export interface MarketplaceJson {
 
 export interface MarketplacePluginEntry {
   readonly name: string
+  readonly version?: string
   readonly source: string | { readonly source: string; readonly repo: string }
   readonly description: string
   readonly strict: false
@@ -60,6 +62,7 @@ export const generateMarketplace = (
       .filter(([name]) => existingPluginNames.has(name))
       .map(([name, pluginConfig]) => ({
         name,
+        version: pluginConfig.version,
         source: `./plugins/${name}`,
         description: pluginConfig.description,
         strict: false as const,

@@ -443,16 +443,22 @@ skills:
         pattern: "**Update check (non-blocking).** At the start of a task, run `bash scripts/check-update.sh`. It does a read-only version check at most once per day and prints one line when a newer kami is available; relay that line to the user, then continue. It sends no data, and fails silently when offline, sandboxed, or without `curl`. Never let it block the work.\n\n"
         with: ""
 
-  ian-xiaohei-illustrations:
+  xiaohei:
     source: { repo: helloianneo/ian-xiaohei-illustrations, path: ian-xiaohei-illustrations, ref: main }
     plugin: creative
-    patches: []
+    patches:
+      - { type: set_frontmatter, field: name, value: xiaohei }
+    target_patches:
+      - target: agents/openai.yaml
+        patches:
+          - { type: replace_all, pattern: "$ian-xiaohei-illustrations", with: "$xiaohei" }
 
   xiaohei2:
     source: { repo: helloianneo/ian-xiaohei-scenes, path: ian-xiaohei-scenes, ref: main }
     plugin: creative
     patches:
       - { type: set_frontmatter, field: name, value: xiaohei2 }
+      - { type: replace_all, pattern: "$ian-xiaohei-illustrations", with: "$xiaohei" }
     target_patches:
       - target: agents/openai.yaml
         patches:

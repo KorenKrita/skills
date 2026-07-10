@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSy
 import { join } from "node:path"
 import { parse as parseYaml } from "yaml"
 import { applyPatches, type Patch } from "./patch-engine.js"
+import { bumpPluginVersion } from "./plugin-version.js"
 import {
   copyFilePreservingMode,
   findNewFileConflicts,
@@ -57,6 +58,8 @@ interface SyncState {
 const ROOT = new URL("../", import.meta.url).pathname.replace(/\/$/, "")
 const SYNC_STATE_PATH = join(ROOT, ".sync-state.json")
 const OVERRIDES_PATH = join(ROOT, "overrides.yaml")
+const MARKETPLACE_CONFIG_PATH = join(ROOT, "marketplace.yaml")
+const MARKETPLACE_JSON_PATH = join(ROOT, ".claude-plugin", "marketplace.json")
 const FORCE_SYNC = process.argv.includes("--force")
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -275,6 +278,7 @@ function hasStagedChanges(): boolean {
 
 function createPr(
   skillName: string,
+  pluginName: string,
   repo: string,
   branch: string,
   isDraft: boolean,
@@ -304,11 +308,20 @@ function createPr(
     return "no-changes"
   }
 
+  const versionBump = bumpPluginVersion(
+    readFileSync(MARKETPLACE_CONFIG_PATH, "utf-8"),
+    pluginName,
+  )
+  writeFileSync(MARKETPLACE_CONFIG_PATH, versionBump.content)
+  exec("npx tsx scripts/build-marketplace.ts")
+  stageSyncChanges([MARKETPLACE_CONFIG_PATH, MARKETPLACE_JSON_PATH], [])
+
   exec(`git -c user.name="github-actions" -c user.email="actions@github.com" commit -m "同步：更新 ${skillName}"`)
   exec(`git push -u origin ${shellQuote(branch)}`)
 
   const bodyFile = join(ROOT, ".tmp-pr-body.md")
-  writeFileSync(bodyFile, body)
+  const versionBody = `${body}\n## Plugin 版本\n\n- \`${pluginName}\`: \`${versionBump.previousVersion}\` → \`${versionBump.nextVersion}\`\n`
+  writeFileSync(bodyFile, versionBody)
 
   ensureLabels(labelList)
 
@@ -476,7 +489,12 @@ const program = Effect.gen(function* () {
     // Create PR
     const branch = `sync/${skillName}-${latestSha.slice(0, 7)}`
     const extraMappingPaths = (extra_mappings ?? []).map(m => join(ROOT, m.to))
-    const stagePaths = [destDir, ...extraMappingPaths]
+    const stagePaths = [
+      destDir,
+      ...extraMappingPaths,
+      MARKETPLACE_CONFIG_PATH,
+      MARKETPLACE_JSON_PATH,
+    ]
     const forceAddPaths = [
       ...upstreamFiles.map(file => join(destDir, file)),
       ...extraMappingPaths,
@@ -485,6 +503,7 @@ const program = Effect.gen(function* () {
     try {
       const result = createPr(
         skillName,
+        plugin,
         source.repo,
         branch,
         patchFailed,

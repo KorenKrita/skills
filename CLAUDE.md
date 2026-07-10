@@ -27,6 +27,7 @@ npm run sync
 
 ## 关键规则
 
+- 所有修改必须遵守根目录 `AGENTS.md` 的 plugin 版本递增规则。
 - 上游 Skill 的修改通过 `overrides.yaml` 声明，不直接维护漂移副本。
 - 本地 Skill 直接放入目标 plugin；当前本地 Skill 是 `plus/fan-out`。
 - Skill 目录名必须等于 `SKILL.md` frontmatter 的 `name`。

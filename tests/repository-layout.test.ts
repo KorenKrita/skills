@@ -49,7 +49,7 @@ const EXPECTED_SKILLS = {
   creative: [
     "archify",
     "humanizer-zh",
-    "ian-xiaohei-illustrations",
+    "xiaohei",
     "kami",
     "ui",
     "web",
@@ -81,6 +81,21 @@ describe("repository layout", () => {
       .filter((name) => statSync(join(ROOT, "plugins", name)).isDirectory())
       .sort()
     expect(actual).toEqual([...PLUGINS].sort())
+  })
+
+  it("keeps marketplace versions valid and generated entries aligned", () => {
+    const config = parseYaml(readFileSync(join(ROOT, "marketplace.yaml"), "utf-8")) as {
+      plugins: Record<string, { version: string }>
+    }
+    const generated = JSON.parse(
+      readFileSync(join(ROOT, ".claude-plugin", "marketplace.json"), "utf-8"),
+    ) as { plugins: Array<{ name: string; version?: string }> }
+
+    for (const plugin of PLUGINS) {
+      const version = config.plugins[plugin]?.version
+      expect(version, plugin).toMatch(/^\d+\.\d+\.\d+$/)
+      expect(generated.plugins.find((entry) => entry.name === plugin)?.version, plugin).toBe(version)
+    }
   })
 
   it("contains the approved 42 unique skills", () => {
@@ -124,6 +139,21 @@ describe("repository layout", () => {
     expect(runtime).not.toContain("thermo-nuclear-code-quality-review")
     expect(runtime).not.toContain("Thermo-Nuclear Code Quality Review")
     expect(runtime).toContain('subagent_type: "nuclear-review"')
+  })
+
+  it("keeps both Xiaohei skills on their local runtime names", () => {
+    const xiaohei = join(ROOT, "plugins", "creative", "skills", "xiaohei")
+    const xiaohei2 = join(ROOT, "plugins", "creative", "skills", "xiaohei2")
+    expect(frontmatterName(join(xiaohei, "SKILL.md"))).toBe("xiaohei")
+    expect(frontmatterName(join(xiaohei2, "SKILL.md"))).toBe("xiaohei2")
+
+    const runtime = [...textFiles(xiaohei), ...textFiles(xiaohei2)]
+      .map((path) => readFileSync(path, "utf-8"))
+      .join("\n")
+    expect(runtime).not.toContain("$ian-xiaohei-illustrations")
+    expect(runtime).not.toContain("$ian-xiaohei-scenes")
+    expect(runtime).toContain("$xiaohei")
+    expect(runtime).toContain("$xiaohei2")
   })
 
   it("removes unavailable hai skill references from the selected subset", () => {
