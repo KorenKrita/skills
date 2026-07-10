@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<!-- ==================================================================
+     KAMI 介绍 · 一页纸 · 白底打印版
+     基于 one-pager.html，@page / body 背景改为纯白以贴合打印纸张。
+     渲染：base_url 指向 assets/templates，字体相对路径 ../fonts 生效。
+     目标：页数必须 == 1
+     ================================================================== -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Kami · 为 AI 时代设计的文档排版系统</title>
+<meta name="author" content="Tw93">
+<meta name="description" content="Kami 是为 AI 时代设计的文档排版系统：给大模型一段简报，得到衬线主导、墨蓝点缀、可直接打印的专业 PDF，覆盖简历到白皮书 8 类文档与 18 种图表。">
+<meta name="keywords" content="Kami, 文档排版, 设计系统, AI 文档, 一页纸, PDF">
+<meta name="generator" content="Kami">
+<style>
+  /* Regular weight */
+  @font-face {
+    font-family: "TsangerJinKai02";
+    src: url("../fonts/TsangerJinKai02-W04.ttf") format("truetype"),
+       url("https://cdn.jsdelivr.net/gh/tw93/Kami@main/assets/fonts/TsangerJinKai02-W04.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  /* Bold weight - W05 for all bold variants */
+  @font-face {
+    font-family: "TsangerJinKai02";
+    src: url("../fonts/TsangerJinKai02-W05.ttf") format("truetype"),
+       url("https://cdn.jsdelivr.net/gh/tw93/Kami@main/assets/fonts/TsangerJinKai02-W05.ttf") format("truetype");
+    font-weight: 500;
+    font-style: normal;
+  }
+
+  /* 打印优化：白底。屏幕默认是 #f5f4ed 羊皮纸底，此版本改白底是为了
+     直接打印到白纸时不在背景上铺一层墨，并让边缘干净。 */
+  @page {
+    size: A4;
+    margin: 15mm 18mm 15mm 18mm;
+    background: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --parchment: #f5f4ed;
+    --ivory:     #faf9f5;
+    --near-black:#141413;
+    --dark-warm: #3d3d3a;
+    --olive:     #504e49;
+    --stone:     #6b6a64;
+    --brand:     #1B365D;
+    --border:    #e8e6dc;
+    --border-soft:#e5e3d8;
+    --tag-bg:    #E4ECF5;
+    --serif: "TsangerJinKai02", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", "STSong", Georgia, serif;
+    --sans: var(--serif);
+    --mono: "JetBrains Mono", "SF Mono", "Fira Code", Consolas, Monaco, "TsangerJinKai02", monospace;
+  }
+
+  html, body { background: #ffffff; }
+
+  @media screen {
+    body { max-width: 210mm; margin: 0 auto; padding: 15mm 18mm; }
+  }
+
+  body {
+    color: var(--near-black);
+    font-family: var(--serif);
+    font-size: 10pt;
+    line-height: 1.45;
+    letter-spacing: 0.3pt;
+  }
+
+  .serif { font-family: var(--serif); }
+
+  /* ========== HEADER ========== */
+  .header {
+    margin-bottom: 16pt;
+    padding-bottom: 12pt;
+    border-bottom: 0.5pt solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20pt;
+  }
+  .title-block { flex: 1; }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 7pt;
+    font-size: 9pt;
+    color: var(--brand);
+    letter-spacing: 1.5pt;
+    text-transform: uppercase;
+    margin-bottom: 7pt;
+    font-weight: 500;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 8pt;
+    height: 1.5pt;
+    border-radius: 0.75pt;
+    background: var(--brand);
+    flex-shrink: 0;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-size: 25pt;
+    font-weight: 500;
+    color: var(--near-black);
+    line-height: 1.15;
+    margin-bottom: 5pt;
+  }
+  .subtitle {
+    font-size: 11pt;
+    color: var(--olive);
+    line-height: 1.4;
+  }
+  .meta {
+    font-size: 9pt;
+    color: var(--stone);
+    text-align: right;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+
+  /* ========== METRICS ========== */
+  .metrics {
+    display: flex;
+    gap: 14pt;
+    margin-bottom: 22pt;
+    padding: 5pt 0 8pt 0;
+    border-bottom: 0.3pt dotted var(--border);
+  }
+  .metric {
+    flex: 1;
+    background: transparent;
+    padding: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 5pt;
+    break-inside: avoid;
+  }
+  .metric-value {
+    font-family: var(--serif);
+    font-size: 24pt;
+    font-weight: 500;
+    color: var(--brand);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    letter-spacing: -0.2pt;
+  }
+  .metric-label {
+    font-size: 9pt;
+    color: var(--olive);
+    line-height: 1.3;
+    white-space: nowrap;
+  }
+
+  /* ========== SECTIONS ========== */
+  section { margin-bottom: 20pt; break-inside: avoid; }
+  section:last-of-type { margin-bottom: 0; }
+
+  h2 {
+    font-family: var(--serif);
+    font-size: 16pt;
+    font-weight: 500;
+    color: var(--near-black);
+    margin-bottom: 6pt;
+  }
+  h2 .sub {
+    font-size: 9pt;
+    color: var(--stone);
+    font-weight: 400;
+    margin-left: 6pt;
+  }
+
+  p { margin-bottom: 6pt; line-height: 1.45; }
+  p:last-child { margin-bottom: 0; }
+
+  .lead {
+    font-size: 12pt;
+    line-height: 1.6;
+    color: var(--dark-warm);
+    margin-bottom: 20pt;
+    letter-spacing: 0.04em;
+  }
+
+  .hl { color: var(--brand); font-weight: 500; }
+
+  /* ========== 2-column grid ========== */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24pt;
+  }
+
+  /* ========== dash list ========== */
+  ul.dash { margin: 0; padding-left: 16pt; }
+  ul.dash li { margin-bottom: 6pt; line-height: 1.45; }
+  ul.dash li:last-child { margin-bottom: 0; }
+  ul.dash li::marker { color: var(--brand); }
+
+  /* ========== Timeline ========== */
+  .timeline { display: flex; gap: 12pt; margin-top: 6pt; }
+  .tl-step { flex: 1; break-inside: avoid; }
+  .tl-year {
+    font-family: var(--serif);
+    font-size: 11pt;
+    font-weight: 500;
+    color: var(--brand);
+    margin-bottom: 2pt;
+  }
+  .tl-head {
+    font-size: 10pt;
+    font-weight: 500;
+    color: var(--near-black);
+    margin-bottom: 2pt;
+  }
+  .tl-body { font-size: 9pt; color: var(--olive); line-height: 1.4; }
+
+  /* ========== Install command block ========== */
+  .cmd {
+    display: block;
+    background: var(--ivory);
+    border: 0.5pt solid var(--border);
+    border-radius: 5pt;
+    padding: 9pt 12pt;
+    font-family: var(--mono);
+    font-size: 9pt;
+    color: var(--dark-warm);
+    line-height: 1.65;
+    letter-spacing: 0;
+    white-space: pre;
+    margin-top: 4pt;
+  }
+  .cmd .p { color: var(--brand); }
+  .cmd .c { color: var(--stone); }
+
+  /* ========== Closing callout ========== */
+  .callout {
+    background: transparent;
+    border-left: 1.8pt solid var(--brand);
+    padding: 4pt 0 4pt 14pt;
+    margin-top: 18pt;
+    font-size: 10pt;
+    line-height: 1.55;
+    color: var(--olive);
+    break-inside: avoid;
+  }
+  .callout .hl { color: var(--brand); font-weight: 500; }
+
+  /* ========== FOOTER ========== */
+  .footer {
+    margin-top: 18pt;
+    padding-top: 6pt;
+    border-top: 0.3pt dotted var(--border);
+    font-size: 9pt;
+    color: var(--stone);
+    display: flex;
+    justify-content: space-between;
+    letter-spacing: 0.3pt;
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== HEADER ========== -->
+<div class="header">
+  <div class="title-block">
+    <div class="eyebrow">AI 文档排版系统</div>
+    <h1>Kami · 紙</h1>
+    <div class="subtitle">好内容值得好纸。给大模型一段简报，得到可直接打印的专业文档。</div>
+  </div>
+  <div class="meta">
+    Tw93<br>
+    2026.06.29<br>
+    v1.9.1
+  </div>
+</div>
+
+<!-- ========== METRICS ========== -->
+<div class="metrics">
+  <div class="metric">
+    <div class="metric-value">8</div>
+    <div class="metric-label">文档模板</div>
+  </div>
+  <div class="metric">
+    <div class="metric-value">18</div>
+    <div class="metric-label">图表类型</div>
+  </div>
+  <div class="metric">
+    <div class="metric-value">5</div>
+    <div class="metric-label">语言支持</div>
+  </div>
+  <div class="metric">
+    <div class="metric-value">1</div>
+    <div class="metric-label">强调色</div>
+  </div>
+</div>
+
+<!-- ========== LEAD ========== -->
+<p class="lead">
+  Kami 把编辑级的排版规范沉淀成一套可复用的设计语言：<span class="hl">单一墨蓝强调</span>、衬线承担层次、暖灰中性色、克制的留白。你只描述需求，AI 负责选模板、填内容、导出 A4 PDF，<span class="hl">无需手写一行 CSS</span>。
+</p>
+
+<!-- ========== 核心内容（两栏） ========== -->
+<div class="two-col">
+  <section>
+    <h2>一种语言，多类文档</h2>
+    <p>同一套色彩 token 与排印规则，从一页纸贯通到长文白皮书，风格始终一致。</p>
+    <ul class="dash">
+      <li>简历、一页纸方案、正式信件</li>
+      <li>作品集、白皮书、长文报告</li>
+      <li>演示 slides、个股研报、更新日志</li>
+      <li>内嵌 <span class="hl">18 种</span>矢量图表与流程图</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>克制的设计原则</h2>
+    <p>规则比选项多，刻意收窄表达空间，换来跨文档的稳定与可读。</p>
+    <ul class="dash">
+      <li>墨蓝强调覆盖面积不超过 <span class="hl">5%</span></li>
+      <li>衬线承担层次，字重只用 400 与 500</li>
+      <li>暖灰中性色，杜绝冷调蓝灰</li>
+      <li>为打印而生，分页与字体内嵌稳定</li>
+    </ul>
+  </section>
+</div>
+
+<!-- ========== 工作流 Timeline ========== -->
+<section>
+  <h2>四步交付<span class="sub">从一句话简报到可打印 PDF</span></h2>
+  <div class="timeline">
+    <div class="tl-step">
+      <div class="tl-year">第 1 步</div>
+      <div class="tl-head">描述需求</div>
+      <div class="tl-body">一句话简报交给 AI，说清用途与受众。</div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-year">第 2 步</div>
+      <div class="tl-head">自动选型</div>
+      <div class="tl-body">按用途匹配模板，数据自动配上合适图表。</div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-year">第 3 步</div>
+      <div class="tl-head">填充排版</div>
+      <div class="tl-body">内容落入衬线网格，层次与节奏自动对齐。</div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-year">第 4 步</div>
+      <div class="tl-head">导出交付</div>
+      <div class="tl-body">输出 A4 PDF 与 HTML，可直接打印或分享。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 安装 ========== -->
+<section>
+  <h2>在你的 AI 工具里启用<span class="sub">Claude Code / Codex / Claude Desktop</span></h2>
+  <code class="cmd"><span class="c"># Claude Code</span>
+<span class="p">/plugin</span> marketplace add tw93/kami　<span class="p">&amp;&amp;</span>　<span class="p">/plugin</span> install kami@kami
+<span class="c"># Codex</span>
+codex plugin marketplace add tw93/kami　<span class="p">&amp;&amp;</span>　codex plugin add kami@kami</code>
+</section>
+
+<!-- ========== 收尾旁注 ========== -->
+<div class="callout">
+  Kami 是 <span class="hl">Kaku · Waza · Kami</span> 工具集的一员：Kaku 写代码，Waza 练习惯，Kami 交付文档。把排版交给系统，把注意力留给内容。
+</div>
+
+<!-- ========== FOOTER ========== -->
+<div class="footer">
+  <span>本页为白底打印版，屏幕默认采用 #f5f4ed 羊皮纸底</span>
+  <span>kami.tw93.fun · github.com/tw93/kami</span>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "kami",
+  "version": "1.9.3",
+  "description": "Typeset professional documents and landing pages with the Kami design system.",
+  "author": {
+    "name": "Tw93",
+    "email": "hitw93@gmail.com"
+  },
+  "homepage": "https://github.com/tw93/kami",
+  "repository": "https://github.com/tw93/kami",
+  "license": "MIT",
+  "skills": "./skills/"
+}

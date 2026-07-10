@@ -8,9 +8,10 @@
   "plugins": [
     {
       "name": "kami",
-      "description": "Typeset professional documents: resumes, one-pagers, white papers, letters, portfolios, slide decks. Warm parchment, ink-blue accent, serif-led hierarchy.",
+      "version": "1.9.3",
+      "description": "Typeset professional documents and landing pages with the Kami design system.",
       "category": "documents",
-      "source": "./",
+      "source": "./plugins/kami",
       "homepage": "https://github.com/tw93/kami"
     }
   ]
