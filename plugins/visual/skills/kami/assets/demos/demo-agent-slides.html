@@ -297,7 +297,7 @@
     <h1>Things you don't know about Agents</h1>
     <div class="sub">Loops, harness, context, memory: what actually moves the needle in production.</div>
     <div class="line"></div>
-    <div class="meta">kami slides demo · A4 landscape · 7 slides</div>
+    <div class="meta">kami slides demo · A4 landscape · 8 slides</div>
   </div>
   <div class="cover-visual">
     <!-- Decorative loop mark: concentric arcs in brand + stone -->
@@ -399,6 +399,66 @@
   <div class="footer-mark">Agent Engineering</div>
 </section>
 
+<!-- ═══════════ 01 · Agent Loop (traced) ═══════════ -->
+<section class="slide">
+  <div class="slide-head">
+    <span class="eyebrow">01 · Agent Loop</span>
+  </div>
+  <div class="slide-title">One turn, traced</div>
+
+  <p class="claim" style="max-width: 60ch;">The same loop, made concrete: a single user turn flows through the agent to a tool and back.</p>
+
+  <div style="flex:1; display:flex; align-items:center; justify-content:center;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 280" width="640" height="427" style="background:#f5f4ed">
+    <style>
+      text { font-family: Charter, Georgia, "TsangerJinKai02", "Source Han Serif SC", "Noto Serif CJK SC", serif; }
+    </style>
+    <defs>
+      <marker id="seq-arrow" markerWidth="8" markerHeight="5" refX="8" refY="2.5" orient="auto-start-reverse">
+        <polygon points="0 0, 8 2.5, 0 5" fill="#1b365d" />
+      </marker>
+      <marker id="seq-arrow-open" markerWidth="8" markerHeight="5" refX="8" refY="2.5" orient="auto-start-reverse">
+        <polyline points="0 0, 8 2.5, 0 5" fill="none" stroke="#1b365d" stroke-width="1" />
+      </marker>
+    </defs>
+    <line class="lifeline" data-actor="U" x1="70" y1="70" x2="70" y2="250" stroke="#504e49" stroke-width="0.75" stroke-dasharray="6 4" />
+    <line class="lifeline" data-actor="A" x1="210" y1="70" x2="210" y2="250" stroke="#504e49" stroke-width="0.75" stroke-dasharray="6 4" />
+    <line class="lifeline" data-actor="T" x1="350" y1="70" x2="350" y2="250" stroke="#504e49" stroke-width="0.75" stroke-dasharray="6 4" />
+    <g class="message" data-from="U" data-to="A" data-label="ask" data-line-style="solid" data-arrow-head="filled" data-self="false">
+      <line x1="70" y1="90" x2="210" y2="90" stroke="#504e49" stroke-width="1" marker-end="url(#seq-arrow)" />
+      <text x="140" y="80" font-size="11" text-anchor="middle" font-weight="400" fill="#6b6a64" dy="3.8499999999999996">ask</text>
+    </g>
+    <g class="message" data-from="A" data-to="T" data-label="invoke(query)" data-line-style="solid" data-arrow-head="filled" data-self="false">
+      <line x1="210" y1="130" x2="350" y2="130" stroke="#504e49" stroke-width="1" marker-end="url(#seq-arrow)" />
+      <text x="280" y="120" font-size="11" text-anchor="middle" font-weight="400" fill="#6b6a64" dy="3.8499999999999996">invoke(query)</text>
+    </g>
+    <g class="message" data-from="T" data-to="A" data-label="result" data-line-style="dashed" data-arrow-head="filled" data-self="false">
+      <line x1="350" y1="170" x2="210" y2="170" stroke="#504e49" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+      <text x="280" y="160" font-size="11" text-anchor="middle" font-weight="400" fill="#6b6a64" dy="3.8499999999999996">result</text>
+    </g>
+    <g class="message" data-from="A" data-to="U" data-label="answer" data-line-style="dashed" data-arrow-head="filled" data-self="false">
+      <line x1="210" y1="210" x2="70" y2="210" stroke="#504e49" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#seq-arrow)" />
+      <text x="140" y="200" font-size="11" text-anchor="middle" font-weight="400" fill="#6b6a64" dy="3.8499999999999996">answer</text>
+    </g>
+    <g class="actor" data-id="U" data-label="User" data-type="participant">
+      <rect x="30" y="30" width="80" height="40" rx="4" ry="4" fill="#faf9f5" stroke="#e8e6dc" stroke-width="1" />
+      <text x="70" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="#141413" dy="4.55">User</text>
+    </g>
+    <g class="actor" data-id="A" data-label="Agent" data-type="participant">
+      <rect x="170" y="30" width="80" height="40" rx="4" ry="4" fill="#faf9f5" stroke="#e8e6dc" stroke-width="1" />
+      <text x="210" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="#141413" dy="4.55">Agent</text>
+    </g>
+    <g class="actor" data-id="T" data-label="Tool" data-type="participant">
+      <rect x="310" y="30" width="80" height="40" rx="4" ry="4" fill="#faf9f5" stroke="#e8e6dc" stroke-width="1" />
+      <text x="350" y="50" font-size="13" text-anchor="middle" font-weight="500" fill="#141413" dy="4.55">Tool</text>
+    </g>
+    </svg>
+  </div>
+
+  <div class="page-num">03</div>
+  <div class="footer-mark">Agent Engineering</div>
+</section>
+
 <!-- ═══════════ 03 · Harness over models ═══════════ -->
 <section class="slide">
   <div class="slide-head">
@@ -430,7 +490,7 @@
     </div>
   </div>
 
-  <div class="page-num">03</div>
+  <div class="page-num">04</div>
   <div class="footer-mark">Agent Engineering</div>
 </section>
 
@@ -485,7 +545,7 @@
     </div>
   </div>
 
-  <div class="page-num">04</div>
+  <div class="page-num">05</div>
   <div class="footer-mark">Agent Engineering</div>
 </section>
 
@@ -519,7 +579,7 @@
     </div>
   </div>
 
-  <div class="page-num">05</div>
+  <div class="page-num">06</div>
   <div class="footer-mark">Agent Engineering</div>
 </section>
 
@@ -555,7 +615,7 @@
     </div>
   </div>
 
-  <div class="page-num">06</div>
+  <div class="page-num">07</div>
   <div class="footer-mark">Agent Engineering</div>
 </section>
 
@@ -564,7 +624,7 @@
   <h1>Protocol first.<br>Then parallelism.</h1>
   <div class="line"></div>
   <div class="sub">Fix your evals before you tweak the Agent. Most of what looks like model failure is infrastructure noise in disguise.</div>
-  <div class="page-num">07</div>
+  <div class="page-num">08</div>
   <div class="footer-mark">End of Deck</div>
 </section>
 
