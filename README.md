@@ -1,8 +1,10 @@
 # KorenKrita Skills
 
-个人 Claude Code skill 聚合 marketplace。订阅一个 marketplace 获取所有 skill。
+个人 Agent Skills 聚合仓库，同时支持 Claude Code Marketplace 和 Pi Package。
 
 ## 安装
+
+### Claude Code
 
 ```bash
 /plugin marketplace add KorenKrita/skills
@@ -20,6 +22,44 @@
 /plugin install visual@korenkrita-skills
 /plugin install ui-ux-pro-max@korenkrita-skills
 ```
+
+### Pi
+
+全局安装仓库中的全部 skill：
+
+```bash
+pi install git:github.com/KorenKrita/skills
+```
+
+安装后，Pi 会根据 skill 的 `description` 自动按需加载。也可以在 Pi 中手动调用：
+
+```text
+/skill:tdd
+```
+
+如果 `/skill:<name>` 命令不可用，可以通过 `/settings` 开启 skill commands，或在 `~/.pi/agent/settings.json` 中设置：
+
+```json
+{
+  "enableSkillCommands": true
+}
+```
+
+管理、更新和卸载：
+
+```bash
+pi config
+pi update --extensions
+pi remove git:github.com/KorenKrita/skills
+```
+
+默认安装到用户级配置；如需仅在当前项目中启用，可添加 `-l`：
+
+```bash
+pi install -l git:github.com/KorenKrita/skills
+```
+
+> `ui-ux-pro-max` 是 Claude Marketplace 的外部引用，不在本仓库的 Pi Package skill 集合中。
 
 ## Plugin 列表
 
