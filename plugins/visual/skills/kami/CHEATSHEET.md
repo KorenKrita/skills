@@ -271,6 +271,8 @@ Eighteen built-in diagram types (incl. Mermaid-sourced sequence / class / ER; se
 
 Usage: extract the `<svg>` block from the HTML file and paste into the template's `<figure>` container.
 
+**Repo-maintained diagram** (README / docs-site figure living in the user's repository): keep the trio consistent, `index.html` source + same-name PNG re-exported after every change + `prompt.md` (must preserve / suggested additions / visual direction / sister boundaries). Evidence pass before drawing; maturity encoding for shipped / in-build / future. See `references/diagrams.md` «Maintained diagram assets».
+
 **Data chart colors**: primary series `#1B365D` · secondary `#504e49` → `#6b6a64` → `#b8b7b0` → `#d4d3cd` → `#EEF2F7`.
 
 **Editing data**: only modify elements between `<!-- DATA START -->` / `<!-- DATA END -->`, leave CSS untouched. All coordinates must be divisible by 4.
