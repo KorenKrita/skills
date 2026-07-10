@@ -47,15 +47,15 @@ stays in `lifecycle.schema.json`.
 
 ## Runtime validation
 
-`renderers/shared/validator.mjs` compiles all five schemas with ajv
-(draft 2020-12 dialect via `ajv/dist/2020.js`) using `strict: true` and
-`allErrors: true`; `common.schema.json` is registered with `ajv.addSchema` so
-the `$ref`s resolve. Validation runs when a renderer loads its input, before
-the renderer's own layout checks.
+At development time, `scripts/generate-validators.mjs` compiles all five
+schemas with ajv's draft 2020-12 standalone generator using `strict: true` and
+`allErrors: true`. The generated `renderers/shared/generated-validators.mjs`
+is committed and shipped with the skill, so runtime validation has no npm or
+network dependency. `renderers/shared/validator.mjs` applies the matching
+standalone validator before the renderer's own layout checks.
 
-If ajv is not installed (no `npm install` in the skill folder), the validator
-prints a warning and skips schema validation; renderer layout checks still
-run, so structurally valid files keep rendering.
+`npm test` runs the generator in check mode and fails when the committed
+validators drift from their schemas.
 
 ## Error format
 

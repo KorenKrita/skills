@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const skillRoot = path.resolve(__dirname, '..');
@@ -18,6 +18,8 @@ function usage() {
   archify inspect <type> <input.json>
   archify check <output.html>
   archify examples
+  archify doctor
+  archify demo [output-directory]
 
 Types:
   architecture, workflow, sequence, dataflow, lifecycle
@@ -66,6 +68,106 @@ function commandCheck(args) {
 function commandExamples() {
   const result = runNode([path.join(skillRoot, 'test/render-examples.mjs')], { cwd: skillRoot });
   if (result.status !== 0) exitFrom(result);
+}
+
+async function commandDoctor() {
+  const checks = [];
+  const nodeMajor = Number.parseInt(process.versions.node.split('.')[0], 10);
+  checks.push({
+    label: `Node.js v${process.versions.node} (requires >=18)`,
+    ok: nodeMajor >= 18,
+    missing: 0,
+    failureLabel: 'unsupported',
+  });
+
+  const template = path.join(skillRoot, 'assets/template.html');
+  checks.push({
+    label: 'Core template',
+    ok: fs.existsSync(template),
+    missing: fs.existsSync(template) ? 0 : 1,
+  });
+
+  const validators = path.join(skillRoot, 'renderers/shared/generated-validators.mjs');
+  const validatorsExist = fs.existsSync(validators);
+  let validatorsValid = false;
+  if (validatorsExist) {
+    try {
+      const module = await import(`${pathToFileURL(validators).href}?doctor=${Date.now()}`);
+      validatorsValid = [...TYPES].every((type) => typeof module[type] === 'function');
+    } catch {
+      validatorsValid = false;
+    }
+  }
+  checks.push({
+    label: 'Standalone schema validators',
+    ok: validatorsValid,
+    missing: validatorsExist ? 0 : 1,
+    invalid: validatorsExist && !validatorsValid ? 1 : 0,
+    failureLabel: validatorsExist ? 'invalid' : 'missing',
+  });
+
+  const examples = {
+    architecture: 'web-app.architecture.json',
+    workflow: 'agent-tool-call.workflow.json',
+    sequence: 'cache-miss-request.sequence.json',
+    dataflow: 'product-analytics.dataflow.json',
+    lifecycle: 'agent-run.lifecycle.json',
+  };
+
+  for (const type of TYPES) {
+    const required = [
+      path.join(skillRoot, 'renderers', type, `render-${type}.mjs`),
+      path.join(skillRoot, 'schemas', `${type}.schema.json`),
+      path.join(skillRoot, 'examples', examples[type]),
+    ];
+    const missing = required.filter((file) => !fs.existsSync(file)).length;
+    checks.push({
+      label: `${type} renderer, schema, and example`,
+      ok: missing === 0,
+      missing,
+    });
+  }
+
+  console.log('Archify doctor\n');
+  for (const check of checks) {
+    console.log(`[${check.ok ? 'ok' : (check.failureLabel || 'missing')}] ${check.label}`);
+  }
+
+  const nodeFailed = checks[0].ok ? 0 : 1;
+  const missingFiles = checks.reduce((count, check) => count + check.missing, 0);
+  const invalidRuntime = checks.reduce((count, check) => count + (check.invalid || 0), 0);
+  if (nodeFailed === 0 && missingFiles === 0 && invalidRuntime === 0) {
+    console.log('\nArchify is ready.');
+    return;
+  }
+
+  const problems = [];
+  if (nodeFailed) problems.push('Node.js 18 or newer is required');
+  if (missingFiles) problems.push(`${missingFiles} required file${missingFiles === 1 ? '' : 's'} missing`);
+  if (invalidRuntime) problems.push(`${invalidRuntime} runtime check${invalidRuntime === 1 ? '' : 's'} failed`);
+  console.error(`\nArchify is not ready: ${problems.join('; ')}.`);
+  process.exitCode = 1;
+}
+
+function commandDemo(args) {
+  if (args.length > 1) fail(usage());
+
+  const outputDirectory = path.resolve(args[0] || process.cwd());
+  const output = path.join(outputDirectory, 'archify-demo.html');
+  const input = path.join(skillRoot, 'examples/web-app.architecture.json');
+
+  try {
+    fs.mkdirSync(outputDirectory, { recursive: true });
+  } catch (error) {
+    fail(`Could not create demo directory "${outputDirectory}": ${error.message}`, 1);
+  }
+
+  const result = runNode([rendererPath('architecture'), input, output]);
+  if (result.status !== 0) exitFrom(result);
+
+  console.log(`\nDemo ready: ${output}`);
+  console.log('Next: open the HTML in your browser, then render your own diagram:');
+  console.log('  archify render architecture <input.json> <output.html>');
 }
 
 function commandValidate(args) {
@@ -149,6 +251,12 @@ switch (command) {
     break;
   case 'examples':
     commandExamples();
+    break;
+  case 'doctor':
+    await commandDoctor();
+    break;
+  case 'demo':
+    commandDemo(args);
     break;
   default:
     fail(`Unknown command "${command}".\n\n${usage()}`);

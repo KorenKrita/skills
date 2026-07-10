@@ -23,7 +23,81 @@ test('cli: help lists commands and diagram types', () => {
   const result = run(['--help']);
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /archify render <type>/);
+  assert.match(result.stdout, /archify doctor/);
+  assert.match(result.stdout, /archify demo \[output-directory\]/);
   assert.match(result.stdout, /architecture, workflow, sequence, dataflow, lifecycle/);
+});
+
+test('cli: doctor reports a complete installation is ready', () => {
+  const result = run(['doctor']);
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /\[ok\] Node\.js v\d+/);
+  assert.match(result.stdout, /\[ok\] Core template/);
+  assert.match(result.stdout, /\[ok\] Standalone schema validators/);
+  assert.match(result.stdout, /\[ok\] architecture renderer, schema, and example/);
+  assert.match(result.stdout, /\[ok\] lifecycle renderer, schema, and example/);
+  assert.match(result.stdout, /Archify is ready\./);
+});
+
+test('cli: doctor identifies an incomplete installation', () => {
+  const incompleteRoot = path.join(tmp, 'incomplete-skill');
+  const incompleteBin = path.join(incompleteRoot, 'bin');
+  fs.mkdirSync(incompleteBin, { recursive: true });
+  fs.copyFileSync(cli, path.join(incompleteBin, 'archify.mjs'));
+
+  const result = spawnSync(process.execPath, [path.join(incompleteBin, 'archify.mjs'), 'doctor'], {
+    cwd: incompleteRoot,
+    encoding: 'utf8',
+  });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /\[missing\] Core template/);
+  assert.match(result.stdout, /\[missing\] workflow renderer, schema, and example/);
+  assert.match(result.stderr, /Archify is not ready: \d+ required files? missing\./);
+});
+
+test('cli: doctor rejects a corrupt standalone validator', () => {
+  const corruptRoot = path.join(tmp, 'corrupt-skill');
+  fs.cpSync(skillRoot, corruptRoot, {
+    recursive: true,
+    filter(source) {
+      const rel = path.relative(skillRoot, source);
+      return rel !== 'node_modules' && !rel.startsWith(`node_modules${path.sep}`)
+        && rel !== 'test' && !rel.startsWith(`test${path.sep}`);
+    },
+  });
+  fs.writeFileSync(path.join(corruptRoot, 'renderers/shared/generated-validators.mjs'), 'export const workflow = ;\n');
+
+  const result = spawnSync(process.execPath, [path.join(corruptRoot, 'bin/archify.mjs'), 'doctor'], {
+    cwd: corruptRoot,
+    encoding: 'utf8',
+  });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /\[invalid\] Standalone schema validators/);
+  assert.match(result.stderr, /Archify is not ready: 1 runtime check failed\./);
+});
+
+test('cli: demo creates a ready-to-open diagram in a chosen directory', () => {
+  const outputDirectory = path.join(tmp, 'my-demo');
+  const output = path.join(outputDirectory, 'archify-demo.html');
+  const result = run(['demo', outputDirectory]);
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(fs.existsSync(output), true);
+  assert.match(fs.readFileSync(output, 'utf8'), /Sample Web App Diagram/);
+  assert.match(result.stdout, new RegExp(`Demo ready: ${output.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
+  assert.match(result.stdout, /Next: open the HTML in your browser/);
+  assert.match(result.stdout, /archify render architecture/);
+});
+
+test('cli: demo defaults to the current directory', () => {
+  const workingDirectory = path.join(tmp, 'default-demo');
+  fs.mkdirSync(workingDirectory);
+  const result = run(['demo'], { cwd: workingDirectory });
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(fs.existsSync(path.join(workingDirectory, 'archify-demo.html')), true);
 });
 
 test('cli: render writes a diagram html file', () => {
