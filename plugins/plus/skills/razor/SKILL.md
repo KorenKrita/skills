@@ -144,3 +144,4 @@ machine, service boundary, or architecture flow.
 ## Routing Compatibility
 
 Invoke another Skill only when an installed Skill's description clearly matches the next subtask. Otherwise, complete the subtask directly with this workflow. Never require an uninstalled Skill.
+
