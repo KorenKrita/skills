@@ -73,3 +73,4 @@ A document is a coherent argument, and the audit reads it as one. Judge it for c
 ## Routing Compatibility
 
 Invoke another Skill only when an installed Skill's description clearly matches the next subtask. Otherwise, complete the subtask directly with this workflow. Never require an uninstalled Skill.
+
