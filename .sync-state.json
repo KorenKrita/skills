@@ -181,13 +181,13 @@
     ]
   },
   "ocr": {
-    "sha": "4cc2fe8568929faad40be03a58452830d6a5ece5",
+    "sha": "c3da87885086ff41ed8f2f77b65c7a3c471e01aa",
     "files": [
       "SKILL.md"
     ]
   },
   "nuclear-review": {
-    "sha": "0dda29e839d15464a137af9935665a5a47ee09b8",
+    "sha": "a8145426e541afa424a403e3866496216c1b8142",
     "files": [
       "SKILL.md"
     ]
@@ -230,7 +230,7 @@
     ]
   },
   "read": {
-    "sha": "b24260d6d85efae6b4dc17c0038e1aa5b063b1cd",
+    "sha": "b70c0e7f784303aece08304ad13f5ded55650ab7",
     "files": [
       "SKILL.md",
       "references/read-methods.md",
@@ -262,7 +262,7 @@
     ]
   },
   "ui": {
-    "sha": "b24260d6d85efae6b4dc17c0038e1aa5b063b1cd",
+    "sha": "b70c0e7f784303aece08304ad13f5ded55650ab7",
     "files": [
       "SKILL.md",
       "references/design-aesthetic-quality.md",
