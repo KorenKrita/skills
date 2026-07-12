@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Implementation Notes</title>
+</head>
+<body>
+  <main>
+    <h1>Implementation Notes</h1>
+    <article id="sync-append-content-newline-2026-07-12">
+      <h2>同步补丁的结尾换行规范化</h2>
+      <p><strong>状态：</strong>agent-resolved</p>
+      <p><strong>日期：</strong>2026-07-12</p>
+      <p><strong>背景：</strong><code>overrides.yaml</code> 中使用 YAML block scalar（<code>text: |</code>）定义的 <code>append_content</code> 文本自带结尾换行；补丁引擎此前又无条件追加一个换行，导致强制同步审计生成仅多一个尾部空行的差异，并错误触发 plugin 版本升级和 PR。</p>
+      <p><strong>决策：</strong><code>append_content</code> 在拼接前对补丁文本执行 <code>trimEnd()</code>，最终统一保留一个文件结尾换行。该规范只消除补丁配置携带的尾部空白，不改变正文内部空白。</p>
+      <p><strong>验证：</strong><code>tests/patch-engine.test.ts</code> 覆盖带结尾换行的 YAML block scalar；同步 Action run <code>29180216479</code> 重新审计后，原误报的 docs-vs-code、docs-vs-docs、geju、goudi、idea、razor、web 均报告“文件内容无变化”。</p>
+    </article>
+  </main>
+</body>
+</html>
