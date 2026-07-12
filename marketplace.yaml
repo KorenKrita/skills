@@ -2,12 +2,11 @@ marketplace:
   name: korenkrita-skills
   owner:
     name: KorenKrita
-  description: "KorenKrita 的 Skill 订阅库"
-
+  description: KorenKrita 的 Skill 订阅库
 plugins:
   base:
     version: 0.0.1
-    description: "Matt Pocock active Skill 主体：规格、实现、测试、调试、审查与协作流程"
+    description: Matt Pocock active Skill 主体：规格、实现、测试、调试、审查与协作流程
     category: engineering
     keywords:
       - engineering
@@ -15,10 +14,9 @@ plugins:
       - debugging
       - code-review
       - workflow
-
   plus:
     version: 0.0.1
-    description: "工程审计、决策方法、研究工具与 Claude Code 自动续跑"
+    description: 工程审计、决策方法、研究工具与 Claude Code 自动续跑
     category: productivity
     keywords:
       - audit
@@ -26,10 +24,9 @@ plugins:
       - research
       - goal
       - review
-
   creative:
-    version: 0.0.1
-    description: "UI/Web 设计、中文写作优化、文档排版与小黑插画"
+    version: 0.0.2
+    description: UI/Web 设计、中文写作优化、文档排版与小黑插画
     category: design
     keywords:
       - ui
