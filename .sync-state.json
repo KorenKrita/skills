@@ -187,7 +187,7 @@
     ]
   },
   "nuclear-review": {
-    "sha": "a8145426e541afa424a403e3866496216c1b8142",
+    "sha": "a29f5a8ca161b1de4ffc5484454958bebc04eaa5",
     "files": [
       "SKILL.md"
     ]
@@ -460,7 +460,7 @@
     ]
   },
   "kami": {
-    "sha": "f620bfca03d0c526d37bde61aeb688e01eea2e12",
+    "sha": "b3d856266d3e75278770f58e55d19d69583e35b0",
     "files": [
       "CHEATSHEET.md",
       "LICENSE",
