@@ -75,6 +75,7 @@ from lint import (  # noqa: F401  re-exported for test_build.py
     _extract_root_vars,
     _off_palette_findings,
     _pair_names,
+    _root_token_findings,
     check_all,
     check_cross_template_consistency,
     check_off_palette,

@@ -44,6 +44,7 @@ from build import (  # noqa: E402
     _parse_slide_sequence,
     _resume_balance_issues,
     _rhythm_issues,
+    _root_token_findings,
     check_all,
     check_cross_template_consistency,
     check_markdown_residue,
@@ -714,6 +715,34 @@ def test_off_palette_ignores_root_and_svg() -> None:
         check("_off_palette_findings skips :root defs and <svg> fills",
               findings == [],
               f"unexpected findings: {[(f.line, f.excerpt) for f in findings]}")
+    finally:
+        p.unlink(missing_ok=True)
+
+
+def test_root_token_findings_flags_off_palette_definition() -> None:
+    """An off-palette hex *defined* in :root (never used as a literal property
+    hex) escapes _off_palette_findings, which blanks :root. _root_token_findings
+    closes that gap: a stray `--brand-deep: #a64f33` second accent is flagged,
+    while a registered token and cool-gray (reported elsewhere) are not."""
+    fixture = """<!doctype html>
+<html><head><style>
+:root {
+  --brand: #1B365D;
+  --brand-deep: #a64f33;
+}
+</style></head><body></body></html>
+"""
+    p = write_temp_html(fixture)
+    try:
+        findings = _root_token_findings(p, {"#1b365d"})
+        rules = {f.rule for f in findings}
+        excerpts = " ".join(f.excerpt for f in findings)
+        check("_root_token_findings flags off-palette :root token #a64f33",
+              "off-palette-token" in rules and "#a64f33" in excerpts,
+              f"rules={rules or '(none)'} excerpts={excerpts or '(none)'}")
+        check("_root_token_findings does not flag the registered --brand token",
+              "#1b365d" not in excerpts,
+              f"unexpectedly flagged brand token: {excerpts}")
     finally:
         p.unlink(missing_ok=True)
 

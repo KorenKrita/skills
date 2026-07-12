@@ -270,8 +270,41 @@ def _off_palette_findings(path: Path, allowed: set[str]) -> list[Finding]:
     return findings
 
 
+ROOT_TOKEN_DEF = re.compile(r"(--[\w-]+)\s*:\s*(#[0-9a-fA-F]{3,6})\b")
+
+
+def _root_token_findings(path: Path, allowed: set[str]) -> list[Finding]:
+    """Flag `:root` token definitions whose hex is off the registered palette.
+
+    `_off_palette_findings` blanks the `:root` block before scanning property
+    values, so a dead or off-palette token *defined* in `:root` but never written
+    as a literal hex in a property escapes every guard (this is how a stray
+    `--brand-deep: #a64f33` second accent hid in portfolio.html). This closes that
+    gap for print templates: every `:root` chromatic token must resolve to a
+    registered tokens.json value. Screen templates (landing pages) keep their own
+    local tokens outside the print palette, so callers exempt them.
+    """
+    raw = path.read_text(encoding="utf-8", errors="replace")
+    text = _strip_css_block_comments(raw)
+    findings: list[Finding] = []
+    for block in ROOT_BLOCK.finditer(text):
+        body_start = block.start(1)
+        for vm in ROOT_TOKEN_DEF.finditer(block.group(1)):
+            h = vm.group(2).lower()
+            if h in allowed:
+                continue
+            if h in COOL_GRAY_BLOCKLIST:
+                continue  # reported by the cool-gray rule in scan_file
+            line = text.count("\n", 0, body_start + vm.start(2)) + 1
+            findings.append(Finding(path, line, "off-palette-token",
+                f"{vm.group(1)}: {h} is a :root token off the registered palette "
+                "(single-accent invariant; register in tokens.json or remove)"))
+    return findings
+
+
 def check_off_palette(verbose: bool = False) -> int:
     allowed = _load_token_values()
+    screen_names = set(SCREEN_TEMPLATES.values())
     targets = sorted(TEMPLATES.glob("*.html"))
     if not targets:
         print("ERROR: no templates found for off-palette scan (bad checkout?)")
@@ -279,6 +312,8 @@ def check_off_palette(verbose: bool = False) -> int:
     findings: list[Finding] = []
     for p in targets:
         file_findings = _off_palette_findings(p, allowed)
+        if p.name not in screen_names:
+            file_findings.extend(_root_token_findings(p, allowed))
         findings.extend(file_findings)
         if verbose:
             print(f"scanned {p.relative_to(ROOT)}: {len(file_findings)} off-palette finding(s)")
