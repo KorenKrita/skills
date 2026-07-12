@@ -138,6 +138,16 @@ describe("patch-engine", () => {
         expect(final.trimEnd()).toMatch(/追加内容。$/)
       }),
     )
+
+    it.effect("normalizes trailing newlines from YAML block scalars", () =>
+      Effect.gen(function* () {
+        const { final } = yield* applyPatches(ZOOM_OUT_SKILL, [
+          { type: "append_content", text: "## 额外说明\n\n追加内容。\n" },
+        ])
+        expect(final).toMatch(/追加内容。\n$/)
+        expect(final).not.toMatch(/追加内容。\n\n$/)
+      }),
+    )
   })
 
   describe("combined patches", () => {

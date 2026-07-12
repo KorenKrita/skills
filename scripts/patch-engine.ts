@@ -129,7 +129,7 @@ function applySingle(content: string, patch: Patch): Effect.Effect<string, Patch
     }
 
     case "append_content": {
-      const newBody = body.trimEnd() + "\n\n" + patch.text + "\n"
+      const newBody = body.trimEnd() + "\n\n" + patch.text.trimEnd() + "\n"
       return Effect.succeed(reassemble(fields, newBody))
     }
   }
