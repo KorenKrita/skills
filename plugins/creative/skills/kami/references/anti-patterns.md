@@ -78,6 +78,7 @@ The main `landing-page.html` template does not ship a price card or language swi
 | 38 | FAQ and `llms-full.txt` diverge | FAQ says one install path or price, AI-facing docs say another | Treat FAQ, JSON-LD, `llms.txt`, and `llms-full.txt` as one public fact set and update them together |
 | 39 | Screenshot gallery uses private local assets | `<img src="/Users/me/project/shot.png">` or `../other-repo/shots/app.webp` | Copy the image into the site repo or use a stable public URL; packaged templates must not depend on sibling checkouts |
 | 40 | Locale copy updated in only one place | One locale changes price, version, or install path while other locale pages still show the old facts | Search all locale pages plus structured data for the old value and update every matching surface |
+| 41 | Feature rows alternated to escape the product-list look | A visual + copy row mirrored every other row, a fixed visual track against a `1fr` copy track: the copy never fills its column, so the surplus lands between the copy and the visual as a hole, and the copy's left edge jumps every other row | Run every row the same way so the copy keeps one left edge and the surplus always falls on the outer trim. Mirror a paragraph-sized text mass, never a short bullet list. Get rhythm from unequal weight (a lead row with a larger visual, fewer points on supporting rows), not from alternation |
 
 ## Image Slots
 
