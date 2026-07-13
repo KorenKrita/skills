@@ -181,7 +181,7 @@
     ]
   },
   "ocr": {
-    "sha": "22782aa66e9ac0e81e97a35521f732ccde652366",
+    "sha": "242616544cffe7bba7942619a9db0634cf877268",
     "files": [
       "SKILL.md"
     ]
@@ -460,7 +460,7 @@
     ]
   },
   "kami": {
-    "sha": "b3d856266d3e75278770f58e55d19d69583e35b0",
+    "sha": "f97bfc9ef83626edb863f6e42632067047a23601",
     "files": [
       "CHEATSHEET.md",
       "LICENSE",
