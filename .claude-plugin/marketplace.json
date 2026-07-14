@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "base",
-      "version": "0.0.1",
+      "version": "0.0.2",
       "source": "./plugins/base",
       "description": "Matt Pocock active Skill 主体：规格、实现、测试、调试、审查与协作流程",
       "strict": false,
