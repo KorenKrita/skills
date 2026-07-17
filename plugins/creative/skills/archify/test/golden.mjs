@@ -145,6 +145,19 @@ check('SKILL.md metadata version matches package.json major.minor',
   !!skillVersion && pkg.version.startsWith(skillVersion),
   `SKILL.md says ${skillVersion}, package.json says ${pkg.version}`);
 
+for (const readmeName of ['README.md', 'README_EN.md', 'README_ZH.md']) {
+  const readme = fs.readFileSync(path.join(repoRoot, readmeName), 'utf8');
+  check(`${readmeName} badge matches package.json version`,
+    readme.includes(`/badge/version-${pkg.version}-`),
+    `${readmeName} does not advertise ${pkg.version}`);
+}
+
+const landingPage = fs.readFileSync(path.join(repoRoot, 'docs/index.html'), 'utf8');
+const landingVersions = [...landingPage.matchAll(/\bv\d+\.\d+\.\d+\b/g)].map((m) => m[0]);
+check('GitHub Pages version labels match package.json',
+  landingVersions.length > 0 && landingVersions.every((v) => v === `v${pkg.version}`),
+  `landing page says ${[...new Set(landingVersions)].join(', ') || '(no version)'}`);
+
 // ---------------------------------------------------------------------------
 fs.rmSync(tmp, { recursive: true, force: true });
 if (failures) {
