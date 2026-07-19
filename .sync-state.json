@@ -252,7 +252,7 @@
     ]
   },
   "read": {
-    "sha": "b70c0e7f784303aece08304ad13f5ded55650ab7",
+    "sha": "c4fd8192de1edef3b81c5b7f61931a5b77fcc9d8",
     "files": [
       "SKILL.md",
       "references/read-methods.md",
@@ -284,7 +284,7 @@
     ]
   },
   "ui": {
-    "sha": "b70c0e7f784303aece08304ad13f5ded55650ab7",
+    "sha": "c4fd8192de1edef3b81c5b7f61931a5b77fcc9d8",
     "files": [
       "SKILL.md",
       "references/design-aesthetic-quality.md",
