@@ -149,6 +149,10 @@ Any font-family that may render Chinese or Japanese must include a CJK fallback,
 **Minimum floor**: web text >= 12px, PDF text >= 9pt.
 **Slide caption floor**: slides 上 caption 至少 24px (不是 12px)。Print 9pt 在投影距离不可读，slide caption 用 pt x 2.67。
 
+**Ladder discipline**: sizes must land ON the scale, never between its steps. Components that each pick their own size drift into 12.5 / 13.5 / 14.5 / 17.5 neighbours; a reader cannot tell a 13.5 from a 14, so the difference registers as noise instead of hierarchy. Audit a screen stylesheet with `grep 'font-size:' <file> | sort | uniq -c`: every value should be a scale step, and the 12px floor should carry only uppercase micro-labels and badges, never prose (prose stops at 14).
+
+**Serif sets larger than sans at the same number**: a tall x-height serif at 15px already reads bigger than 15px sans. Do not raise a serif body size to fix perceived readability; check the ladder step first.
+
 ### Weight
 
 - **Serif body**: 400 (W04 font file)
@@ -204,6 +208,14 @@ Print documents are **tighter** than English web body. English web typically run
 | xl | 24-32pt | Section-title margins |
 | 2xl | 40-60pt | Between major sections |
 | 3xl | 80-120pt | Between chapters (long docs) |
+
+**Proximity law (a heading belongs to what follows)**: the gap UNDER a section head must be clearly smaller than the gap ABOVE it, ideally by 2x or more. Get this backwards (generous below, tight above) and the head reads as the tail of the previous section, no matter how large its type is. A screen page runs on three steps and nothing else: inside a block, head-to-content, section-to-section.
+
+**A cramped head is an internal problem**: when a heading block feels dense, the cause is usually its own internals (eyebrow-to-title, title-to-lede), not the section gaps. Open those by a few points before touching the macro rhythm.
+
+**Two-column rows: cap both tracks, justify to the edges.** In an image-plus-copy row, let the copy column grow freely (`1fr`) and the text strands itself against an empty far edge. Cap both tracks and push the slack into the gutter instead: both outer edges stay aligned to the container, and the copy sits at its natural measure.
+
+**A repeated row is no place for ornament.** A connector line, a badge, or an index number that looks charming once becomes noise on the fifth repetition. Empty space between the two columns is the answer, not a graphic that fills it.
 
 ### Page margins (A4)
 
@@ -944,7 +956,7 @@ table.data td:first-child {
 | Empty space 25-50% | Acceptable if the slide has a pinned `.co` callout. Otherwise add one supporting bullet or a small inline figure. Never pad with filler prose. |
 | Cover | No horizontal rule; title centered `38pt`; subtitle on one line; bottom meta centered |
 
-Before drafting an image-heavy deck, sketch a short slot map: `page -> slide title -> evidence shape -> image slot -> visual brief`. Use broad types only: cover, assertion, comparison, metric, quote, image evidence, closing. This is a rhythm check, not a locked layout registry. The `visual brief` is internal working material for image selection, crop, or generation; it must not leak into slide titles, body copy, or captions. Keep Kami's default simple: use the existing `.c2`, `table.t2x2`, `.co`, data table, and inline figure patterns unless the source material clearly needs something else.
+Image-heavy decks carry two acceptance bars: the visual brief (crop notes, prompt fragments, generation instructions) is internal working material and never appears in slide titles, body copy, or captions; and the deck uses the existing `.c2`, `table.t2x2`, `.co`, data table, and inline figure patterns unless the source material clearly needs something else. How you plan toward that (slot map, outline, or otherwise) is your call; whatever you sketch is a rhythm check, not a locked layout registry.
 
 If the user provides a real PPTX or brand template and explicitly asks to preserve it, do a template inventory before content editing: thumbnail the source deck, identify reusable layout families, then map each section to an existing layout. Do not do this for the default WeasyPrint or Marp paths; Kami templates are already the inventory.
 
@@ -1135,12 +1147,37 @@ Use a small slot matrix before filling a landing page or product site. This keep
 
 Every screenshot path must resolve from the repo or a stable public URL. Never reference `/Users`, `file://`, or sibling checkouts. Missing visuals remain material gaps or omitted panels; they are not replaced with stock atmosphere.
 
+- **Localized UI needs localized captures.** When the product ships a localized UI, each locale page carries captures in that page's language (menu bars, window chrome, gallery states). One shared English screenshot across all locale pages breaks the promise the localized copy just made. Template the image directory per locale so every capture swaps at once, rather than overriding images one by one.
+- **Social image bytes must match the declared type.** A PNG renamed `.jpg` ships RGBA bytes against an `image/jpeg` Content-Type and social validators flag or drop it. Encode the og:image as a real baseline JPEG at 1200x630; the re-encode typically also cuts the file to a fraction of the PNG size.
+
 ### Layout
 
 - `max-width: 1120px` centered, padding `88px 64px 120px`
 - Sections numbered `00 · Label` through `04 · Label` with `section-num` / `section-title` / `section-lede` pattern
 - Two responsive breakpoints: `880px` (tablet) and `480px` (phone)
 - Section rhythm is a system, not per-gap. Run section spacing as one responsive ladder (e.g. desktop 96/72, tablet 72/54, phone 56/42). When a page reads too airy or too tight, scale the *whole* set by a single factor (about 0.75) across all breakpoints at once; nudging one gap leaves asymmetry, and asymmetry that survives tuning is structural. At the phone breakpoint step gutters down (64px to 16px) and shrink display sizes (hero title, price amount) in the same pass.
+
+### Single-line surfaces
+
+Certain copy surfaces must render as one line; a wrap there reads as a defect, not as text flow. The near-wrap state (one word from wrapping) counts as a failure too, because any locale or font fallback pushes it over.
+
+- Single-line at the desktop baseline (1280px): hero tagline, feature subtitles, benefit points, gallery captions, section ledes under ~12 words, footer ethos.
+- Single-line at 375px as well: key-fact tokens (price line, platform line, CTA labels, hero chips).
+- Fix order is fixed: cut words first, rephrase second, adjust layout last. Never shrink the font, never force it with `<br>`, never shave padding to buy one word of width.
+- Any component whose height depends on its text (carousel captions, rotating taglines) must be verified with the longest shipped locale; a wrap that appears in one locale makes the component jump between slides.
+- One wrap found means sweeping every surface in this list across every locale, not fixing the reported spot (see `AGENTS.md` «Critical Line-Break Scan» for the PDF-side counterpart).
+
+### Decorative layers
+
+Backgrounds, particles, connecting lines, and gradient motion get a two-round iteration budget. If the layer still reads as murky, busy, or foreign after the second adjustment round, stop tuning parameters and present a plain-surface version (page background plus the existing typography) next to the current state. The plain version wins far more often than a third round of tuning; decoration that needs three rounds of defense is decoration the page does not need. This is the page-level twin of the feature-row lesson below: when rescuing a gesture keeps failing, the gesture is wrong, not the parameters.
+
+### Mobile density inversion
+
+Below the phone breakpoint, the information diet reverses: images first, words second.
+
+- Feature blocks lead with the image; copy compresses to 1-2 sentences per block.
+- FAQ collapses by default (details/summary or equivalent); a phone reader scrolls past 8 open answers and loses the pricing section below them.
+- Wrap every hover style in `@media (hover: hover)`. On touch screens a tap must not flash the hover state; a flashing hover color on tap is a shipped bug, not a nicety.
 
 ### Eyebrow
 
@@ -1172,6 +1209,12 @@ Every screenshot path must resolve from the repo or a stable public URL. Never r
 - Tabs: pill buttons 12px `--latin-ui`, active state uses brand-tint background
 - Click navigation: left half = previous, right half = next
 - Caption `.line`: italic serif, 14px olive. Poetic one-liners describing each screenshot
+- Rapid switching keeps caption and tab state synchronized with the visible frame; test by clicking faster than the transition duration, not just once per panel
+
+### Links
+
+- One link behavior across the whole site: brand color, no underline, hover lightens. Do not add per-component underline or color exceptions; two special cases drift into five and the reader loses the "brand color means clickable" contract.
+- That contract cuts both ways: brand color on non-links (FAQ questions, section titles) reads as clickable and misleads. Non-link headings stay near-black.
 
 ### Buttons
 
@@ -1188,7 +1231,12 @@ Mobile resting state: natural width, left-aligned to the hero text edge, height 
 
 ### Pricing
 
-- Amount: 112px serif, letter-spacing 0
+Content rules in `references/writing.md` «Pricing rules»: benefits lead, the price states itself once, the CTA never carries the number.
+
+- Benefits list `.price-benefits`: 4-6 items, serif 16px dark-warm, one line each at desktop width, plain borderless list (no bullets, no card frame)
+- Amount: 30px serif, one factual line (`$N · One-time purchase` shape), `lining-nums tabular-nums`; never display-size the price. Emphasis comes from the centered block and whitespace, not font size
+- The card stays quiet: no border box, no shadow; a gradient (if any) resolves to the page background, never to white
+- CTA button label is the action (`Buy {{PRODUCT}}`), without the price
 - Comparison: 18px, use `<s>` for competitor prices (stone color, 1px underline)
 - Highlight: `.hl` class for brand-colored emphasis
 - Terms: 13.5px olive, centered, max-width 640px, line-height 1.5
@@ -1222,11 +1270,27 @@ Blocks without `class="language-*"` stay monochrome.
 - Flex row with 32px gap, each metric is value (36px serif 500) + label (13px `--latin-ui` stone)
 - `font-variant-numeric: tabular-nums` on values
 
+### Cards (site-wide contract)
+
+Like «Links» and «Buttons», cards are a vocabulary, not a per-section choice.
+
+- One border treatment across every card on the site (same token, same width). Before styling a new card component, grep the page for existing card borders and reuse them; "this section's cards look different" is the most-reported drift.
+- One hover treatment across every card: shadow or translate, pick one for the site. Two sections with different hover physics read as two different products.
+- Re-verify foreground/background contrast in the hover state, not just the resting state. A hover that recolors the background can land text on a same-color background (this has shipped); any hover that changes either color must be checked with both.
+
 ### Demo Card Grid
 
 - `auto-fill, minmax(240px, 1fr)` grid, 18px gap
 - Cards: ivory bg, 1px border, 8px radius, whisper shadow on hover
 - Image fills top, title 15px weight 500 + desc 12px olive below
+
+### Content card lists (article / blog indexes)
+
+For card grids whose content is written text (article listings, changelog indexes), length is controlled twice: at write time and at render time.
+
+- Title: `-webkit-line-clamp: 2` with ellipsis as the hard stop, but write titles to fit one line; a two-line title is tolerated, not targeted. Titles carry no parenthetical asides (move them into the summary) and use a tighter line-height than body text (1.2-1.3).
+- Summary: `-webkit-line-clamp: 4` with ellipsis. Never let overflow push card heights apart; the clamp keeps the grid rhythm even when content varies.
+- Clamp plus ellipsis is the only truncation gesture: no fading text, no "read more" inline links inside the clamped block.
 
 ### Features
 
@@ -1256,6 +1320,15 @@ The `.features` list above is the shipped default. A feature *row* (a visual on 
 - Code spans: mono 12px on brand-tint background, 3px radius
 - Tail paragraph: `.faq-tail` after `</dl>`, 13px stone, links to help page. Closes the FAQ without another section
 
+### Testimonial wall (only with real quotes)
+
+No template ships this section; build it only from real, attributed quotes (name, handle or source). When the quotes flow in masonry columns with a collapsed default state:
+
+- Clip the collapsed wall to the SHORTEST column so the fold is one flat line under the fade. Columns fill until each passes the collapse height and overshoot unevenly; clipped to the tallest, the expand control hangs off one column with dead space beside the others.
+- One expand control ("Show all") below the fade; the expanded state removes the clip entirely. Expansion reveals everything at once (no pagination, no second click) and keeps the scroll position anchored at the control; jumping the viewport to the bottom of the expanded wall disorients the reader.
+- Collapsed height is a conversion decision: roughly 9-12 quotes, and never so tall that the pricing section drops out of comfortable reach. Which quotes may appear collapsed is a content rule; see `references/writing.md` «Social proof rules».
+- An external "more quotes" link (search results, social feed) renders as a card in the wall's own visual language, placed last, one line of copy; a styled button or foreign embed after the wall reads as an ad.
+
 ### Footer
 
 - Two-column flex: brand mark (icon + name + tagline) left, colophon (links + ethos) right
@@ -1272,7 +1345,7 @@ The `.features` list above is the shipped default. A feature *row* (a visual on 
 - **Avoid scaling the currency glyph with super.** Do not write `.price-currency { font-size: 0.5em; vertical-align: super }`. That trick makes `$` and the digit visually unequal. Prefer `font-size: 0.74em; line-height: 1; transform: translateY(0.015em);`.
 - **Language menu items need vertical room for descenders.** When `<a>` inside `.lang-menu` has `line-height: 1`, the descender of 'g' / 'y' / 'p' is clipped. Use `min-height: 32px; padding: 6px 10px; line-height: 1.35;`. Add an invisible `::before` bridge between trigger and menu so the cursor can cross the gap without dismissing the menu.
 
-> The main landing-page template does not ship a language switcher or a price card by default; the `{{HERO_LINKS}}` slot is where one would go. Kami's own site at `styles.css` L67-151 ships a tested `.lang-switch` + `.lang-menu` implementation (hover bridge, descender padding, focus-within fallback). Copy it when you add multi-locale links to a landing page.
+> The main landing-page template ships a pricing section but no language switcher; the `{{HERO_LINKS}}` slot is where one would go. Kami's own `styles.css` ships a tested `.lang-switch` + `.lang-menu` implementation (hover bridge, descender padding, focus-within fallback); grep for `.lang-switch`. Copy it when you add multi-locale links to a landing page.
 
 ### Multilingual SEO scaffolding
 
@@ -1304,6 +1377,18 @@ When the product site grows docs, help, or guide pages (see «Product site syste
 - On-this-page TOC: a thin in-flow list under a hairline top border, with a `--latin-ui` uppercase 11px "On this page" heading and depth-3 entries indented about 12px. Hide it entirely below the tablet breakpoint; it is an aid, not content.
 - Prev/next pager: quiet borderless text links, not bordered cards. A 2-column grid with one thin top divider; each link is a `--latin-ui` uppercase "Previous"/"Next" eyebrow over a brand serif title, `border: 0; background: none`. The next link aligns right (resets left on phone). Press feedback via `:active { opacity: 0.6 }`. A bordered card here reads heavy on mobile.
 - Mobile (tablet breakpoint): the sidebar un-sticks (`position: static`) and collapses to a horizontal scroll strip (`display: flex; overflow-x: auto; scrollbar-width: none`) with the active rail moved to `border-bottom`; the TOC is hidden. Reuse the landing page's existing breakpoints; do not invent a new ladder.
+- Acceptance: at 1280px the prose column holds the ~720px measure; at 375px the sidebar reads as a horizontal strip with the active rail on `border-bottom` and zero page overflow; `aria-current` and the visual rail always agree.
+
+### Dashboards (screen, no template)
+
+Data dashboards built in the Kami idiom (analytics boards, sales views, status pages) inherit the full design system plus these information rules. No template ships; build from the landing-page shell.
+
+- **One currency, one unit system.** Mixed currencies get converted to a single display currency before anything renders; a board that shows three currencies side by side cannot be scanned. Same for units (GB vs MB, days vs hours).
+- **Zero rows disappear.** Regions, SKUs, or days with a zero value are hidden or aggregated into "other", not rendered as rows of zeros. Empty rows are noise wearing a grid.
+- **One meaningful default time range.** Since-launch or last-30-days, chosen once; every selector option must answer a question the owner actually asks. Cut options rather than adding them.
+- **Implementation detail stays out of the surface.** Sync mechanisms, API states, internal field names, and refresh plumbing belong in logs, not on the board. The reader is deciding, not debugging.
+- **Every chart answers one question.** Where is growth, which region buys, what broke: if a chart only restates a number that is already on screen as a stat, delete the chart (screen twin of `references/anti-patterns.md` #18).
+- Numbers on the board follow the reconciliation rule: totals must be checked against one authoritative source before shipping, with the basis noted.
 
 ## 12. Mermaid diagrams
 
@@ -1337,7 +1422,10 @@ Before declaring any screen change done, screenshot the real rendered surface; a
 - Capture at phone (375px, plus 320px for CTAs) and desktop (1280px), in every shipped locale.
 - Scan for line widows objectively: measure each text block's last-line width against its widest line and flag anything below about 13%. Eyeballing misses pages, and nested `<code>` hides widows from greps. Accept "0 widows" only after the check confirms it.
 - Confirm CTAs reach their natural-width left-aligned resting state with no overflow, code is legible at the reduced mobile font, the gallery and any multi-column grids collapse to a single column, and total page overflow is zero.
+- Scan each screenshot for sparse blocks: a low-information region taller than about a quarter viewport, an empty grid slot, or a single item rattling in a multi-column row. Fix by adding content or tightening the layout, not by leaving decorative whitespace.
+- Check every «Single-line surfaces» entry at both widths; key-fact tokens (price, platform, CTA) must hold one line at 375px.
 - Long pages do not fit one viewport; use a capture helper that can scroll to a specific element (first code block, pager) before shooting.
+- Serve fresh bytes: browsers cache stylesheets and restore scroll positions, so a plain reload can screenshot the OLD css at the OLD scroll point and pass a broken change. Verify through a cache-busted URL (or a fresh-named temp copy of the page) and confirm the viewport actually shows the section under review before trusting the capture.
 
 ## KO locale tuning
 

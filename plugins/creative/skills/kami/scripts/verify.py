@@ -1,9 +1,10 @@
 """End-to-end render verification for kami templates.
 
-Splits out from build.py: renders each template via WeasyPrint, validates
-page-count against per-template ceilings, inspects embedded PDF fonts to
-warn when only a fallback is used, and runs an advisory density scan over
-the rendered examples when invoked for the full suite.
+Renders each template through render.render_pdf, validates page-count against
+per-template ceilings, inspects embedded PDF fonts to warn when only a
+fallback is used, and runs an advisory density scan over the rendered
+examples when invoked for the full suite. Self-sufficient: registries come
+from shared, the render pipeline from render, the density scan from checks.
 """
 from __future__ import annotations
 
@@ -12,13 +13,21 @@ import re
 import subprocess
 from pathlib import Path
 
-from highlight import highlight_code_blocks
-from optional_deps import (
-    MissingDepError,
-    require_pypdf_reader,
-    require_weasyprint_html,
+from checks import scan_density
+from lint import scan_file
+from optional_deps import MissingDepError, require_pypdf_reader
+from render import build_slides, render_pdf
+from shared import (
+    DIAGRAMS,
+    EXAMPLES,
+    TEMPLATES,
+    build_targets,
+    default_example_pdfs,
+    diagram_targets,
+    load_checks_thresholds,
+    pptx_targets,
+    screen_targets,
 )
-from shared import DIAGRAMS, EXAMPLES, TEMPLATES, default_example_pdfs, load_checks_thresholds
 
 # Primary fonts expected in embedded PDF font names
 CN_PRIMARY_FONTS = {"TsangerJinKai02"}
@@ -99,35 +108,13 @@ def _check_font_sources(html_path: Path) -> list[str]:
     return missing
 
 
-def verify_target(
-    name: str,
-    source: str,
-    max_pages: int,
-    src_dir: Path,
-    *,
-    infer_author_fn,
-    set_pdf_metadata_fn,
-) -> list[str]:
-    """Render `source` to a PDF, then run page-count and font checks.
-
-    `infer_author_fn` and `set_pdf_metadata_fn` are passed in by the caller
-    (build.py) so this module avoids a circular import on those helpers.
-    """
+def verify_target(name: str, source: str, max_pages: int, src_dir: Path) -> list[str]:
+    """Render `source` to a PDF, then run page-count and font checks."""
     issues: list[str] = []
     src = src_dir / source
     if not src.exists():
         issues.append(f"source not found: {src}")
         return issues
-
-    try:
-        HTML = require_weasyprint_html()
-        PdfReader = require_pypdf_reader()
-    except MissingDepError as exc:
-        issues.append(str(exc))
-        return issues
-
-    EXAMPLES.mkdir(parents=True, exist_ok=True)
-    out = EXAMPLES / f"{name}.pdf"
 
     # Warn about missing local font files before rendering
     missing_fonts = _check_font_sources(src)
@@ -138,15 +125,14 @@ def verify_target(
         print(f"  [FONT MISS] Skill recovery (downloads to the user font dir, not the skill): bash scripts/ensure-fonts.sh")
         print(f"  [FONT MISS] Fallback: brew install --cask font-source-han-serif-sc")
 
-    html_text = src.read_text(encoding="utf-8")
-    html_text = highlight_code_blocks(html_text)
-    HTML(string=html_text, base_url=str(src.parent)).write_pdf(str(out))
-
-    # Set PDF metadata (only replaces placeholders, preserves filled values)
-    set_pdf_metadata_fn(out, author=infer_author_fn())
+    out = EXAMPLES / f"{name}.pdf"
+    try:
+        n = render_pdf(src, out)
+    except MissingDepError as exc:
+        issues.append(str(exc))
+        return issues
 
     # page count check
-    n = len(PdfReader(str(out)).pages)
     if max_pages and n > max_pages:
         over = n - max_pages
         hint = ""
@@ -187,46 +173,35 @@ def verify_target(
     return issues
 
 
-def verify_screen_target(name: str, source: str, scan_file_fn) -> list[str]:
-    """Lint a browser-only template via the caller-provided scan_file."""
+def verify_screen_target(name: str, source: str) -> list[str]:
+    """Lint a browser-only template via lint.scan_file."""
     src = TEMPLATES / source
     if not src.exists():
         return [f"source not found: {src}"]
-    findings = scan_file_fn(src)
+    findings = scan_file(src)
     if findings:
         return [f"{len(findings)} template violation(s)"]
     return []
 
 
-def verify_all(
-    target: str | None,
-    *,
-    html_targets,
-    screen_targets,
-    diagram_targets,
-    pptx_targets,
-    verify_slides_fn,
-    scan_file_fn,
-    scan_density_fn,
-    infer_author_fn,
-    set_pdf_metadata_fn,
-) -> int:
-    """Drive verification across the requested target set.
+def verify_all(target: str | None) -> int:
+    """Drive verification across the requested target set."""
+    html_targets = build_targets()
+    screen_targets_map = screen_targets()
+    diagram_targets_map = diagram_targets()
+    pptx_targets_map = pptx_targets()
 
-    All registries and helper callbacks are passed in to keep this module free
-    of circular imports back into build.py.
-    """
     targets_to_run: dict[str, tuple[str, int, Path] | None] = {}
     screen_targets_to_run: dict[str, str] = {}
     if target:
         if target in html_targets:
             src, mp = html_targets[target]
             targets_to_run[target] = (src, mp, TEMPLATES)
-        elif target in screen_targets:
-            screen_targets_to_run[target] = screen_targets[target]
-        elif target in diagram_targets:
-            targets_to_run[target] = (diagram_targets[target], 0, DIAGRAMS)
-        elif target in pptx_targets:
+        elif target in screen_targets_map:
+            screen_targets_to_run[target] = screen_targets_map[target]
+        elif target in diagram_targets_map:
+            targets_to_run[target] = (diagram_targets_map[target], 0, DIAGRAMS)
+        elif target in pptx_targets_map:
             targets_to_run[target] = None
         else:
             print(f"ERROR: unknown target: {target}")
@@ -234,25 +209,21 @@ def verify_all(
     else:
         for name, (src, mp) in html_targets.items():
             targets_to_run[name] = (src, mp, TEMPLATES)
-        for name, src in screen_targets.items():
+        for name, src in screen_targets_map.items():
             screen_targets_to_run[name] = src
-        for name, src in diagram_targets.items():
+        for name, src in diagram_targets_map.items():
             targets_to_run[name] = (src, 0, DIAGRAMS)
-        for name in pptx_targets:
+        for name in pptx_targets_map:
             targets_to_run[name] = None
 
     failures = 0
     rows: list[tuple[str, str]] = []
     for name, config in targets_to_run.items():
         if config is None:
-            issues = verify_slides_fn(name)
+            issues = [] if build_slides(name) else ["slides build failed"]
         else:
             source, max_pages, src_dir = config
-            issues = verify_target(
-                name, source, max_pages, src_dir,
-                infer_author_fn=infer_author_fn,
-                set_pdf_metadata_fn=set_pdf_metadata_fn,
-            )
+            issues = verify_target(name, source, max_pages, src_dir)
         if issues:
             rows.append((f"ERROR: {name}", "; ".join(issues)))
             failures += 1
@@ -260,7 +231,7 @@ def verify_all(
             rows.append((f"OK: {name}", "ok"))
 
     for name, source in screen_targets_to_run.items():
-        issues = verify_screen_target(name, source, scan_file_fn)
+        issues = verify_screen_target(name, source)
         if issues:
             rows.append((f"ERROR: {name}", "; ".join(issues)))
             failures += 1
@@ -275,7 +246,7 @@ def verify_all(
         if pdfs:
             print()
             print("Density scan (advisory):")
-            scan = scan_density_fn(pdfs)
+            scan = scan_density(pdfs)
             if scan is not None:
                 sparse, warn, _, scanned = scan
                 if sparse + warn == 0:

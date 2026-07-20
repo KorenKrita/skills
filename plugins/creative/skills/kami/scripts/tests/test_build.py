@@ -31,26 +31,30 @@ from build import (  # noqa: E402
     HTML_TARGETS,
     PPTX_TARGETS,
     SCREEN_TARGETS,
+    main as build_main,
+)
+from checks import (  # noqa: E402
     _BG_B,
     _BG_G,
     _BG_R,
     _density_bucket,
-    _extract_root_vars,
     _last_content_y,
     _markdown_residue_issues,
-    _off_palette_findings,
     _orphan_last_line,
-    _pair_names,
     _parse_slide_sequence,
     _resume_balance_issues,
     _rhythm_issues,
+    check_markdown_residue,
+    check_placeholders,
+)
+from lint import (  # noqa: E402
+    _extract_root_vars,
+    _off_palette_findings,
+    _pair_names,
     _root_token_findings,
     check_all,
     check_cross_template_consistency,
-    check_markdown_residue,
     check_off_palette,
-    check_placeholders,
-    main as build_main,
     scan_file,
 )
 from shared import (  # noqa: E402
@@ -63,6 +67,7 @@ from shared import (  # noqa: E402
     build_targets,
     diagram_targets,
     load_checks_thresholds,
+    pptx_targets,
     screen_targets,
 )
 import highlight as highlight_mod  # noqa: E402
@@ -308,6 +313,8 @@ def test_registry_consistency() -> None:
           dict(DIAGRAM_TARGETS) == diagram_targets() == dict(DIAGRAM_TEMPLATES))
     check("PPTX_TARGETS has 2 entries", len(PPTX_TARGETS) == 2,
           f"got {len(PPTX_TARGETS)}")
+    check("PPTX_TARGETS in build.py matches shared.pptx_targets()",
+          dict(PPTX_TARGETS) == pptx_targets())
     check("PARCHMENT_RGB is canonical", PARCHMENT_RGB == (0xF5, 0xF4, 0xED))
 
 
@@ -959,6 +966,13 @@ def test_markdown_residue_flags_raw_markers() -> None:
     check("markdown residue ignores clean text",
           _markdown_residue_issues("Clean paragraph with converted emphasis.") == [])
 
+    issues = _markdown_residue_issues("A claim\u2014with an em dash.\n中文\u2014\u2014双破折号。")
+    check("markdown residue flags em dashes",
+          sum("em dash" in issue for issue in issues) == 2,
+          f"issues={issues}")
+    check("markdown residue allows en dash and hyphen",
+          _markdown_residue_issues("Ranges use 2019-2024 and 3–5 items.") == [])
+
 
 def test_check_markdown_residue_skips_html_code_blocks() -> None:
     dirty = write_temp_html("<html><body><p>Visible **raw bold**</p></body></html>", suffix=".html")
@@ -1440,6 +1454,379 @@ def test_mermaid_normalize_cli_reports_missing_input() -> None:
         check("mermaid_normalize CLI reports missing input without traceback",
               result.returncode == 1 and "ERROR:" in combined and "Traceback" not in combined,
               combined.strip())
+
+
+# --------------------------- content IR ---------------------------
+
+def test_content_schemas_cover_all_public_doc_types() -> None:
+    from shared import content_schema_types, public_document_template_kinds
+    expected = public_document_template_kinds() | {"landing-page"}
+    actual = set(content_schema_types())
+    check("content schemas cover every public doc type plus landing-page",
+          actual == expected,
+          f"missing: {sorted(expected - actual)}, extra: {sorted(actual - expected)}")
+
+
+def test_content_schemas_parse_and_are_objects() -> None:
+    from shared import SCHEMAS_DIR, content_schema_types
+    bad = []
+    for name in content_schema_types():
+        try:
+            schema = json.loads((SCHEMAS_DIR / f"{name}.json").read_text(encoding="utf-8"))
+            if schema.get("type") != "object" or "required" in schema and not schema["required"]:
+                bad.append(name)
+        except json.JSONDecodeError:
+            bad.append(name)
+    check("content schemas parse as object contracts", not bad, f"bad: {bad}")
+
+
+def test_validate_node_flags_structural_defects() -> None:
+    from content import validate_node
+    schema = {
+        "type": "object",
+        "required": ["title", "metrics"],
+        "properties": {
+            "title": {"type": "string", "minLength": 2, "maxLength": 10},
+            "metrics": {
+                "type": "array", "minItems": 3, "maxItems": 4,
+                "items": {"type": "object", "required": ["value"],
+                          "properties": {"value": {"type": "string"}}},
+            },
+            "layout": {"type": "string", "enum": ["cover", "content"]},
+        },
+    }
+    ok = validate_node({"title": "Hello", "metrics": [{"value": "1"}] * 3}, schema)
+    check("validate_node passes a conforming object", ok == [])
+    issues = validate_node(
+        {"title": "way too long for the cap", "metrics": [{}], "layout": "hero"},
+        schema,
+    )
+    text = "\n".join(issues)
+    check("validate_node flags length, count, required, and enum defects",
+          "too long" in text and "too few items" in text
+          and "missing required field 'value'" in text and "'hero' not in" in text,
+          text)
+
+
+def test_coverage_issues_catch_dropped_values() -> None:
+    from content import coverage_issues
+    content = {
+        "name": "Kami",
+        "metric": "62%",
+        "note": "p" * 120,
+        "image": "shot.png",
+        "cjk": "用户 2M 规模",
+    }
+    html_text = "Kami cut latency 62% at 用户2M规模 scale"
+    issues, checked, skipped = coverage_issues(content, html_text)
+    check("coverage passes present values, skips prose and images, normalizes CJK spacing",
+          issues == [] and checked == 3 and skipped == 1,
+          f"issues={issues} checked={checked} skipped={skipped}")
+    issues, _, _ = coverage_issues({"metric": "$340K"}, html_text)
+    check("coverage flags a dropped atomic value",
+          len(issues) == 1 and "$340K" in issues[0], str(issues))
+
+
+def test_check_content_cli_validates_and_covers() -> None:
+    from content import check_content
+    payload = {
+        "type": "letter",
+        "lang": "en",
+        "content": {
+            "sender": "Ada Lovelace, London",
+            "date": "2026-07-13",
+            "recipient": "Charles Babbage",
+            "salutation": "Dear Charles,",
+            "paragraphs": [
+                "I write to state my purpose in one sentence: the engine deserves a program of its own.",
+                "The evidence sits in the notes: fifty operations, one loop, and a table the machine can follow.",
+                "My ask is specific: review the table this month so we can test it on the mill.",
+            ],
+            "signoff": "Sincerely,",
+            "signature": "Ada",
+        },
+    }
+    with tempfile.TemporaryDirectory() as d:
+        content_path = Path(d) / "content.json"
+        content_path.write_text(json.dumps(payload), encoding="utf-8")
+        rc = silently(check_content, [str(content_path)])
+        check("check_content accepts a valid letter IR", rc == 0)
+        html = write_temp_html(
+            "<html><body><p>Ada Lovelace, London 2026-07-13 Charles Babbage "
+            "Dear Charles, My ask is specific: review the table this month so "
+            "we can test it on the mill. Sincerely, Ada</p></body></html>"
+        )
+        try:
+            rc = silently(check_content, [str(content_path), str(html)])
+            check("check_content coverage passes when atomic values present", rc == 0)
+        finally:
+            html.unlink()
+        del payload["content"]["signature"]
+        content_path.write_text(json.dumps(payload), encoding="utf-8")
+        rc = silently(check_content, [str(content_path)])
+        check("check_content rejects a missing required field", rc == 1)
+        rc = silently(check_content, [])
+        check("check_content usage error returns 2", rc == 2)
+
+
+def test_build_cli_dispatches_new_checks() -> None:
+    rc, out = run_build_args(["--check-content"])
+    check("build.py --check-content without args is a usage error",
+          rc == 2 and "usage" in out, out.strip()[:120])
+    rc, out = run_build_args(["--check-visual"])
+    check("build.py --check-visual without args is a usage error",
+          rc == 2 and "usage" in out, out.strip()[:120])
+
+
+def test_visual_checklist_and_output_dir() -> None:
+    from visual import REVIEW_CHECKLIST, visual_output_dir
+    check("visual checklist has stable size and no em dash",
+          len(REVIEW_CHECKLIST) == 8 and all("\u2014" not in line for line in REVIEW_CHECKLIST))
+    out = visual_output_dir(Path("/tmp/docs/report.pdf"))
+    check("visual output dir sits next to the pdf",
+          out == Path("/tmp/docs/report-visual"), str(out))
+
+
+def test_visual_clears_stale_page_images() -> None:
+    """A re-render with fewer pages must not leave prior page PNGs behind."""
+    from visual import _clear_page_images
+    with tempfile.TemporaryDirectory() as d:
+        target = Path(d)
+        for name in ("page-01.png", "page-07.png", "notes.txt"):
+            (target / name).write_bytes(b"x")
+        _clear_page_images(target)
+        left = sorted(p.name for p in target.iterdir())
+        check("stale page PNGs removed, unrelated files kept",
+              left == ["notes.txt"], str(left))
+
+
+def test_coverage_survives_split_markup_values() -> None:
+    """Values split across sibling nodes ("62" + "%") must still count as present."""
+    from content import coverage_issues
+    issues, checked, _ = coverage_issues({"metric": "62%"}, "value:\n62\n%")
+    check("coverage rejoins values split by markup",
+          issues == [] and checked == 1, str(issues))
+
+
+def test_coverage_rejects_substrings_and_hidden_text() -> None:
+    """Changed facts and hidden-only copies must not satisfy coverage."""
+    from content import coverage_issues
+    from checks import visible_html_text
+
+    cases = [
+        ({"metric": "62%"}, "Revenue reached 162%"),
+        ({"metric": "62"}, "Revenue reached 1962"),
+        ({"metric": "12 34"}, "Revenue reached 1234"),
+        ({"metric": 1.0}, "Revenue reached 1.5"),
+    ]
+    issues = [coverage_issues(content, text)[0] for content, text in cases]
+    check("coverage rejects values embedded in larger or collapsed tokens",
+          all(len(found) == 1 for found in issues), str(issues))
+
+    hidden_html = (
+        "<html><head><title>62%</title><style>.concealed { display: none }</style></head><body>"
+        "<template>62%</template><p hidden>62%</p>"
+        '<p aria-hidden="true">62%</p><p style="display: none">62%</p>'
+        '<p class="concealed">62%</p>'
+        "<p>Visible value is 61%.</p></body></html>"
+    )
+    text = visible_html_text(hidden_html)
+    missing, _, _ = coverage_issues({"metric": "62%"}, text)
+    check("coverage ignores head, template, hidden, and display-none text",
+          len(missing) == 1, f"text={text!r} issues={missing}")
+
+
+def test_coverage_checks_asset_attributes() -> None:
+    from content import coverage_issues, html_resource_attributes
+
+    raw = (
+        '<img src="./images/product-shot.png" alt="Product">'
+        '<source srcset="images/product-shot@2x.webp 2x, images/product-shot.webp 1x">'
+        '<template><img src="hidden-shot.png"></template>'
+        '<a href="linked-only.png">not embedded</a>'
+    )
+    attrs = html_resource_attributes(raw)
+    present, checked, _ = coverage_issues(
+        {"image": "product-shot.png", "images": ["product-shot@2x.webp"]}, "", attrs
+    )
+    missing, _, _ = coverage_issues({"image": "missing-shot.png"}, "", attrs)
+    check("coverage accepts image paths present in src and srcset",
+          present == [] and checked == 2, f"issues={present} attrs={attrs}")
+    check("coverage rejects omitted image assets",
+          len(missing) == 1 and "missing-shot.png" in missing[0], str(missing))
+    hidden, _, _ = coverage_issues(
+        {"images": ["hidden-shot.png", "linked-only.png"]}, "", attrs
+    )
+    check("coverage ignores assets in templates and plain links",
+          len(hidden) == 2, f"issues={hidden} attrs={attrs}")
+
+
+def test_coverage_caps_adversarial_reports() -> None:
+    from content import MAX_COVERAGE_ISSUES, MAX_COVERAGE_VALUES, coverage_issues
+
+    missing, _, _ = coverage_issues({"values": list(range(1000))}, "")
+    oversized, _, _ = coverage_issues({"values": ["present"] * (MAX_COVERAGE_VALUES + 1)}, "present")
+    check("coverage caps missing-value reports",
+          len(missing) == MAX_COVERAGE_ISSUES + 1
+          and "issue limit" in missing[-1], f"issues={len(missing)}")
+    check("coverage caps the number of atomic values",
+          len(oversized) == 1 and "too many atomic values" in oversized[0], str(oversized[-2:]))
+
+
+# --------------------------- MCP server ---------------------------
+
+def test_mcp_server_stdio_protocol() -> None:
+    """The server must speak newline-delimited JSON-RPC with nothing else on stdout."""
+    script = REPO_ROOT / "scripts" / "mcp_server.py"
+    msgs = [
+        {"jsonrpc": "2.0", "id": 1, "method": "initialize",
+         "params": {"protocolVersion": "2025-03-26"}},
+        {"jsonrpc": "2.0", "method": "notifications/initialized"},
+        {"jsonrpc": "2.0", "id": 2, "method": "tools/list"},
+        {"jsonrpc": "2.0", "id": 3, "method": "tools/call",
+         "params": {"name": "kami_templates", "arguments": {}}},
+        {"jsonrpc": "2.0", "id": 4, "method": "tools/call",
+         "params": {"name": "nope", "arguments": {}}},
+    ]
+    stdin = "".join(json.dumps(m) + "\n" for m in msgs)
+    result = subprocess.run(
+        [sys.executable, str(script)],
+        input=stdin, capture_output=True, text=True, cwd=REPO_ROOT, timeout=60,
+    )
+    try:
+        replies = {m.get("id"): m for m in map(json.loads, result.stdout.strip().splitlines())}
+    except json.JSONDecodeError:
+        check("mcp server stdout is newline-delimited JSON", False, result.stdout[:200])
+        return
+    init = replies.get(1, {}).get("result", {})
+    check("mcp initialize echoes protocol version and names the server",
+          init.get("protocolVersion") == "2025-03-26"
+          and init.get("serverInfo", {}).get("name") == "kami",
+          json.dumps(init)[:200])
+    tools = [t["name"] for t in replies.get(2, {}).get("result", {}).get("tools", [])]
+    check("mcp tools/list exposes the four kami tools",
+          tools == ["kami_templates", "kami_render", "kami_check", "kami_screenshot"],
+          str(tools))
+    body = replies.get(3, {}).get("result", {}).get("content", [{}])[0].get("text", "{}")
+    payload = json.loads(body)
+    check("mcp kami_templates returns registries and schema types",
+          set(payload.get("document_templates", {})) == set(HTML_TEMPLATES)
+          and payload.get("content_schema_types"),
+          body[:200])
+    check("mcp unknown tool returns a JSON-RPC error",
+          "error" in replies.get(4, {}), json.dumps(replies.get(4, {}))[:200])
+    check("mcp notification produced no reply", len(replies) == 4, str(sorted(replies)))
+
+
+def test_mcp_server_rejects_bad_frames_without_exiting() -> None:
+    """Wrong-shaped JSON-RPC frames return errors and do not kill the server."""
+    script = REPO_ROOT / "scripts" / "mcp_server.py"
+    msgs = [
+        [],
+        {"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": "bad"},
+        {"jsonrpc": "2.0", "id": 2, "method": "tools/call",
+         "params": {"name": "kami_templates", "arguments": ["bad"]}},
+        {"jsonrpc": "2.0", "id": 3, "method": "ping"},
+    ]
+    result = subprocess.run(
+        [sys.executable, str(script)],
+        input="".join(json.dumps(m) + "\n" for m in msgs),
+        capture_output=True, text=True, cwd=REPO_ROOT, timeout=60,
+    )
+    replies = [json.loads(line) for line in result.stdout.strip().splitlines()]
+    by_id = {reply.get("id"): reply for reply in replies}
+    check("mcp malformed frames keep the process alive",
+          result.returncode == 0 and len(replies) == 4 and "result" in by_id.get(3, {}),
+          (result.stdout + result.stderr)[:400])
+    check("mcp wrong params and arguments return invalid-params errors",
+          by_id.get(1, {}).get("error", {}).get("code") == -32602
+          and by_id.get(2, {}).get("error", {}).get("code") == -32602,
+          result.stdout[:400])
+
+
+def test_mcp_render_guards_source_and_output_types() -> None:
+    from mcp_server import tool_render
+
+    with tempfile.TemporaryDirectory() as d:
+        root = Path(d)
+        html = root / "source.html"
+        html.write_text("<html><body>safe source</body></html>", encoding="utf-8")
+        original = html.read_bytes()
+        hardlink = root / "hardlink.pdf"
+        hardlink.hardlink_to(html)
+        victim = root / "victim.txt"
+        victim.write_bytes(b"do-not-overwrite")
+        symlink = root / "symlink.pdf"
+        symlink.symlink_to(victim)
+        rejected = 0
+        for out in (html, hardlink, symlink, root / "not-pdf.txt"):
+            try:
+                tool_render({"html": str(html), "out": str(out)})
+            except ValueError:
+                rejected += 1
+        check("mcp render rejects source aliases and non-PDF outputs",
+              rejected == 4 and html.read_bytes() == original
+              and victim.read_bytes() == b"do-not-overwrite",
+              f"rejected={rejected} source_changed={html.read_bytes() != original}")
+
+
+def test_visual_rejects_empty_pdf_and_bad_dpi() -> None:
+    try:
+        from pypdf import PdfWriter
+        from visual import render_pages
+    except ImportError:
+        check("visual empty-PDF guard skipped without pypdf", True)
+        return
+
+    with tempfile.TemporaryDirectory() as d:
+        pdf = Path(d) / "empty.pdf"
+        evidence = Path(d) / "empty-visual"
+        evidence.mkdir()
+        old_page = evidence / "page-01.png"
+        old_page.write_bytes(b"last-good-run")
+        writer = PdfWriter()
+        writer.write(str(pdf))
+        errors = 0
+        for dpi in (1, -1, 301):
+            try:
+                render_pages(pdf, dpi=dpi)
+            except ValueError:
+                errors += 1
+        try:
+            render_pages(pdf, dpi=110)
+        except ValueError as exc:
+            empty_error = "no pages" in str(exc)
+        else:
+            empty_error = False
+        check("visual rejects empty PDFs and out-of-range DPI",
+              empty_error and errors == 3,
+              f"empty_error={empty_error} dpi_errors={errors}")
+        check("failed visual render preserves last good evidence",
+              old_page.read_bytes() == b"last-good-run")
+
+        symlink_target = Path(d) / "elsewhere"
+        symlink_target.mkdir()
+        symlink_output = Path(d) / "linked-visual"
+        symlink_output.symlink_to(symlink_target, target_is_directory=True)
+        try:
+            render_pages(pdf, out_dir=symlink_output, dpi=110)
+        except ValueError as exc:
+            symlink_rejected = "symbolic link" in str(exc)
+        else:
+            symlink_rejected = False
+        check("visual rejects a symbolic-link evidence directory", symlink_rejected)
+
+        huge_pdf = Path(d) / "huge.pdf"
+        huge_writer = PdfWriter()
+        huge_writer.add_blank_page(width=5000, height=5000)
+        huge_writer.write(str(huge_pdf))
+        try:
+            render_pages(huge_pdf, dpi=300)
+        except ValueError as exc:
+            huge_rejected = "pixels" in str(exc)
+        else:
+            huge_rejected = False
+        check("visual rejects an oversized raster page before rendering", huge_rejected)
 
 
 def _test_functions():

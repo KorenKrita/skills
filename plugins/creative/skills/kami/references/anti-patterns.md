@@ -49,6 +49,7 @@ Common failures when AI generates professional documents. Organized by failure t
 | 21 | "Latest" without a date | "Uses the latest framework" | "Uses Next.js 15 (as of 2026-04)" |
 | 22 | Competitor comparison without market data | "Leading solution in the market" | Cite the ranking source, or use "one of the established solutions" |
 | 23 | Assumed availability | "Available on all major platforms" | List the actual platforms verified |
+| 24 | Maintainer identity leaks into demo content | A demo or example distilled from a real resume or proposal keeps job-search phrases, client names, quote amounts, or engagement periods that identify the source | Swap in public figures, public projects, or invented generic data before the content lands anywhere shareable; list the swapped signals in the handoff |
 
 ## Tone Contamination
 
@@ -63,7 +64,7 @@ Common failures when AI generates professional documents. Organized by failure t
 
 ## Landing Page
 
-The main `landing-page.html` template does not ship a price card or language switcher by default. Rules #30 and #31 below apply when you add either component (Kami's own `styles.css` L67-151 has a working `.lang-switch` reference).
+The main `landing-page.html` template ships a pricing section but no language switcher. Rule #30 applies when a price display styles its currency glyph; #31 applies when you add a switcher (Kami's own `styles.css` has a working `.lang-switch` reference; grep for `.lang-switch`).
 
 | # | Pattern | Bad | Fix |
 |---|---------|-----|-----|
@@ -79,6 +80,10 @@ The main `landing-page.html` template does not ship a price card or language swi
 | 39 | Screenshot gallery uses private local assets | `<img src="/Users/me/project/shot.png">` or `../other-repo/shots/app.webp` | Copy the image into the site repo or use a stable public URL; packaged templates must not depend on sibling checkouts |
 | 40 | Locale copy updated in only one place | One locale changes price, version, or install path while other locale pages still show the old facts | Search all locale pages plus structured data for the old value and update every matching surface |
 | 41 | Feature rows alternated to escape the product-list look | A visual + copy row mirrored every other row, a fixed visual track against a `1fr` copy track: the copy never fills its column, so the surplus lands between the copy and the visual as a hole, and the copy's left edge jumps every other row | Run every row the same way so the copy keeps one left edge and the surplus always falls on the outer trim. Mirror a paragraph-sized text mass, never a short bullet list. Get rhythm from unequal weight (a lead row with a larger visual, fewer points on supporting rows), not from alternation |
+| 42 | Locale pages share one hard-coded-language screenshot | Nine localized pages all showing an English menu bar or window chrome | When the product UI is localized, capture per locale and template the image directory per locale page; localized copy over an English screenshot breaks the promise it just made |
+| 43 | Social image bytes do not match the declared type | A PNG renamed to `.jpg` (RGBA bytes served as `image/jpeg`), so validators flag or drop the og:image | Encode the og:image as a real baseline JPEG at 1200x630; check bytes with `file <image>`, not the extension |
+| 44 | Site chrome stops at the homepage | A releases or docs subpage ships without og:image, favicon, or theme-color while the homepage has all three | Site chrome is one set for every page and subsite: inherit the homepage cover as the default og:image and sweep all pages whenever a new one is added |
+| 45 | Hand-copied dynamic counts | "56.9k stars" pasted into the page, stale within weeks | Either fetch the count at build time or print a snapshot date next to it; a bare hand-copied count is an expiring fact with no expiry label |
 
 ## Image Slots
 

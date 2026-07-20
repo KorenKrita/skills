@@ -318,8 +318,22 @@ def check_off_palette(verbose: bool = False) -> int:
         if verbose:
             print(f"scanned {p.relative_to(ROOT)}: {len(file_findings)} off-palette finding(s)")
 
+    # Demo HTML inherits template CSS by copy, so a token change leaves stale
+    # hexes behind in assets/demos with no guard: that is exactly how demos
+    # kept shipping old colors after palette edits. Scan property values only
+    # (demos carry local :root copies on purpose). Pure white is sanctioned:
+    # deliberate white-paper print variants document it in their header.
+    demo_allowed = allowed | {"#ffffff", "#fff"}
+    demo_targets = sorted((ROOT / "assets" / "demos").glob("*.html"))
+    for p in demo_targets:
+        file_findings = _off_palette_findings(p, demo_allowed)
+        findings.extend(file_findings)
+        if verbose:
+            print(f"scanned {p.relative_to(ROOT)}: {len(file_findings)} off-palette finding(s)")
+
     if not findings:
-        print(f"OK: no off-palette colors across {len(targets)} template(s)")
+        print(f"OK: no off-palette colors across {len(targets)} template(s) "
+              f"and {len(demo_targets)} demo(s)")
         return 0
 
     print(f"\nERROR: [off-palette] {len(findings)}")
