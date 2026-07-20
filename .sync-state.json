@@ -283,6 +283,13 @@
       "scripts/lint_goal_command.py"
     ]
   },
+  "i-have-adhd": {
+    "sha": "72c33eee81ea439cf01991e93729adfce2ffc99e",
+    "files": [
+      "agents/openai.yaml",
+      "SKILL.md"
+    ]
+  },
   "ui": {
     "sha": "c1a0d6e38c47636a50e40f3123c3e66cb832587d",
     "files": [

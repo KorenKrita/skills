@@ -393,6 +393,11 @@ skills:
         patches:
           - { type: replace_all, pattern: "$qiaomu-goal-meta-skill", with: "$goal-gen" }
 
+  i-have-adhd:
+    source: { repo: ayghri/i-have-adhd, path: skills/i-have-adhd, ref: main }
+    plugin: plus
+    patches: []
+
   # Local Skill: plugins/plus/skills/fan-out
   # Independent hook: plugins/plus/hooks (obra/double-shot-latte)
 

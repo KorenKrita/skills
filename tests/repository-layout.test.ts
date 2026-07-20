@@ -38,6 +38,7 @@ const EXPECTED_SKILLS = {
     "geju",
     "goal-gen",
     "goudi",
+    "i-have-adhd",
     "idea",
     "improve",
     "nopua",
@@ -56,6 +57,8 @@ const EXPECTED_SKILLS = {
     "xiaohei2",
   ],
 } as const
+
+const EXPECTED_SKILL_COUNT = Object.values(EXPECTED_SKILLS).flat().length
 
 function skillNames(plugin: string): string[] {
   return readdirSync(join(ROOT, "plugins", plugin, "skills"))
@@ -98,13 +101,13 @@ describe("repository layout", () => {
     }
   })
 
-  it("contains the approved 42 unique skills", () => {
+  it(`contains the approved ${EXPECTED_SKILL_COUNT} unique skills`, () => {
     const allNames = PLUGINS.flatMap((plugin) => skillNames(plugin))
     expect(skillNames("base")).toEqual([...EXPECTED_SKILLS.base].sort())
     expect(skillNames("plus")).toEqual([...EXPECTED_SKILLS.plus].sort())
     expect(skillNames("creative")).toEqual([...EXPECTED_SKILLS.creative].sort())
-    expect(allNames).toHaveLength(42)
-    expect(new Set(allNames).size).toBe(42)
+    expect(allNames).toHaveLength(EXPECTED_SKILL_COUNT)
+    expect(new Set(allNames).size).toBe(EXPECTED_SKILL_COUNT)
   })
 
   it("keeps every skill directory aligned with its frontmatter name", () => {
@@ -123,7 +126,7 @@ describe("repository layout", () => {
     }
     const state = JSON.parse(readFileSync(join(ROOT, ".sync-state.json"), "utf-8")) as Record<string, unknown>
     expect(Object.keys(state).sort()).toEqual(Object.keys(overrides.skills).sort())
-    expect(Object.keys(overrides.skills)).toHaveLength(41)
+    expect(Object.keys(overrides.skills)).toHaveLength(42)
     for (const [skill, config] of Object.entries(overrides.skills)) {
       expect(existsSync(join(ROOT, "plugins", config.plugin, "skills", skill)), skill).toBe(true)
     }

@@ -15,7 +15,7 @@ plugins:
       - code-review
       - workflow
   plus:
-    version: 0.0.1
+    version: 0.0.2
     description: 工程审计、决策方法、研究工具与 Claude Code 自动续跑
     category: productivity
     keywords:
