@@ -59,7 +59,7 @@ Never draw illustrative imagery using inline SVG. SVG is for icons and geometric
 
 ## Production Quality Baseline
 
-Check before handoff. These are not aesthetic choices, they are non-negotiable.
+Check before handoff. Accessibility and the CSS-pattern bans are non-negotiable; everything else below is craft detail in service of the locked direction.
 
 > Treat the sections below as craft details, not defaults. Only apply them when they serve the locked visual direction. If removing a detail changes nothing about how the interface feels, leave it out.
 
@@ -72,11 +72,11 @@ Check before handoff. These are not aesthetic choices, they are non-negotiable.
 ### Animation
 - Honor `prefers-reduced-motion`: disable or reduce animations when set
 - Animate `transform`/`opacity` only (compositor-friendly, no layout thrash)
-- Never `transition: all`; list properties explicitly
+- No bounce or elastic easing: real objects decelerate smoothly; use exponential ease-out (`ease-out-quart`, `ease-out-quint`, or `cubic-bezier(0.16,1,0.3,1)`)
 - Interruptible animations: prefer CSS transitions for interactive state changes (hover, toggle, open/close) because they retarget mid-animation; reserve keyframe animations for staged sequences that run once (e.g., staggered page enters)
 - Staggered enter: split content into semantic chunks with ~100ms delay; titles into words at ~80ms; typical enter uses `opacity: 0 → 1`, `translateY(12px) → 0`, and `blur(4px) → 0`
 - Subtle exit: use a small fixed `translateY(-12px)` instead of full height; keep duration ~150ms `ease-in`, shorter and softer than enter
-- Contextual icon swaps: animate with `scale: 0.25 → 1`, `opacity: 0 → 1`, and `blur: 4px → 0px`. With a spring library: `{ type: "spring", duration: 0.3, bounce: 0 }`. Without: keep both icons in DOM (one absolute) and cross-fade with CSS using `cubic-bezier(0.2, 0, 0, 1)`
+- Contextual icon swaps: animate with `scale: 0.25 → 1`, `opacity: 0 → 1`, and `blur: 4px → 0px`. With a spring library: `{ type: "spring", duration: 0.3, bounce: 0 }`. Without: keep both icons in DOM (one absolute) and cross-fade with CSS using `cubic-bezier(0.2, 0, 0, 1)`. No rotation unless rotation is semantically meaningful (e.g. a chevron indicating direction change)
 - Scale on press: buttons use `scale(0.96)` on active/press via CSS transitions so the press can be interrupted; add a `static` prop to disable when motion would be distracting
 - Page-load guard: use `initial={false}` on animated presence wrappers for toggles, tabs, and icon swaps to prevent enter animations on first render; do not use it for intentional page-load entrance sequences
 
@@ -195,21 +195,11 @@ These patterns appear in the majority of AI-generated interfaces. Each one has a
 | Modals as a lazy escape for overflow UI | Interrupts flow and breaks browser back navigation; used when an inline expansion, drawer, or separate page would be better | Inline expand, detail panel, or dedicated route; modals only when the action truly requires focus-lock |
 | `transition: all` or animating width/height/padding/margin | Forces the browser into layout recalculation on every frame | List exact properties (`transition-property: transform, opacity`); use `grid-template-rows: 0fr to 1fr` for height reveals |
 
-## Motion Specifics
-
-Complements the motion timing in the main SKILL.md constraints.
-
-- No bounce or elastic easing. Real objects decelerate smoothly. Use exponential ease-out (`ease-out-quart`, `ease-out-quint`, or `cubic-bezier(0.16,1,0.3,1)`) for natural, high-quality deceleration.
-- Animate `transform` and `opacity` only. Every other property triggers layout or paint.
-- For height reveals, use `grid-template-rows: 0fr` to `1fr` transitions instead of animating `height` directly. It avoids the `height: auto` animation trap.
-- Icon swaps: use a 120ms cross-fade with `opacity` and a subtle `scale(0.9)` to `scale(1)`. No rotation unless rotation is semantically meaningful (e.g. a chevron indicating direction change).
-- Do not use `transition: all` even as a quick prototype shortcut. It animates layout, color, and font-size simultaneously, causing visible jank.
-
 ## Reference-site Brand Presets (awesome-design-md)
 
 `VoltAgent/awesome-design-md` maintains 66+ curated DESIGN.md files extracted from real-world brand sites. Running `npx getdesign@latest add <brand>` drops the file into the project root, giving the agent concrete token values to decompose rather than reasoning from memory.
 
-**Usage rule:** never auto-run the command. Offer it as an option during direction lock, run it only with explicit user approval, and treat the result as seed decomposition material, not a finished direction.
+**Usage rule:** never auto-run the command. Offer it as an option during direction lock, run it only with explicit user approval, and treat the result as seed decomposition material, not a finished direction. After an approved run, read the generated `DESIGN.md` at project root and do the 3-property decomposition against that file rather than from memory; the user still names the aesthetic precisely.
 
 **Brands in the catalog** (recognize these when a user names a reference):
 
@@ -268,16 +258,12 @@ These are not visual polish items. They are the difference between a demo and a 
 
 Would a stranger glancing at the first viewport say "an AI made this" immediately? If yes, the committed direction was not committed enough. The usual culprits: reflex font, default purple accent, centered hero with generic card grid beneath. Fix the typography, the color system, or the layout until the answer flips.
 
-## Brand Preset Flow
-
-For well-known brands (Linear, Stripe, Claude, Vercel, Apple, Tesla, Notion, Figma, Airbnb, Spotify, and ~56 others catalogued in `awesome-design-md`): ask the user whether to pull the curated preset via `npx getdesign@latest add <brand>`. If they approve, run it, read the generated `DESIGN.md` at project root, then do the 3-property decomposition against that file rather than from memory. The preset is a starting point, not a direction: the user still names the aesthetic precisely, and the reflex-font blocklist and absolute bans still win on any conflict.
-
 ## App Shell Rules
 
 When building a sidebar + main workspace layout (Slack, Linear, Notion class):
 - Decorative backgrounds default to off
 - Surface hierarchy uses background-color steps and shadow only
-- All interactive elements get `active:scale-95`
+- All interactive elements get the standard press scale from Animation (`scale(0.96)` on active/press)
 - Button radius is consistent within each component type (pick one: pill, square, or one fixed value, do not mix)
 - Commit to a named radius scale before the first component (see Border radius system above)
 
@@ -292,4 +278,4 @@ When asked for design options, give at least 3 variations spread across genuinel
 
 ---
 
-*Rules in Reflex Fonts, Font Selection, OKLCH, Theme Matrix, Absolute Bans, Motion Specifics, and AI Slop Test adapted from [pbakaus/impeccable](https://github.com/pbakaus/impeccable) (Apache 2.0). DESIGN.md Scaffold adapted from [getdesign.md](https://getdesign.md) (MIT); concept credited to Google Stitch. Brand preset catalog from [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md) (MIT). Content Authenticity, Multi-Card Alignment, and Strategic Omissions inspired by [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill).*
+*Rules in Reflex Fonts, Font Selection, OKLCH, Theme Matrix, Absolute Bans, the motion rules, and AI Slop Test adapted from [pbakaus/impeccable](https://github.com/pbakaus/impeccable) (Apache 2.0). DESIGN.md Scaffold adapted from [getdesign.md](https://getdesign.md) (MIT); concept credited to Google Stitch. Brand preset catalog from [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md) (MIT). Content Authenticity, Multi-Card Alignment, and Strategic Omissions inspired by [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill).*

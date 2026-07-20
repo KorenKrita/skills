@@ -39,7 +39,7 @@ Flow:
 1. Read the current UI evidence: screenshot, rendered page, native view, or responsible component.
 2. Name the exact visual defect in one sentence.
 3. Make the smallest material, geometry, spacing, contrast, typography, or text-fit change that fixes that defect.
-4. Verify the real running surface or generated artifact. Check long words, localized strings, compact states, and at least one narrow viewport when applicable. Terminal output counts as a rendered surface: after changing CLI-facing text or layout, re-run the command and read the actual output.
+4. Verify the real running surface or generated artifact. Check long words, localized strings, compact states, and at least one narrow viewport when applicable. Terminal output counts as a rendered surface: after changing CLI-facing text or layout, re-run the command and read the actual output, checking column alignment, block spacing, and icon consistency across the whole output rather than only the changed line.
 5. If the fix touches three or more components, changes product behavior, or reveals a direction problem, stop and switch to Screenshot Iteration Mode or Lock the Direction First.
 
 **Spacing unification rule.** A spacing or sizing value tuned three times that still looks off is structural, not numeric: collapse the N independent values into one shared named token (`Spacing.s4`, `--gap-content`), with outer container padding defaulting to the inner element gap. Spacing-as-a-system details live in `references/design-reference.md`.
@@ -77,7 +77,7 @@ Activate when the user sends a screenshot or image alongside a complaint ("这�
 
 **Boundary**: if the fix requires changing 3 or more components, or if it reveals a direction problem rather than a specific bug, pause and run the full direction lock before continuing.
 
-**Redesign priority order** (when reworking an existing UI rather than building from scratch): font replacement → color cleanup → hover/active states → layout and whitespace → replace generic components → add loading/empty/error states → typographic polish. This order maximizes visual lift while minimizing the blast radius of each pass. Full rules in `references/design-reference.md`. Common traps and absolute CSS bans: `references/design-traps.md`.
+**Redesign priority order** (when reworking an existing UI rather than building from scratch): font replacement → color cleanup → hover/active states → layout and whitespace → replace generic components → add loading/empty/error states → typographic polish. This order maximizes visual lift while minimizing the blast radius of each pass. Full rules, common traps, and absolute CSS bans all live in `references/design-reference.md`.
 
 ## Lock the Direction First
 
@@ -90,7 +90,7 @@ Before writing any code, ask the user directly, using the environment's native q
 1. **Who uses this, and in what context?** Analyst dashboard differs from landing page or onboarding flow. See "App shell exception" below if the answer is a sidebar + main workspace layout.
 2. **What is the aesthetic direction?** Name it precisely: dense editorial, raw terminal, ink-on-paper, brutalist grid, warm analog. "Clean and modern" is not a direction. If the user names a reference site or product ("feels like Linear / Claude.ai / Vercel"), do not accept it as a direction -- extract 3 concrete properties from it: button radius philosophy, surface depth treatment (shadow vs background step vs border), and accent color family. Name those instead.
 
-   **Shortcut for well-known brands**: see "Brand preset flow" in `references/design-reference.md`. Ask first, run the preset, then decompose against the generated file.
+   **Shortcut for well-known brands**: see "Reference-site Brand Presets" in `references/design-reference.md`. Ask first, run the preset, then decompose against the generated file.
 3. **What is the design signature?** A typeface, color system, unexpected motion, asymmetric layout. Pick one and make it obvious.
 4. **What are the hard constraints?** Framework, bundle size, contrast minimums, keyboard accessibility.
 5. **What is the signature micro-interaction?** Scale on press, staggered reveal, or contextual icon animation. Pick one and know exactly how it's implemented.
@@ -120,7 +120,7 @@ If question 1 is an app shell (Slack, Linear, Notion class), load the "App shell
 
 If the surface is a dashboard, analytics view, or chart-heavy interface, also load `references/design-data-viz.md` for chart selection, number alignment, and product-benchmark rules. Skip when building marketing pages, landing pages, or generic components.
 
-State the chosen direction in one sentence, then load `references/design-reference.md` and check the tech stack conflicts table. Name the single CSS strategy before writing the first component. For token decisions (color, font, motion): load `references/design-tokens.md`. For aesthetic quality review and production structure: load `references/design-aesthetic-quality.md`.
+State the chosen direction in one sentence, then load `references/design-reference.md` and check the tech stack conflicts table. Name the single CSS strategy before writing the first component. Token decisions (color, font, motion) live in the same file: OKLCH Rules, Theme Matrix, the font sections, and Animation. For aesthetic quality review and production structure: load `references/design-aesthetic-quality.md`.
 
 Summarize the direction as three lines before writing any code:
 - **Visual thesis**: mood, material, and energy in one sentence (e.g. "warm brutalist editorial with high-contrast ink type and rough paper texture")
