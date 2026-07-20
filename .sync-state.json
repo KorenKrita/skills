@@ -203,7 +203,7 @@
     ]
   },
   "ocr": {
-    "sha": "41620dc723ef447324e72cc8c2000be2857aaaa3",
+    "sha": "a4a281c1f5925bfd53c7076afc8feb48cb4d171a",
     "files": [
       "SKILL.md"
     ]
@@ -252,7 +252,7 @@
     ]
   },
   "read": {
-    "sha": "c4fd8192de1edef3b81c5b7f61931a5b77fcc9d8",
+    "sha": "c1a0d6e38c47636a50e40f3123c3e66cb832587d",
     "files": [
       "SKILL.md",
       "references/read-methods.md",
@@ -284,14 +284,12 @@
     ]
   },
   "ui": {
-    "sha": "c4fd8192de1edef3b81c5b7f61931a5b77fcc9d8",
+    "sha": "c1a0d6e38c47636a50e40f3123c3e66cb832587d",
     "files": [
       "SKILL.md",
       "references/design-aesthetic-quality.md",
       "references/design-data-viz.md",
       "references/design-reference.md",
-      "references/design-tokens.md",
-      "references/design-traps.md",
       "references/durable-context.md"
     ]
   },
@@ -483,7 +481,7 @@
     ]
   },
   "kami": {
-    "sha": "f97bfc9ef83626edb863f6e42632067047a23601",
+    "sha": "21fa0b19e8f3af58208a9354560e89565131a93a",
     "files": [
       "CHEATSHEET.md",
       "LICENSE",
@@ -561,24 +559,37 @@
       "references/mermaid.md",
       "references/production.md",
       "references/resume-writing.md",
+      "references/schemas/changelog.json",
+      "references/schemas/equity-report.json",
+      "references/schemas/landing-page.json",
+      "references/schemas/letter.json",
+      "references/schemas/long-doc.json",
+      "references/schemas/one-pager.json",
+      "references/schemas/portfolio.json",
+      "references/schemas/resume.json",
+      "references/schemas/slides.json",
       "references/tokens.json",
       "references/writing.md",
       "scripts/build.py",
       "scripts/build_metadata.py",
       "scripts/check-update.sh",
       "scripts/checks.py",
+      "scripts/content.py",
       "scripts/draft-release-notes.py",
       "scripts/ensure-fonts.sh",
       "scripts/highlight.py",
       "scripts/lint.py",
+      "scripts/mcp_server.py",
       "scripts/mermaid_normalize.py",
       "scripts/optional_deps.py",
       "scripts/package-skill.sh",
+      "scripts/render.py",
       "scripts/shared.py",
       "scripts/site_facts.py",
       "scripts/tests/test_build.py",
       "scripts/tokens.py",
-      "scripts/verify.py"
+      "scripts/verify.py",
+      "scripts/visual.py"
     ]
   },
   "xiaohei": {
