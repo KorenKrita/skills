@@ -24,6 +24,10 @@ PACKAGE_REQUIRED_ENTRIES=(
   "scripts/build.py"
   "scripts/ensure-fonts.sh"
   "scripts/site_facts.py"
+  "scripts/content.py"
+  "scripts/visual.py"
+  "scripts/mcp_server.py"
+  "references/schemas/resume.json"
 )
 
 mkdir -p "$(dirname "$OUT")"
@@ -49,7 +53,7 @@ awk '
   /^assets\/fonts\/JetBrainsMono\.woff2$/ { print; next }
   /^assets\/fonts\/LICENSE-SourceHanSerifK\.txt$/ { print; next }
   /^references\// { print; next }
-  /^scripts\/(build|check-update|checks|ensure-fonts|highlight|lint|mermaid_normalize|optional_deps|shared|site_facts|tokens|verify)\.(py|sh)$/ { print; next }
+  /^scripts\/(build|check-update|checks|content|ensure-fonts|highlight|lint|mcp_server|mermaid_normalize|optional_deps|render|shared|site_facts|tokens|verify|visual)\.(py|sh)$/ { print; next }
 ' "$MANIFEST" > "$FILTERED_MANIFEST"
 
 # Coverage gate: every tracked scripts/ file must be either packaged by the

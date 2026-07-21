@@ -684,14 +684,29 @@ pre.code .k { color: var(--brand); }
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
+/* 权益清单是视觉主角：价格只陈述一次、中等字号（writing.md Pricing rules）。
+   超大价格数字会把整个区块变成价签，放大价格敏感度。 */
+.price-benefits {
+  list-style: none;
+  margin: 0 0 36px;
+  padding: 0;
+}
+.price-benefits li {
+  font-family: var(--serif);
+  font-size: 16px;
+  color: var(--dark-warm);
+  line-height: 1.55;
+  padding: 4px 0;
+}
 .price-amount {
   font-family: Georgia, Charter, serif;
   font-weight: 500;
-  font-size: 112px;
-  line-height: 1;
+  font-size: 30px;
+  line-height: 1.2;
   color: var(--near-black);
   margin: 0 0 24px;
   letter-spacing: 0;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .price-vs {
   font-family: var(--serif);
@@ -882,7 +897,9 @@ footer.foot {
   .principles li:nth-child(even) { padding-left: 0; }
 
   .price-card { padding: 48px 16px 40px; }
-  .price-amount { font-size: 72px; letter-spacing: 0; margin-bottom: 18px; }
+  .price-benefits { margin-bottom: 28px; }
+  .price-benefits li { font-size: 15px; }
+  .price-amount { font-size: 24px; letter-spacing: 0; margin-bottom: 18px; }
   .price-vs { font-size: 15px; margin-bottom: 32px; }
   .price-card .btn-primary { min-width: 240px; }
   .price-terms { font-size: 12.5px; line-height: 1.5; margin-top: 24px; }
@@ -1001,6 +1018,9 @@ footer.foot {
     </div>
 
     <div class="price-card">
+      <ul class="price-benefits">
+        <!-- {{PRICE_BENEFITS}}，4-6 条 <li>，每条一行、长度接近，写买家得到什么 -->
+      </ul>
       <p class="price-amount">{{PRICE_DISPLAY}}</p>
       <p class="price-vs">{{PRICE_COMPARISON}}</p>
       <a class="btn-primary" href="{{CTA_PRIMARY_URL}}">{{CTA_PRIMARY_LABEL}}</a>

@@ -21,8 +21,10 @@ from optional_deps import MissingDepError, require_pymupdf, require_pypdf_reader
 from shared import (
     PARCHMENT_RGB,
     ROOT,
+    TEMPLATES,
     default_example_pdfs,
     load_checks_thresholds,
+    pptx_targets,
     rel_to_root,
 )
 
@@ -32,6 +34,9 @@ MARKDOWN_RESIDUE_MARKERS = (
     ("markdown thematic break", MARKDOWN_THEMATIC_BREAK),
     ("unconverted bold marker", re.compile(r"\*\*")),
     ("unconverted inline-code marker", re.compile(r"`")),
+    # Em dash is banned in every deliverable (writing.md, anti-patterns #27).
+    # It keeps leaking past the prose-level rule, so it is a machine gate here.
+    ("em dash (banned punctuation)", re.compile("\u2014")),
 )
 
 # Parchment background RGB for pixel comparison (sourced from shared.PARCHMENT_RGB).
@@ -67,31 +72,86 @@ def check_placeholders(paths: list[str]) -> int:
 
 # ---------- markdown residue check ----------
 
+def css_hidden_selectors(raw: str) -> tuple[set[str], set[str]]:
+    """Return simple class and id selectors hidden by inline stylesheet rules.
+
+    This intentionally recognizes only unambiguous single-element selectors;
+    a full CSS cascade belongs to the renderer, not this zero-dependency check.
+    """
+    hidden_classes: set[str] = set()
+    hidden_ids: set[str] = set()
+    style_blocks = re.findall(r"<style\b[^>]*>(.*?)</style\s*>", raw, flags=re.I | re.S)
+    for block in style_blocks:
+        clean = re.sub(r"/\*.*?\*/", "", block, flags=re.S)
+        for selectors, body in re.findall(r"([^{}]+)\{([^{}]*)\}", clean, flags=re.S):
+            compact = re.sub(r"\s+", "", body.lower())
+            if "display:none" not in compact and "visibility:hidden" not in compact:
+                continue
+            for selector in selectors.split(","):
+                selector = selector.strip()
+                class_match = re.fullmatch(r"(?:[a-zA-Z][\w-]*)?\.([\w-]+)", selector)
+                id_match = re.fullmatch(r"(?:[a-zA-Z][\w-]*)?#([\w-]+)", selector)
+                if class_match:
+                    hidden_classes.add(class_match.group(1))
+                elif id_match:
+                    hidden_ids.add(id_match.group(1))
+    return hidden_classes, hidden_ids
+
+
 class _VisibleTextParser(HTMLParser):
     """Extract visible text from filled HTML while skipping code-like blocks."""
 
-    _SKIP_TAGS = {"code", "pre", "script", "style"}
+    _SKIP_TAGS = {"code", "head", "noscript", "pre", "script", "style", "template"}
+    _VOID_TAGS = {
+        "area", "base", "br", "col", "embed", "hr", "img", "input",
+        "link", "meta", "param", "source", "track", "wbr",
+    }
 
-    def __init__(self) -> None:
+    def __init__(self, hidden_classes: set[str], hidden_ids: set[str]) -> None:
         super().__init__(convert_charrefs=True)
+        self._hidden_classes = hidden_classes
+        self._hidden_ids = hidden_ids
         self._skip_depth = 0
+        self._skip_stack: list[bool] = []
         self.parts: list[str] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        if tag in self._SKIP_TAGS:
+        attrs_map = {name.lower(): (value or "") for name, value in attrs}
+        style = re.sub(r"\s+", "", attrs_map.get("style", "").lower())
+        classes = set(attrs_map.get("class", "").split())
+        hidden = (
+            tag in self._SKIP_TAGS
+            or "hidden" in attrs_map
+            or attrs_map.get("aria-hidden", "").lower() == "true"
+            or bool(classes & self._hidden_classes)
+            or attrs_map.get("id", "") in self._hidden_ids
+            or "display:none" in style
+            or "visibility:hidden" in style
+        )
+        if tag not in self._VOID_TAGS:
+            self._skip_stack.append(hidden)
+        if hidden:
             self._skip_depth += 1
+            if tag in self._VOID_TAGS:
+                self._skip_depth -= 1
 
     def handle_endtag(self, tag: str) -> None:
-        if tag in self._SKIP_TAGS and self._skip_depth > 0:
+        hidden = self._skip_stack.pop() if self._skip_stack else False
+        if hidden and self._skip_depth > 0:
             self._skip_depth -= 1
+
+    def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        # Self-closing hidden/input nodes contain no visible text and must not
+        # leave the parser in a skipped state for the following sibling.
+        return
 
     def handle_data(self, data: str) -> None:
         if self._skip_depth == 0:
             self.parts.append(data)
 
 
-def _visible_html_text(raw: str) -> str:
-    parser = _VisibleTextParser()
+def visible_html_text(raw: str) -> str:
+    parser = _VisibleTextParser(*css_hidden_selectors(raw))
     parser.feed(raw)
     return "\n".join(parser.parts)
 
@@ -125,7 +185,7 @@ def _markdown_text_chunks(path: Path) -> tuple[list[tuple[int | None, str]], str
 
     raw = path.read_text(encoding="utf-8", errors="replace")
     if suffix in {".html", ".htm"}:
-        return [(None, _visible_html_text(raw))], None
+        return [(None, visible_html_text(raw))], None
     return [(None, raw)], None
 
 
@@ -297,7 +357,7 @@ def _last_content_y(samples: bytes, w: int, h: int, stride: int, n: int) -> int:
 def _density_bucket(empty: float, warn_pct: float, sparse_pct: float) -> str:
     """Categorize a page by its trailing-whitespace fraction.
 
-    Pure so `_scan_density` and its tests share one decision. A test that
+    Pure so `scan_density` and its tests share one decision. A test that
     reimplements these comparisons would stay green if the real operators
     drifted (`>` to `>=`, or warn/sparse swapped); calling this keeps the
     assertion anchored to production logic.
@@ -309,12 +369,13 @@ def _density_bucket(empty: float, warn_pct: float, sparse_pct: float) -> str:
     return "OK"
 
 
-def _scan_density(paths: list[str]) -> tuple[int, int, int, int] | None:
+def scan_density(paths: list[str]) -> tuple[int, int, int, int] | None:
     """Scan PDFs and print SPARSE/WARN lines.
 
     Returns (sparse, warn, missing, scanned), or None if PyMuPDF is missing.
     Thresholds (warn_pct, sparse_pct, dpi) come from
-    references/checks_thresholds.json.
+    references/checks_thresholds.json. Public: verify.py runs the same scan
+    as its advisory pass.
     """
     try:
         fitz = require_pymupdf()
@@ -376,7 +437,7 @@ def check_density(paths: list[str]) -> int:
             print("ERROR: no PDF files to scan")
             return 2
 
-    result = _scan_density(paths)
+    result = scan_density(paths)
     if result is None:
         return 2
     sparse, warn, missing, scanned = result
@@ -565,25 +626,27 @@ def _rhythm_issues(seq: list[str], max_content_run: int, divider_min_deck_size: 
     return issues
 
 
-def check_rhythm(targets: list[str], pptx_targets: dict[str, str], templates_dir: Path) -> int:
+def check_rhythm(targets: list[str]) -> int:
     """Scan slide templates for monotony: too many consecutive content_slides,
     missing dividers, and missing density variation.
 
-    Thresholds come from references/checks_thresholds.json.
+    Targets come from the shared PPTX registry; thresholds from
+    references/checks_thresholds.json.
     """
-    names = targets if targets else list(pptx_targets.keys())
+    slide_sources = pptx_targets()
+    names = targets if targets else list(slide_sources)
     failures = 0
     rhythm_cfg = load_checks_thresholds()["rhythm"]
     max_content_run = int(rhythm_cfg["max_content_run"])
     divider_min_deck_size = int(rhythm_cfg["divider_min_deck_size"])
 
     for name in names:
-        source = pptx_targets.get(name)
+        source = slide_sources.get(name)
         if source is None:
             print(f"ERROR: {name}: not a known slides target")
             failures += 1
             continue
-        src = templates_dir / source
+        src = TEMPLATES / source
         if not src.exists():
             print(f"ERROR: {name}: source not found ({src})")
             failures += 1

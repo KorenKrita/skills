@@ -42,12 +42,14 @@ If "no", don't draw. Diagrams add signal to hierarchy, direction, and magnitude.
 
 ## 2. Complexity budget
 
-**Target density: 4/10**. Enough to be technically complete, not so dense the reader needs a guide.
+**Target density: 4/10** for editorial documents (reports, one-pagers, decks). Enough to be technically complete, not so dense the reader needs a guide.
 
 - Nodes > 9 -> this is two diagrams, not one
 - Two nodes that always travel together -> they're one node
 - A line whose meaning is obvious from layout -> remove the line
 - 5 nodes in ink-blue -> you haven't decided what's focal
+
+**Teaching tier: 6-7/10.** A figure inside a technical teaching article (the reader expects to learn how something works) carries more: layers, data-flow direction, and at least one labeled trade-off or decision point. A 3-box overview shipped as an "architecture diagram" in that context reads as marketing, and readers say so. If hand-assembled SVG cannot hold that detail at the target display width, switch to the host-image illustration path (SKILL.md «Illustrations») instead of enlarging the SVG.
 
 **Focal rule**: 1-2 focal elements per diagram (`#1B365D` stroke + `#EEF2F7` fill). Everything else goes neutral. Focal signal comes from contrast, not count.
 
@@ -642,6 +644,28 @@ Every diagram template carries a poster-size `@page` sized to its own frame and 
 
 ---
 
-## 11. Credit
+## 11. Illustration briefs (host image model)
+
+For raster illustrations delegated to the host's image generation (SKILL.md «Illustrations» defines when to switch). The brief is the deliverable Kami controls; write it tightly and the image model has nowhere to drift.
+
+**Brief skeleton**, in order:
+
+1. Canvas: warm parchment `#f5f4ed`, never pure white; generous whitespace; composed like a figure in a well-typeset report.
+2. Accent: ink blue `#1B365D` on the 1-2 focal elements only; everything else warm gray with a yellow-brown undertone; no second hue anywhere.
+3. Strokes and icons: thin single-line geometric strokes; flat icons matching section 6 (rounded line style, no fills beyond the two sanctioned ones); no gradients, drop shadows, or 3D.
+4. Labels: serif, few, short. Prefer single words; image models misspell long phrases, and a misspelled label voids the image. If a label must be a phrase, plan to typeset it in HTML over the image instead.
+5. Content spec: the same complexity budget as section 2 (state the tier: 4/10 editorial or 6-7/10 teaching), what is focal, and the reading direction.
+
+**QC before placing a generated image** (regenerate on any failure, do not retouch expectations):
+
+- Palette holds: parchment ground, single blue accent, no stray hue, no cool grays.
+- No gradient, shadow, or 3D crept in.
+- Text in the image is spelled correctly and minimal; anything wrong or verbose gets re-briefed with fewer words.
+- Composition reads as a report figure (balanced margins, clear focal point), not as a poster or clip art.
+- Style matches the other generated images in the same deliverable (shared style anchor, see SKILL.md batch rule).
+
+---
+
+## 12. Credit
 
 This capability is inspired by Cathryn Lavery's [diagram-design](https://github.com/cathrynlavery/diagram-design) (a Claude Code skill with 13 editorial diagram types). kami borrowed the **approach** (inline SVG, semantic tokens, complexity budget, anti-slop table). Not the full catalog.

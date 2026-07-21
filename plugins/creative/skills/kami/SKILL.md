@@ -21,15 +21,7 @@ Key rule: explicit prompt > editorial judgment > habit notes > frontmatter defau
 
 Run this only when the user explicitly references a sibling project as a visual reference: "like my <project> site", "match the style of <repo>", "use the look from <directory>". Skip silently when no such reference exists.
 
-When triggered, before generating:
-
-1. Locate the referenced project's style files:
-   ```bash
-   find <referenced-path> -maxdepth 4 \( -name "*.css" -o -name "tailwind.config.*" -o -name "theme.*" -o -name "tokens.*" \) | head -20
-   ```
-2. Extract: dominant color values (hex / hsl), font stack, spacing scale, border-radius scale. Prefer values declared in CSS variables or design tokens over inline literals.
-3. Merge into the in-session brand profile as Layer C (visual customization), not Layer B (session defaults). Do not override an explicit `--brand` flag or values that the user typed in this turn.
-4. Report back in one line before continuing: "scanned <project>, extracted N colors / M fonts; using as visual reference."
+When triggered, before generating: locate the referenced project's declared design tokens (CSS variables, tailwind/theme config, token files) and extract dominant colors, font stack, spacing scale, and border-radius scale; prefer declared tokens over inline literals. Merge into the in-session brand profile as Layer C (visual customization), not Layer B (session defaults); never override an explicit `--brand` flag or values the user typed this turn. Report back in one line before continuing: "scanned <project>, extracted N colors / M fonts; using as visual reference."
 
 Skip and fall back to the brand profile defaults if the referenced path does not exist, no CSS-like files are found, or the extraction would conflict with the user's explicit values in the current message.
 
@@ -38,8 +30,6 @@ Skip and fall back to the brand profile defaults if the referenced path does not
 ## Step 1 · Decide the language
 
 **Match the user's language.** Chinese -> `*.html` / `slides-weasy.html`. English -> `*-en.html` / `slides-weasy-en.html`. Japanese -> CJK path (`.html` / `slides-weasy.html`) as best-effort, JP Mincho first, visual QA before shipping. Korean -> dedicated `*-ko.html` / `slides-weasy-ko.html` family as best-effort, visual QA before shipping. Reference docs are shared English specs.
-
-When ambiguous (e.g. a one-word command like "resume"), ask a one-liner rather than guess.
 
 | User language | HTML templates | Slides (PDF default) | Slides (PPTX fallback) |
 |---|---|---|---|
@@ -55,22 +45,11 @@ Always use `CHEATSHEET.md` and `references/*.md` for design, writing, production
 
 Code blocks with `class="language-*"` are highlighted only when optional `Pygments` is installed in the build environment. Without it, PDFs still render and code blocks stay monochrome.
 
-## Step 1.5 · Intent extraction (silent checklist)
+## Step 1.5 · Intent extraction (silent)
 
-Before choosing a template, verify these four dimensions are clear. Do not ask unless 2+ are missing and cannot be inferred from context.
+Before picking a template, silently confirm purpose, audience, hard constraints, and what outcome counts as success. Skip any dimension the conversation or the document type already answers (a resume's purpose is always "get an interview").
 
-| Dimension | What to extract | Example |
-|---|---|---|
-| **Purpose** | Why this document exists | Persuade investor vs. align internal team vs. close a candidate |
-| **Audience** | Who reads it, what they already know | Technical CTO (skip basics) vs. non-technical board (explain terms) |
-| **Constraint** | Hard limits on length, format, tone, or delivery | "One page max", "formal English", "print-ready A4" |
-| **Success** | What outcome counts as success | They schedule a meeting / they approve the budget / they understand the architecture |
-
-Rules:
-- If the conversation already answered a dimension, skip it silently.
-- If a dimension can be inferred from the document type (e.g. resume purpose is always "get an interview"), skip it.
-- If 2+ dimensions are genuinely unclear, ask in a single compact question (max 2 sub-questions).
-- Never ask all four as a checklist. This is a background verification, not a form.
+Question budget, global for this skill: infer first, from the decision tree and context. Ask at most once, in one compact question (max 2 sub-questions), and only when 2+ intent dimensions are genuinely unresolvable or two templates genuinely both fit. Never present the dimensions as a checklist.
 
 ## Execution contract
 
@@ -132,8 +111,6 @@ Ambiguity examples that justify a one-liner:
 - "2 page exec summary with metric tiles" -> ask "one-pager or equity-report?"
 - "5 page argument with several charts" -> ask "long-doc or portfolio?"
 
-Pick from the tree first. Ask only when the tree is genuinely silent.
-
 ### Diagrams (primitives, not a separate template type)
 
 When the user asks for **a diagram inside** a long-doc / portfolio / slide (not a standalone document), route to `assets/diagrams/` rather than a template:
@@ -164,25 +141,7 @@ For a **repo-maintained diagram** (README or docs-site architecture figure, "给
 
 Before drawing, always ask: **would a well-written paragraph teach the reader less than this diagram?** If no, don't draw.
 
-**Auto-select charts from data.** When content contains numerical data, choose the chart type and embed it without waiting for the user to specify. Decision tree (first match wins):
-
-| Data shape | Chart |
-|---|---|
-| Has open/high/low/close fields, or per-day price | Candlestick |
-| Has + and - contributions that sum to a total (bridge, waterfall, P&L) | Waterfall |
-| One series, values sum to ~100%, items ≤ 6 | Donut |
-| One series, values sum to ~100%, items ≥ 7 | Horizontal bar |
-| Two or more series across time (months, quarters, years) | Line |
-| One series across time, large count changes dominate (not rate) | Bar |
-| Multiple categories, same time snapshot, 2+ series | Grouped bar |
-| 2×2 strategic or priority positioning | Quadrant |
-| Hierarchical data with depth ≥ 2 | Tree |
-| Process with decision branches | Flowchart |
-| Cross-team or cross-role process with ≥ 3 actors | Swimlane |
-| Set overlaps or shared attributes between 2-3 groups | Venn |
-| Category comparison, single series, no time axis | Bar |
-
-When data fits multiple types, prefer the one that shows variance most clearly. Always embed inside a `<figure>` with a caption that states the insight, not just the data range.
+**Auto-select charts from data.** When content contains numerical data, choose the chart type yourself and embed it without waiting for the user to specify; the available chart primitives are the `assets/diagrams/` set above. Two house calls that differ from common defaults: shares of ~100% render as a donut only up to 6 items, 7 or more becomes a horizontal bar; a single time series where absolute count changes dominate (not rate) renders as bars, not a line. When several types fit, prefer the one that shows variance most clearly. Always embed inside a `<figure>` with a caption that states the insight, not just the data range.
 
 ### Illustrations (host image model, not inline SVG)
 
@@ -191,7 +150,9 @@ Inline diagrams above are vector SVGs you assemble by hand. For a standalone ras
 - If the running host can generate images (for example ChatGPT), apply the brief below and render the image directly.
 - If it cannot (Claude, Codex, most coding agents), output the brief as text so the user can paste it into any image model.
 
-Brief: warm parchment (`#f5f4ed`) background, never pure white; one accent only, ink blue (`#1B365D`); all else warm gray with a yellow-brown undertone, no other colors; thin single-line geometric strokes and simple flat icons; no gradients, drop shadows, or 3D; serif labels; generous whitespace, composed like a figure in a well-typeset report.
+Brief: warm parchment (`#f5f4ed`) background, never pure white; one accent only, ink blue (`#1B365D`); all else warm gray with a yellow-brown undertone, no other colors; thin single-line geometric strokes and simple flat icons; no gradients, drop shadows, or 3D; serif labels; generous whitespace, composed like a figure in a well-typeset report. Full brief skeleton, icon rules, and QC checklist: `references/diagrams.md` «Illustration briefs».
+
+Switch to this path (instead of enlarging a hand-assembled SVG) when a figure needs more detail than SVG assembly holds at the target display width, typically web-article figures at teaching depth (see `references/diagrams.md` density tiers). When one deliverable needs several generated images, drive them through a single handoff file: one line per image (slot, aspect ratio, shared style anchor, prompt, status), generate in batches of at most 5, update the status column after each batch, and check existing generated output before regenerating. The style anchor is shared by the whole batch; per-image style drift is the failure mode.
 
 ## Step 2.1 · Source and material pass
 
@@ -240,24 +201,9 @@ Use `OK`, `MISSING`, or `not required`. If a required item is missing and no use
 
 ## Step 2.5 · Distill raw content (if applicable)
 
-**Auto-detect whether to distill.** Do not ask the user; judge from the input:
+**Auto-detect whether to distill.** Do not ask the user; judge from the input. Skip distill only when the content already maps one-to-one onto the template's sections with quantified metrics in place, or the user said "use as-is" / "直接用这个". When in doubt, run distill. Distill is cheap; rebuilding a misaligned doc is not.
 
-| Skip distill (fill directly) | Run distill |
-|---|---|
-| Content has explicit section labels matching template structure | Raw prose without section structure |
-| Metrics already quantified with units in place | Numbers scattered or implied, not extracted |
-| User wrote "use this as-is" / "直接用这个" / "原封不动" | User pasted multi-source dump (chat / email thread / multiple docs) |
-| Content count matches template (e.g. 4 metrics for 4 metric cards) | Content count mismatches template (too many or too few items) |
-| One coherent voice with consistent claims | Conflicting claims or duplicate facts across sources |
-
-When in doubt, run distill. Distill is cheap; rebuilding a misaligned doc is not.
-
-When the user hands over **raw material** (meeting notes, brain dump, existing doc in different format, chat transcript, scattered points):
-
-1. **Extract**: pull out every factual claim, number, date, name, source, material reference, and action item
-2. **Classify**: map each extract to the target template's sections (see `references/writing.md` for section structure per doc type)
-3. **Gap-check**: list what the template needs but the raw content doesn't have - include missing facts, missing proof, and missing materials
-4. **Ask once**: share the gap table with the user. Do not guess to fill gaps.
+Distill acceptance: every factual claim, number, date, name, source, and material reference from the raw input must land either in a template section (per-doc structure in `references/writing.md`) or in a gap table of what the template needs but the content lacks. Share the gap table once; never guess to fill a gap.
 
 Example gap-check:
 
@@ -268,6 +214,28 @@ Example gap-check:
 | Materials | logo file provided | product screenshot source |
 
 Then proceed to Step 2.6 (slides) or the layout note (all other doc types) with structured, distilled content.
+
+### Persist the distilled content as a content IR (new documents)
+
+When building a new document (not a text tweak on an existing one), write the distilled result to a `content.json` next to your working HTML before filling:
+
+```json
+{"type": "resume", "lang": "cn", "content": { ... }}
+```
+
+`type` is one of the schema names in `references/schemas/` (one-pager, letter, resume, long-doc, portfolio, slides, equity-report, changelog, landing-page). Read the matching schema before writing: its `$comment` notes carry the per-field quality bar. Then validate before any layout work:
+
+```bash
+python3 scripts/build.py --check-content content.json
+```
+
+Fix schema errors by fixing the content (or asking the user for the missing fact), not by loosening structure. After filling the template, re-run with the filled HTML to confirm no fact was dropped on the way in:
+
+```bash
+python3 scripts/build.py --check-content content.json filled.html
+```
+
+Values longer than 80 characters are treated as prose you may rephrase; short atomic values (names, metrics, dates, bullets) must survive verbatim.
 
 ## Step 2.6 · Deck pre-flight (slides only)
 
@@ -353,7 +321,7 @@ Pick the tier that matches the task. Default to the lowest tier that covers the 
 |---|---|---|
 | **Content-only** | Updating text, swapping bullets, translating an existing doc. CSS stays untouched. | `CHEATSHEET.md` only |
 | **Layout tweak** | Adjusting spacing, moving sections, changing font size within spec. CSS touched. | `CHEATSHEET.md` + template (tokens already inline) |
-| **New document** | Building from scratch or from raw content. | Full design spec + writing spec + template |
+| **New document** | Building from scratch or from raw content. | Full design spec + writing spec + template + `references/schemas/<type>.json` |
 | **Resume content** | Resume-specific bullet structure, project framing, scope-result-outcome rules. | `resume-writing.md` + template |
 | **Sources / materials** | Company, product, market, launch, funding, specs, or branded subject. | `writing.md` source rules + user/source material |
 | **Deck (>20 slides)** | Long presentation needing Part Divider, Code Cards, section headers. | Full design spec + Deck Recipe (design.md section 8) |
@@ -374,20 +342,18 @@ The full spec files for reference:
 ## Step 4 · Fill content into the template
 
 - Copy the template into your working directory; don't write HTML from scratch
-- **CSS stays untouched**, only edit the body
+- **CSS stays untouched during content fill.** Layout adjustments go through the Layout-tweak tier (Step 3) and stay within spec; any real style change syncs `references/design.md` and the sibling templates, never a single file
 - Content follows `writing.md`: data over adjectives, distinctive phrasing over industry clichés
 - Avoid patterns listed in `references/anti-patterns.md`: emptiness, fabrication, mimicry, excess, source gaps, tone contamination
 - **Before filling, read the quality bar for your document type** in `writing.md` section "Quality bars by document type". Structure is necessary but not sufficient: a resume bullet needs Action + Scope + Result + Business Outcome; an equity report needs variant perception + quantified catalysts; slides need assertion-evidence titles. Meeting the quality bar is as important as filling every placeholder.
 
 ### Do not generate
 
-These are the most common AI document failures. Cross-reference `references/anti-patterns.md` for the full list.
+These are the most common AI document failures. Cross-reference `references/anti-patterns.md` for the full list; `--check-placeholders` catches leftover template tokens mechanically.
 
-- Do not leave placeholder text in the final document ("Lorem ipsum", "[Insert here]", "TBD")
 - Do not invent metrics, financial data, or statistics; mark gaps with `[DATA NEEDED: description]`
 - Do not use stock-image descriptions as image placeholders ("A diverse team collaborating in a modern office")
 - Do not pad content to fill template slots (a resume with 3 real projects does not need 5 fabricated ones)
-- Do not write a paragraph that merely restates its own heading in sentence form
 
 ### Fill PDF metadata (WeasyPrint reads these into the PDF)
 
@@ -479,19 +445,32 @@ python3 scripts/build.py landing-page        # screen-first static HTML template
 python3 scripts/build.py --verify slides    # single slide deck verification
 python3 scripts/build.py --check-placeholders path/to/filled.html
 python3 scripts/build.py --check-markdown path/to/filled.pdf
+python3 scripts/build.py --check-content content.json path/to/filled.html
+python3 scripts/build.py --check-visual path/to/filled.pdf
 python3 scripts/build.py --check-resume-balance path/to/resume.pdf
 python3 scripts/build.py --check-density              # page whitespace scanner (skips cover)
 python3 scripts/build.py --check            # lint + token/theme + public-site fact checks
 python3 scripts/build_metadata.py --check   # Claude/Codex plugin mirror + marketplace drift check
 ```
 
-> **Screen verify**: `--check-density` is a print gate. For screen output (landing or docs pages) instead screenshot the rendered page at 375px and 1280px in every locale and scan for line widows before shipping. See `references/design.md` Section 11 «Responsive screenshot verification».
+> **Screen verify**: `--check-density` is a print gate. For ANY browser-delivered surface (landing page, docs page, dashboard, testimonial wall, article index), screenshotting the rendered page at 375px and 1280px in every locale is a hard step before declaring done, not an on-request extra: scan for line widows, sparse blocks, and single-line-surface wraps, and report the result. Do not wait for the user to ask "does it work on mobile". See `references/design.md` Section 11 «Responsive screenshot verification».
+
+> **Perceptual verify (PDF deliverables)**: geometry checks cannot see a fallback glyph or an arrow crossing a label. Before shipping a filled PDF, run `python3 scripts/build.py --check-visual path/to/filled.pdf`, then view every exported page image against the printed checklist. One hit means a whole-document sweep for that class of issue. If your host cannot view images, send the image paths and checklist to the user instead of skipping the pass.
 
 Source templates intentionally keep `{{...}}` fields. Run placeholder checks on completed documents, not on the template library.
 
 For Markdown-sourced long documents, also run `--check-markdown` on the rendered PDF. It catches visible raw `---`, `**bold**`, and inline-code backticks that should have been converted or removed before delivery.
 
 Visual anomalies (tag double rectangle, font fallback, page break issues) -> `production.md` Part 4.
+
+### Definition of done
+
+A task is done when the user receives, in the closing message:
+
+1. The path of every deliverable, in every promised format (Step 4.5).
+2. Which checks ran and their results, including the page-count contract.
+3. Every remaining `[DATA NEEDED]` gap, listed explicitly. Never declare done with an unreported gap.
+4. The visual verdict, stated honestly by surface: for PDFs the `--check-visual` pass status; for screen surfaces the 375px/1280px screenshot result; when rendering could not be inspected, say "build verified, visuals unconfirmed", not "done".
 
 ### Maintainer-mode checks
 
@@ -538,19 +517,13 @@ It downloads to the XDG user font dir (`${XDG_DATA_HOME:-~/.local/share}/fonts/k
 
 ## Feedback protocol
 
-When the user gives **vague visual feedback** ("looks off", "太挤了", "not elegant"), do not guess. Ask back with current values:
-
-| User says | Ask about |
-|---|---|
-| "太挤了" / "too cramped" | Which element? Line-height (current: X)? Padding (current: Y)? Page margin? |
-| "太松了" / "too loose" | Same direction, reversed |
-| "颜色不对" / "color feels wrong" | Which element? Brand blue overused? A gray reading too cool? |
-| "不够好看" / "not polished" | Font rendering? Alignment? Whitespace distribution? Hierarchy unclear? |
-| "看着不专业" / "unprofessional" | Content wording? Or layout (alignment, consistency)? |
+When the user gives **vague visual feedback** ("looks off", "太挤了", "not elegant"), do not guess. Ask back naming the element and its current value, offering 2 in-spec alternatives.
 
 Template response: "X is currently set to Y. Would you like (a) [specific alternative within spec] or (b) [another option]?"
 
 Never say "I'll adjust the spacing" without naming the exact property and its new value.
+
+**Escalate after two rounds.** If the same element is still not approved after two adjustment rounds, stop nudging values: produce one comparison artifact instead: the current state plus 2-3 labeled variants (A/B/C) of the same content in the same frame, and let the user pick. For choices with no objective criterion (typeface, accent color, logo), skip the nudging entirely and start with a specimen sheet: up to 5 candidates, each a labeled half-page block of identical title-plus-paragraph content. One round of "pick one" converges where five rounds of "try again" do not; after the pick, apply it everywhere and rebuild affected demos in the same round.
 
 ---
 

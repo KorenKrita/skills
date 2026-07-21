@@ -17,5 +17,8 @@
   "orphan": {
     "max_words": 2,
     "max_chars": 15
+  },
+  "visual": {
+    "dpi": 110
   }
 }

@@ -2,11 +2,14 @@
 """kami build & check
 
 Thin CLI shell. Implementation lives in:
+  - render.py  (render_pdf, build_slides, PDF metadata)
   - lint.py    (scan_file, check_all, check_cross_template_consistency)
   - tokens.py  (sync_check)
   - site_facts.py (check_site_facts)
-  - verify.py  (verify_target, verify_all, show_fonts, font checks)
+  - verify.py  (verify_all, show_fonts, font checks)
   - checks.py  (check_placeholders, check_markdown_residue, check_orphans, check_density, check_resume_balance, check_rhythm)
+  - content.py (check_content)
+  - visual.py  (check_visual)
 
 Usage:
     python3 scripts/build.py                      # build all examples (HTML + diagrams + PPTX)
@@ -26,44 +29,16 @@ Usage:
     python3 scripts/build.py --check-resume-balance path/to/resume.pdf
     python3 scripts/build.py --check-rhythm       # warn on monotonous slide sequences
     python3 scripts/build.py --check-rhythm slides slides-en
+    python3 scripts/build.py --check-content content.json            # content IR schema validation
+    python3 scripts/build.py --check-content content.json filled.html # + coverage into the document
+    python3 scripts/build.py --check-visual path/to/doc.pdf          # page PNGs + perceptual checklist
 """
 from __future__ import annotations
 
-import functools
-import os
-import subprocess
 import sys
 from pathlib import Path
 
-from highlight import highlight_code_blocks
-from optional_deps import (
-    MissingDepError,
-    require_pypdf_reader,
-    require_pypdf_writer,
-    require_weasyprint_html,
-)
-from shared import (
-    DIAGRAMS,
-    EXAMPLES,
-    TEMPLATES,
-    build_targets,
-    diagram_targets,
-    screen_targets,
-)
-
-# Implementation modules (also re-exported for tests / external callers).
-from checks import (  # noqa: F401  re-exported for test_build.py
-    _BG_B,
-    _BG_G,
-    _BG_R,
-    _density_bucket,
-    _last_content_y,
-    _markdown_residue_issues,
-    _orphan_last_line,
-    _parse_slide_sequence,
-    _resume_balance_issues,
-    _rhythm_issues,
-    _scan_density,
+from checks import (
     check_density,
     check_markdown_residue,
     check_orphans,
@@ -71,174 +46,57 @@ from checks import (  # noqa: F401  re-exported for test_build.py
     check_resume_balance,
     check_rhythm,
 )
-from lint import (  # noqa: F401  re-exported for test_build.py
-    _extract_root_vars,
-    _off_palette_findings,
-    _pair_names,
-    _root_token_findings,
+from content import check_content
+from lint import (
     check_all,
     check_cross_template_consistency,
     check_off_palette,
     scan_file,
 )
+from optional_deps import MissingDepError
+from render import build_slides, render_pdf
+from shared import (
+    DIAGRAMS,
+    EXAMPLES,
+    TEMPLATES,
+    build_targets,
+    diagram_targets,
+    pptx_targets,
+    screen_targets,
+)
 from site_facts import check_site_facts
 from tokens import sync_check
-from verify import (
-    show_fonts,
-    verify_all,
-)
+from verify import show_fonts, verify_all
+from visual import check_visual
 
 # name -> (source, max_pages). max_pages=0 means no hard check.
-# Sourced from shared.HTML_TEMPLATES (single source of truth for targets).
+# All four dicts derive from the shared registries (single source of truth).
 HTML_TARGETS: dict[str, tuple[str, int]] = build_targets()
 SCREEN_TARGETS: dict[str, str] = screen_targets()
-PPTX_TARGETS: dict[str, str] = {
-    "slides":    "slides.py",
-    "slides-en": "slides-en.py",
-}
-
-# Diagram HTMLs live in a separate directory and have no page-count contract.
-# Registry lives in shared.DIAGRAM_TEMPLATES (single home for all template lists).
+PPTX_TARGETS: dict[str, str] = pptx_targets()
 DIAGRAM_TARGETS: dict[str, str] = diagram_targets()
-
-
-# ------------------------- build helpers -------------------------
-
-@functools.lru_cache(maxsize=1)
-def infer_author() -> str:
-    """Infer author name from git config or environment.
-
-    Priority:
-    1. git config user.name
-    2. KAMI_AUTHOR env var
-    3. fallback to "Kami"
-
-    Cached so a full build doesn't shell out for every PDF target.
-    """
-    try:
-        result = subprocess.run(
-            ["git", "config", "user.name"],
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        if result.returncode == 0 and result.stdout.strip():
-            return result.stdout.strip()
-    except FileNotFoundError:
-        pass
-
-    if env_author := os.environ.get("KAMI_AUTHOR"):
-        return env_author
-
-    return "Kami"
-
-
-def set_pdf_metadata(pdf_path: Path, author: str | None = None) -> None:
-    """Set PDF metadata using pypdf, only if placeholders are still present."""
-    try:
-        PdfReader = require_pypdf_reader()
-        PdfWriter = require_pypdf_writer()
-    except MissingDepError:
-        return
-
-    if not pdf_path.exists():
-        return
-
-    reader = PdfReader(str(pdf_path))
-
-    existing = reader.metadata or {}
-    needs_update = False
-    metadata = dict(existing)
-
-    if author and existing.get("/Author"):
-        author_value = str(existing["/Author"])
-        if "{{" in author_value and "}}" in author_value:
-            metadata["/Author"] = author
-            needs_update = True
-
-    if metadata.get("/Producer") != "Kami":
-        metadata["/Producer"] = "Kami"
-        needs_update = True
-    if metadata.get("/Creator") != "Kami":
-        metadata["/Creator"] = "Kami"
-        needs_update = True
-
-    if not needs_update:
-        return
-
-    writer = PdfWriter()
-    for page in reader.pages:
-        writer.add_page(page)
-
-    writer.add_metadata(metadata)
-
-    with open(pdf_path, "wb") as f:
-        writer.write(f)
 
 
 # ------------------------- build -------------------------
 
 def build_html(name: str, source: str, max_pages: int,
                src_dir: Path = TEMPLATES) -> bool:
-    try:
-        HTML = require_weasyprint_html()
-        PdfReader = require_pypdf_reader()
-    except MissingDepError as exc:
-        print(f"ERROR: {exc}")
-        return False
-
     src = src_dir / source
     if not src.exists():
         print(f"ERROR: {name}: source not found ({src})")
         return False
 
-    EXAMPLES.mkdir(parents=True, exist_ok=True)
-    out = EXAMPLES / f"{name}.pdf"
+    try:
+        n = render_pdf(src, EXAMPLES / f"{name}.pdf")
+    except MissingDepError as exc:
+        print(f"ERROR: {exc}")
+        return False
 
-    html_text = src.read_text(encoding="utf-8")
-    html_text = highlight_code_blocks(html_text)
-    HTML(string=html_text, base_url=str(src.parent)).write_pdf(str(out))
-
-    set_pdf_metadata(out, author=infer_author())
-
-    n = len(PdfReader(str(out)).pages)
-    msg = f"OK: {name}: {n} pages"
     if max_pages and n > max_pages:
-        msg = f"ERROR: {name}: {n} pages (limit {max_pages})"
-        print(msg)
+        print(f"ERROR: {name}: {n} pages (limit {max_pages})")
         return False
-    print(msg)
+    print(f"OK: {name}: {n} pages")
     return True
-
-
-def build_slides(name: str = "slides") -> bool:
-    source = PPTX_TARGETS.get(name)
-    if source is None:
-        print(f"ERROR: {name}: unknown slides target")
-        return False
-    src = TEMPLATES / source
-    if not src.exists():
-        print(f"ERROR: {name}: source not found ({src})")
-        return False
-
-    EXAMPLES.mkdir(parents=True, exist_ok=True)
-    out = EXAMPLES / f"{name}.pptx"
-    # Pass --out so the slides script writes directly to the target path. Older
-    # slides.py defaults to 'output.pptx' in cwd; new copies accept --out.
-    result = subprocess.run(
-        [sys.executable, str(src), "--out", str(out)],
-        cwd=str(src.parent),
-        capture_output=True,
-        text=True,
-    )
-    if result.returncode != 0:
-        print(f"ERROR: {name}: {result.stderr.strip() or 'script failed'}")
-        return False
-    if out.exists():
-        print(f"OK: {name}: generated {out.name}")
-        return True
-    print(f"ERROR: {name}: {out.name} not produced")
-    return False
 
 
 def build_screen_template(name: str, source: str) -> bool:
@@ -294,27 +152,6 @@ def build_single(name: str) -> int:
     return 2
 
 
-# ------------------------- verify glue -------------------------
-
-def verify_slides_target(name: str) -> list[str]:
-    return [] if build_slides(name) else ["slides build failed"]
-
-
-def _verify_all(target: str | None) -> int:
-    return verify_all(
-        target,
-        html_targets=HTML_TARGETS,
-        screen_targets=SCREEN_TARGETS,
-        diagram_targets=DIAGRAM_TARGETS,
-        pptx_targets=PPTX_TARGETS,
-        verify_slides_fn=verify_slides_target,
-        scan_file_fn=scan_file,
-        scan_density_fn=_scan_density,
-        infer_author_fn=infer_author,
-        set_pdf_metadata_fn=set_pdf_metadata,
-    )
-
-
 # ------------------------- entry -------------------------
 
 def _unexpected_arg(args: list[str], allowed: set[str] | None = None) -> str | None:
@@ -362,7 +199,7 @@ def main(argv: list[str]) -> int:
         if len(args) == 2 and args[1].startswith("-"):
             return _error_unexpected(args[1])
         target = args[1] if len(args) > 1 else None
-        return _verify_all(target)
+        return verify_all(target)
     # Path-taking check subcommands share one guard + dispatch table.
     path_checks = {
         "--check-orphans": check_orphans,
@@ -370,6 +207,8 @@ def main(argv: list[str]) -> int:
         "--check-resume-balance": check_resume_balance,
         "--check-placeholders": check_placeholders,
         "--check-markdown": check_markdown_residue,
+        "--check-content": check_content,
+        "--check-visual": check_visual,
     }
     handler = path_checks.get(args[0])
     if handler is not None:
@@ -382,7 +221,7 @@ def main(argv: list[str]) -> int:
         if unexpected:
             return _error_unexpected(unexpected)
         slide_targets = [a for a in args[1:] if not a.startswith("-")]
-        return check_rhythm(slide_targets, PPTX_TARGETS, TEMPLATES)
+        return check_rhythm(slide_targets)
     if args[0].startswith("-"):
         print(f"ERROR: unknown option: {args[0]}")
         return 2

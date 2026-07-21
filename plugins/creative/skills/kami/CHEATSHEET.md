@@ -17,14 +17,7 @@ One-page quick reference. Scan before filling a template or tweaking a detail. F
 
 ## Sources and Materials
 
-
-| Trigger                                                   | Do first                                                            |
-| --------------------------------------------------------- | ------------------------------------------------------------------- |
-| Latest product / version / launch / funding / market data | Check reliable sources first                                        |
-| Company / product / project branded doc                   | Confirm logo, product image, or UI screenshot                       |
-| Key number or result                                      | Record the source; if unverifiable, write magnitude or mark missing |
-| Missing material                                          | Mark the gap or ask the user; do not use unrelated imagery          |
-
+Full pass in SKILL.md Step 2.1. The one contract worth repeating: a number you cannot verify ships as a magnitude or a marked gap, never as fake precision.
 
 ## Color
 
@@ -289,15 +282,11 @@ Alternate light/dark rhythm: add `.sd-alt` to any section container.
 
 ## Verification checks
 
-`python3 scripts/build.py --verify [target]` checks source templates and slides in sequence:
-
-1. Source file exists
-2. WeasyPrint render to PDF for HTML / diagram targets
-3. Page count check for strict targets
-4. Font embedding check
-5. PPTX generation for `slides` / `slides-en`
+`python3 scripts/build.py --verify [target]` covers render, page count, font embedding, and PPTX generation for source templates and slides.
 
 Source templates intentionally keep `{{...}}` fields. Run `python3 scripts/build.py --check-placeholders path/to/filled.html` on completed documents. Run `python3 scripts/build.py --check-density` to warn on pages with >25% trailing whitespace (skips cover).
+
+For new documents built from raw material, validate the content IR before layout and re-check coverage after filling: `python3 scripts/build.py --check-content content.json [filled.html]` (schemas in `references/schemas/`). Before shipping a filled PDF, run `python3 scripts/build.py --check-visual path/to/filled.pdf` and view every exported page image against the printed checklist.
 
 Marp variant deck (opt-in): `assets/templates/marp/`. Render with local `marp-cli`. See design.md §8 + production.md Part 2.5.
 
