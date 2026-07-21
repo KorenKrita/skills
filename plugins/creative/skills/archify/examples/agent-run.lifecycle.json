@@ -5,7 +5,14 @@
     "title": "Agent Run Lifecycle",
     "subtitle": "State machine for planning, tool execution, human approval, retries, and terminal outcomes",
     "output": "examples/lifecycle-agent-run.html",
-    "viewBox": [980, 660]
+    "viewBox": [980, 660],
+    "animation": "trace",
+    "quality_profile": "showcase",
+    "views": [
+      { "id": "main-lifecycle", "label": "Main lifecycle", "focus": ["queued", "planning", "executing", "reviewing", "completed"], "note": "Follow the ordered phases from accepted request to completed response." },
+      { "id": "human-waits", "label": "Human and input waits", "focus": ["executing", "approval", "reviewing", "blocked"], "note": "See where the run pauses without becoming terminal." },
+      { "id": "recovery-and-exits", "label": "Recovery and terminal exits", "focus": ["executing", "failed", "blocked", "cancelled", "expired"], "note": "Separate retryable failure from cancellation and expiry." }
+    ]
   },
   "lanes": [
     { "id": "main", "label": "Lifecycle phases" },
@@ -26,11 +33,11 @@
     { "id": "expired", "type": "failure", "label": "Expired", "sublabel": "timeout", "lane": "terminal", "col": 1, "tag": "terminal" }
   ],
   "transitions": [
-    { "from": "executing", "to": "approval", "variant": "security", "fromSide": "bottom", "toSide": "top", "route": "straight" },
-    { "from": "reviewing", "to": "blocked", "variant": "default", "route": "drop" },
-    { "from": "executing", "to": "failed", "variant": "security", "fromSide": "left", "toSide": "top", "via": [[340, 342], [402, 342]] },
-    { "from": "blocked", "to": "expired", "variant": "security", "fromSide": "bottom", "toSide": "top", "route": "straight" },
-    { "from": "approval", "to": "cancelled", "variant": "security", "fromSide": "bottom", "toSide": "top", "route": "straight" }
+    { "id": "approval-needed", "from": "executing", "to": "approval", "variant": "security", "fromSide": "bottom", "toSide": "top", "route": "straight" },
+    { "id": "review-blocked", "from": "reviewing", "to": "blocked", "variant": "default", "route": "drop" },
+    { "id": "execution-failed", "from": "executing", "to": "failed", "variant": "security", "fromSide": "left", "toSide": "left", "via": [[320, 157], [320, 385]] },
+    { "id": "block-expired", "from": "blocked", "to": "expired", "variant": "security", "fromSide": "bottom", "toSide": "top", "route": "straight" },
+    { "id": "approval-cancelled", "from": "approval", "to": "cancelled", "variant": "security", "fromSide": "bottom", "toSide": "top", "via": [[480, 336], [480, 432], [402, 432]] }
   ],
   "cards": [
     {
