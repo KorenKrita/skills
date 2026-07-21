@@ -37,7 +37,7 @@
     },
     {
       "name": "creative",
-      "version": "0.0.6",
+      "version": "0.0.7",
       "source": "./plugins/creative",
       "description": "UI/Web 设计、中文写作优化、文档排版与小黑插画",
       "strict": false,
