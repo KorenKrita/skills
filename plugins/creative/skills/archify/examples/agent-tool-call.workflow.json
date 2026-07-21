@@ -4,6 +4,29 @@
   "meta": {
     "title": "Agent Tool Call Workflow",
     "subtitle": "Renderer-driven workflow prototype with lanes, anchored nodes, and orthogonal edges",
+    "animation": "trace",
+    "visual_preset": "signal-flow",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "happy-path",
+        "label": "Request to result",
+        "focus": ["user", "chat", "planner", "router", "approval", "tool", "external", "final"],
+        "note": "Follow the successful request from user intent to the final reply."
+      },
+      {
+        "id": "safety-gate",
+        "label": "Policy and recovery",
+        "focus": ["router", "approval", "blocked", "retry"],
+        "note": "See where risky work stops, waits for consent, or returns for revision."
+      },
+      {
+        "id": "evidence-loop",
+        "label": "Evidence and memory",
+        "focus": ["external", "store", "trace"],
+        "note": "Isolate the durable trace and context path behind the visible answer."
+      }
+    ],
     "output": "examples/workflow-agent-tool-call-rendered.html",
     "viewBox": [720, 900]
   },
@@ -41,17 +64,17 @@
     { "id": "trace", "lane": "trace", "col": 4, "type": "database", "label": "Trace Log", "sublabel": "events + output" }
   ],
   "edges": [
-    { "from": "user", "to": "chat", "variant": "default" },
-    { "from": "chat", "to": "planner", "label": "plan", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "route": "drop", "labelSegment": 1 },
-    { "from": "planner", "to": "router", "variant": "default" },
-    { "from": "router", "to": "approval", "label": "needs approval?", "variant": "security", "fromSide": "bottom", "toSide": "top", "route": "drop", "labelSegment": 0, "labelDx": 34, "labelDy": 18 },
-    { "from": "approval", "to": "tool", "variant": "emphasis", "fromSide": "left", "toSide": "left", "route": "return-left" },
-    { "from": "approval", "to": "blocked", "label": "denied", "variant": "security", "role": "error", "fromSide": "bottom", "toSide": "top", "route": "drop", "labelSegment": 1, "labelDy": 12 },
-    { "from": "blocked", "to": "retry", "variant": "dashed", "role": "branch" },
-    { "from": "tool", "to": "external", "variant": "default" },
-    { "from": "external", "to": "final", "variant": "emphasis", "role": "return", "fromSide": "right", "toSide": "right", "route": "outside-right", "width": 1.2 },
-    { "from": "external", "to": "trace", "label": "record result", "variant": "dashed", "fromSide": "bottom", "toSide": "bottom", "route": "bottom-channel", "labelSegment": 1 },
-    { "from": "store", "to": "trace", "label": "trace + memory", "variant": "dashed", "labelAt": [365, 735] }
+    { "id": "request-chat", "from": "user", "to": "chat", "variant": "default" },
+    { "id": "plan-request", "from": "chat", "to": "planner", "label": "plan", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "route": "drop", "labelSegment": 1 },
+    { "id": "planner-route", "from": "planner", "to": "router", "variant": "default" },
+    { "id": "approval-check", "from": "router", "to": "approval", "label": "needs approval?", "variant": "security", "fromSide": "bottom", "toSide": "top", "route": "drop", "labelSegment": 0, "labelDx": 34, "labelDy": 18 },
+    { "id": "approved-tool", "from": "approval", "to": "tool", "variant": "emphasis", "fromSide": "left", "toSide": "left", "route": "return-left" },
+    { "id": "approval-denied", "from": "approval", "to": "blocked", "label": "denied", "variant": "security", "role": "error", "fromSide": "bottom", "toSide": "top", "route": "drop", "labelSegment": 1, "labelDy": 12 },
+    { "id": "retry-request", "from": "blocked", "to": "retry", "variant": "dashed", "role": "branch" },
+    { "id": "tool-external-call", "from": "tool", "to": "external", "variant": "default" },
+    { "id": "external-reply", "from": "external", "to": "final", "variant": "emphasis", "role": "return", "fromSide": "right", "toSide": "right", "route": "outside-right", "width": 1.2 },
+    { "id": "record-result", "from": "external", "to": "trace", "label": "record result", "variant": "dashed", "fromSide": "bottom", "toSide": "bottom", "route": "bottom-channel", "labelSegment": 1 },
+    { "id": "write-trace-memory", "from": "store", "to": "trace", "label": "trace + memory", "variant": "dashed", "labelAt": [365, 735] }
   ],
   "cards": [
     {
