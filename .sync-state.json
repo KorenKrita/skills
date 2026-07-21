@@ -203,7 +203,7 @@
     ]
   },
   "ocr": {
-    "sha": "a4a281c1f5925bfd53c7076afc8feb48cb4d171a",
+    "sha": "389a6e3fa3e19710d6623a213c91dc6fd72808ee",
     "files": [
       "SKILL.md"
     ]
@@ -284,10 +284,10 @@
     ]
   },
   "i-have-adhd": {
-    "sha": "72c33eee81ea439cf01991e93729adfce2ffc99e",
+    "sha": "559f8e041dc92de0c47032a8a9289cea2ef5496b",
     "files": [
-      "agents/openai.yaml",
-      "SKILL.md"
+      "SKILL.md",
+      "agents/openai.yaml"
     ]
   },
   "ui": {
@@ -437,7 +437,7 @@
     ]
   },
   "archify": {
-    "sha": "ed0efcc763d358b78df845182b5ed24a9d165a1c",
+    "sha": "6707ddeadb9042606c1687e8d6b79a85049689ef",
     "files": [
       "LICENSE",
       "SKILL.md",
@@ -445,11 +445,23 @@
       "bin/archify.mjs",
       "examples/agent-run.lifecycle.json",
       "examples/agent-tool-call.workflow.json",
+      "examples/async-job-roundtrip.sequence.json",
       "examples/cache-miss-request.sequence.json",
+      "examples/dataflow-product-analytics.html",
+      "examples/deployment-release.lifecycle.json",
+      "examples/event-stream.dataflow.json",
+      "examples/incident-response.workflow.json",
+      "examples/lifecycle-agent-run.html",
       "examples/product-analytics.dataflow.json",
+      "examples/production-deployment.architecture.json",
+      "examples/release-delivery.workflow.json",
+      "examples/sequence-cache-miss-request.html",
+      "examples/web-app-rendered.html",
       "examples/web-app.architecture.json",
+      "examples/workflow-agent-tool-call-rendered.html",
       "package-lock.json",
       "package.json",
+      "recipes/scenarios.mjs",
       "renderers/architecture/grid.mjs",
       "renderers/architecture/render-architecture.mjs",
       "renderers/dataflow/README.md",
@@ -477,14 +489,58 @@
       "scripts/generate-validators.mjs",
       "scripts/render-examples.mjs",
       "test/animation.test.mjs",
+      "test/chapter-delta-preview.test.mjs",
+      "test/chapter-handoff.test.mjs",
+      "test/chapter-rail.test.mjs",
       "test/cli.test.mjs",
       "test/degraded.test.mjs",
+      "test/diagram-guide.test.mjs",
+      "test/finder.test.mjs",
+      "test/fixtures/v1-baseline/agent-run.lifecycle.json",
+      "test/fixtures/v1-baseline/agent-tool-call.workflow.json",
+      "test/fixtures/v1-baseline/cache-miss-request.sequence.json",
+      "test/fixtures/v1-baseline/product-analytics.dataflow.json",
+      "test/fixtures/v1-baseline/web-app.architecture.json",
+      "test/gallery.test.mjs",
       "test/generate-validators.test.mjs",
       "test/geometry.test.mjs",
       "test/golden.mjs",
       "test/grid.test.mjs",
+      "test/guide-page.test.mjs",
+      "test/guide.test.mjs",
+      "test/guided-views.test.mjs",
+      "test/intent-trace.test.mjs",
+      "test/landing.test.mjs",
       "test/layout-rules.test.mjs",
-      "test/render-output-checks.test.mjs"
+      "test/motion-governor.test.mjs",
+      "test/presentation.test.mjs",
+      "test/proof-aperture.test.mjs",
+      "test/readme-showcase.test.mjs",
+      "test/relationship-direct-explorer.test.mjs",
+      "test/relationship-lens.test.mjs",
+      "test/relationship-permalink.test.mjs",
+      "test/relationship-pulse.test.mjs",
+      "test/render-output-checks.test.mjs",
+      "test/route-journey.test.mjs",
+      "test/route-probe.test.mjs",
+      "test/semantic-camera.test.mjs",
+      "test/semantic-flow.test.mjs",
+      "test/semantic-legend-gateway.test.mjs",
+      "test/semantic-lens.test.mjs",
+      "test/semantic-passport.test.mjs",
+      "test/semantic-radar.test.mjs",
+      "test/semantic-zoom.test.mjs",
+      "test/settled-flow.test.mjs",
+      "test/story-beat-navigator.test.mjs",
+      "test/story-carrier.test.mjs",
+      "test/story-director-strip.test.mjs",
+      "test/story-follow-camera.test.mjs",
+      "test/story-horizon.test.mjs",
+      "test/story-moment-link.test.mjs",
+      "test/story-shelf.test.mjs",
+      "test/story-trail.test.mjs",
+      "test/v1-compatibility.test.mjs",
+      "test/webm-artifact.smoke.mjs"
     ]
   },
   "kami": {
