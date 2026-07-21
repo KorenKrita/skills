@@ -378,8 +378,8 @@ skills:
     exclude_files:
       - scripts/check-update.sh
 
-  nopua:
-    source: { repo: wuji-labs/nopua, path: skills/nopua, ref: main }
+  pua:
+    source: { repo: tanweai/pua, path: skills/pua, ref: main }
     plugin: plus
     patches: []
 

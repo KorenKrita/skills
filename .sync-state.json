@@ -262,10 +262,39 @@
       "scripts/fetch_weixin.py"
     ]
   },
-  "nopua": {
-    "sha": "bf4b2b6c1a509375c499fb2fb6454e9afd08913d",
+  "pua": {
+    "sha": "3fd4e5a1cb7a40938113b66febae532ba36f350a",
     "files": [
-      "SKILL.md"
+      "SKILL.md",
+      "references/agent-team.md",
+      "references/de-escalation-protocol.md",
+      "references/ding-reminders.md",
+      "references/display-protocol.md",
+      "references/evolution-protocol.md",
+      "references/flavors.md",
+      "references/harness-governance.md",
+      "references/methodology-alibaba.md",
+      "references/methodology-amazon.md",
+      "references/methodology-apple.md",
+      "references/methodology-baidu.md",
+      "references/methodology-bytedance.md",
+      "references/methodology-ding.md",
+      "references/methodology-huawei.md",
+      "references/methodology-jd.md",
+      "references/methodology-meituan.md",
+      "references/methodology-microsoft.md",
+      "references/methodology-netflix.md",
+      "references/methodology-pinduoduo.md",
+      "references/methodology-router.md",
+      "references/methodology-tencent.md",
+      "references/methodology-tesla.md",
+      "references/methodology-xiaomi.md",
+      "references/p10-protocol.md",
+      "references/p7-protocol.md",
+      "references/p9-protocol.md",
+      "references/platform.md",
+      "references/survey.md",
+      "references/teardown-protocol.md"
     ]
   },
   "goal-gen": {

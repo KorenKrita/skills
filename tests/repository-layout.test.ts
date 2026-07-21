@@ -41,7 +41,7 @@ const EXPECTED_SKILLS = {
     "i-have-adhd",
     "idea",
     "improve",
-    "nopua",
+    "pua",
     "nuclear-review",
     "ocr",
     "razor",

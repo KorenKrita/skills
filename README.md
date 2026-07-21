@@ -84,7 +84,7 @@ Pi 只加载三个 plugin 的 `skills/`；plugin-level Agent 与 Hook 仅对 Cla
 - [cursor/plugins](https://github.com/cursor/plugins)
 - [KAOPU-XiaoPu/web-design](https://github.com/KAOPU-XiaoPu/web-design)
 - [op7418/Humanizer-zh](https://github.com/op7418/Humanizer-zh)
-- [wuji-labs/nopua](https://github.com/wuji-labs/nopua)
+- [tanweai/pua](https://github.com/tanweai/pua)
 - [joeseesun/qiaomu-goal-meta-skill](https://github.com/joeseesun/qiaomu-goal-meta-skill)
 - [tt-a1i/archify](https://github.com/tt-a1i/archify)
 - [tw93/kami](https://github.com/tw93/kami)
