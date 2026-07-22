@@ -25,7 +25,7 @@ plugins:
       - goal
       - review
   creative:
-    version: 0.0.7
+    version: 0.0.8
     description: UI/Web 设计、中文写作优化、文档排版与小黑插画
     category: design
     keywords:

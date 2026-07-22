@@ -12,6 +12,8 @@ import {
   segmentIntersectsRect,
   cleanFlowProblems,
   cleanCrossingProblems,
+  collectAmbiguousCorridors,
+  cleanAmbiguousCorridorProblems,
   collectBorderRuns,
   cleanBorderRunProblems,
   collectRouteRhythmIssues,
@@ -78,7 +80,6 @@ test('cleanFlowProblems reports collection index, ids, segment, clearance, and f
     diagramType: 'architecture',
     relationCollection: 'connections',
     obstacleKind: 'component',
-    profile: 'standard',
     routeHint: 'set route/via'
   });
   assert.equal(problems.length, 1);
@@ -203,6 +204,64 @@ test('cleanCrossingProblems exempts endpoint touches and collinear corridors', (
     profile: 'showcase',
   });
   assert.deepEqual(problems, []);
+});
+
+test('ambiguous corridor gate reports unrelated collinear overlap with exact identities', () => {
+  const first = { id: 'first', from: 'a', to: 'b' };
+  const second = { id: 'second', from: 'c', to: 'd' };
+  const routes = new Map([
+    [first, { points: [[0, 20], [100, 20], [100, 80]] }],
+    [second, { points: [[40, 20], [140, 20], [140, 80]] }],
+  ]);
+  const hits = collectAmbiguousCorridors({
+    routedRelations: [first, second].map((relation, relationIndex) => ({
+      relation,
+      relationIndex,
+      points: routes.get(relation).points,
+    })),
+  });
+  assert.equal(hits.length, 1);
+  assert.equal(hits[0].overlapLength, 60);
+  assert.deepEqual(hits[0].overlapStart, [40, 20]);
+  assert.deepEqual(hits[0].overlapEnd, [100, 20]);
+
+  const problems = cleanAmbiguousCorridorProblems({
+    relations: [first, second],
+    endpointIds: new Set(['a', 'b', 'c', 'd']),
+    pathFor: (relation) => routes.get(relation),
+    diagramType: 'workflow',
+    relationCollection: 'edges',
+    profile: 'showcase',
+    routeHint: 'move a channel',
+  });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /\[composition\/ambiguous-corridor\] showcase workflow/);
+  assert.match(problems[0], /edges\[0\] id "first" "a" -> "b" shares a 60px corridor with edges\[1\] id "second" "c" -> "d"/);
+  assert.match(problems[0], /\[40, 20\] -> \[100, 20\].*move a channel/);
+});
+
+test('ambiguous corridor gate exempts shared endpoints, point touches, and overlaps below 8px', () => {
+  const routedRelations = [
+    { relation: { from: 'a', to: 'b' }, relationIndex: 0, points: [[0, 20], [100, 20]] },
+    { relation: { from: 'a', to: 'c' }, relationIndex: 1, points: [[40, 20], [140, 20]] },
+    { relation: { from: 'd', to: 'e' }, relationIndex: 2, points: [[100, 20], [100, 80]] },
+    { relation: { from: 'f', to: 'g' }, relationIndex: 3, points: [[94, 60], [101, 60]] },
+    { relation: { from: 'h', to: 'i' }, relationIndex: 4, points: [[98, 60], [110, 60]] },
+  ];
+  assert.deepEqual(collectAmbiguousCorridors({ routedRelations }), []);
+});
+
+test('ambiguous corridor gate keeps standard renderable', () => {
+  const relations = [{ from: 'a', to: 'b' }, { from: 'c', to: 'd' }];
+  const routes = [[[0, 20], [100, 20]], [[40, 20], [140, 20]]];
+  assert.deepEqual(cleanAmbiguousCorridorProblems({
+    relations,
+    endpointIds: new Set(['a', 'b', 'c', 'd']),
+    pathFor: (relation) => ({ points: routes[relations.indexOf(relation)] }),
+    diagramType: 'architecture',
+    relationCollection: 'connections',
+    profile: 'standard',
+  }), []);
 });
 
 test('cleanBorderRunProblems reports a deterministic long run on a rounded frame side', () => {
@@ -405,6 +464,16 @@ test('textUnits: ASCII=1, CJK=2, mixed sums, fullwidth supplementary=2', () => {
   assert.equal(textUnits(null), 0);
   assert.equal(textUnits('𠀀'), 2); // CJK Ext-B (supplementary plane)
   assert.equal(textUnits('🚀'), 2); // emoji
+  assert.equal(textUnits('注入提示词'), 10); // issue #14 original label
+  assert.equal(textUnits('！＠＃０１２'), 12); // fullwidth punctuation + digits
+});
+
+test('textUnits follows wide and halfwidth East Asian presentation boundaries', () => {
+  assert.equal(textUnits('あカ'), 4); // Hiragana + Katakana are wide
+  assert.equal(textUnits('ㄅㆠ'), 4); // Bopomofo + extended Bopomofo are wide
+  assert.equal(textUnits('ㄱ'), 2); // Hangul compatibility letter is wide
+  assert.equal(textUnits('︐︙'), 4); // vertical punctuation forms are wide
+  assert.equal(textUnits('ｶﾀｶﾅ'), 4); // halfwidth Katakana stays one unit per glyph
 });
 
 test('semantic sigils cover every component and lifecycle kind without literal color', () => {

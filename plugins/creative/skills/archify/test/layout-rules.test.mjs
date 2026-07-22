@@ -209,6 +209,61 @@ test('architecture: Clean Flow Gate rejects a connection through a component', (
   assert.match(stderr, /segment 0 .*2px clearance/);
 });
 
+function autoRoutePassThroughDocument(connection) {
+  return {
+    schema_version: 1,
+    diagram_type: 'architecture',
+    meta: { title: 'Auto-route pass-through regression' },
+    components: [
+      { id: 'api', type: 'backend', label: 'API', pos: [400, 280], size: [160, 76] },
+      { id: 'cache', type: 'database', label: 'Cache', pos: [645, 130], size: [130, 60] },
+      { id: 'queue', type: 'cloud', label: 'Queue', pos: [880, 130] },
+    ],
+    connections: [connection],
+  };
+}
+
+test('architecture: default auto route selects a safe orthogonal candidate around an unrelated component', () => {
+  const d = autoRoutePassThroughDocument({ from: 'api', to: 'queue', variant: 'dashed' });
+  const { code, stderr, outPath } = render('architecture', d);
+  assert.equal(code, 0, stderr);
+  const html = fs.readFileSync(outPath, 'utf8');
+  assert.match(html, /data-composition-points="560,318;560,239;880,239;880,160"/);
+});
+
+test('architecture: explicit orthogonal route remains authoritative when it crosses a component', () => {
+  const d = autoRoutePassThroughDocument({
+    from: 'api',
+    to: 'queue',
+    variant: 'dashed',
+    route: 'orthogonal-h',
+  });
+  const { code, stderr } = render('architecture', d);
+  assert.notEqual(code, 0, `expected non-zero exit; stderr:\n${stderr}`);
+  assert.match(stderr, /connections\[0\] "api" -> "queue" crosses component "cache"/);
+});
+
+test('architecture: auto route still fails closed when both bounded doglegs are blocked', () => {
+  const d = autoRoutePassThroughDocument({ from: 'api', to: 'queue', variant: 'dashed' });
+  d.components.push({ id: 'guard', type: 'security', label: 'Guard', pos: [790, 215], size: [60, 50] });
+  const { code, stderr } = render('architecture', d);
+  assert.notEqual(code, 0, `expected non-zero exit; stderr:\n${stderr}`);
+  assert.match(stderr, /connections\[0\] "api" -> "queue" crosses component "cache"/);
+});
+
+test('architecture: explicit waypoints around an obstacle remain valid by default', () => {
+  const d = autoRoutePassThroughDocument({
+    from: 'api',
+    to: 'queue',
+    variant: 'dashed',
+    fromSide: 'right',
+    toSide: 'top',
+    via: [[620, 318], [620, 100], [940, 100]],
+  });
+  const { code, stderr } = render('architecture', d);
+  assert.equal(code, 0, stderr);
+});
+
 test('architecture: showcase rejects an unrelated proper edge crossing', () => {
   const d = {
     schema_version: 1,
@@ -252,6 +307,38 @@ test('architecture: standard keeps the same proper crossing renderable', () => {
     ],
   };
   const { code, stderr } = render('architecture', d);
+  assert.equal(code, 0, stderr);
+});
+
+function ambiguousCorridorDocument(profile) {
+  return {
+    schema_version: 1,
+    diagram_type: 'architecture',
+    meta: { title: 'Ambiguous corridor', quality_profile: profile },
+    components: [
+      { id: 'a', type: 'frontend', label: 'A', pos: [40, 60], size: [60, 40] },
+      { id: 'b', type: 'backend', label: 'B', pos: [400, 60], size: [60, 40] },
+      { id: 'c', type: 'database', label: 'C', pos: [120, 220], size: [60, 40] },
+      { id: 'd', type: 'external', label: 'D', pos: [480, 220], size: [60, 40] },
+    ],
+    connections: [
+      { id: 'first', from: 'a', to: 'b', fromSide: 'right', toSide: 'left', route: 'straight' },
+      { id: 'second', from: 'c', to: 'd', fromSide: 'top', toSide: 'top', via: [[150, 80], [390, 80], [390, 180], [510, 180]] },
+    ],
+  };
+}
+
+test('architecture: showcase rejects an unrelated shared route corridor', () => {
+  const { code, stderr } = render('architecture', ambiguousCorridorDocument('showcase'));
+  assert.notEqual(code, 0, `expected non-zero exit; stderr:\n${stderr}`);
+  assert.match(stderr, /\[composition\/ambiguous-corridor\] showcase architecture/);
+  assert.match(stderr, /connections\[0\] id "first" "a" -> "b" shares a 240px corridor with connections\[1\] id "second" "c" -> "d"/);
+  assert.match(stderr, /\[150, 80\] -> \[390, 80\]/);
+  assert.match(stderr, /do not visually merge/);
+});
+
+test('architecture: standard keeps an ambiguous corridor renderable for repair', () => {
+  const { code, stderr } = render('architecture', ambiguousCorridorDocument('standard'));
   assert.equal(code, 0, stderr);
 });
 
