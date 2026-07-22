@@ -1,0 +1,54 @@
+{
+  "name": "korenkrita-skills",
+  "owner": {
+    "name": "KorenKrita"
+  },
+  "description": "KorenKrita 的 Skill 订阅库",
+  "plugins": [
+    {
+      "name": "base",
+      "version": "0.0.3",
+      "source": "./plugins/base",
+      "description": "Matt Pocock active Skill 主体：规格、实现、测试、调试、审查与协作流程",
+      "strict": false,
+      "category": "engineering",
+      "keywords": [
+        "engineering",
+        "tdd",
+        "debugging",
+        "code-review",
+        "workflow"
+      ]
+    },
+    {
+      "name": "plus",
+      "version": "0.0.5",
+      "source": "./plugins/plus",
+      "description": "工程审计、决策方法、研究工具与 Claude Code 自动续跑",
+      "strict": false,
+      "category": "productivity",
+      "keywords": [
+        "audit",
+        "decision",
+        "research",
+        "goal",
+        "review"
+      ]
+    },
+    {
+      "name": "creative",
+      "version": "0.0.9",
+      "source": "./plugins/creative",
+      "description": "UI/Web 设计、中文写作优化、文档排版与小黑插画",
+      "strict": false,
+      "category": "design",
+      "keywords": [
+        "ui",
+        "web",
+        "writing",
+        "document",
+        "illustration"
+      ]
+    }
+  ]
+}

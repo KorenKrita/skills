@@ -1,0 +1,457 @@
+skills:
+  # ─── base: Matt Pocock active skills ───────────────────────────────────────
+
+  ask-matt:
+    source: { repo: mattpocock/skills, path: skills/engineering/ask-matt, ref: main }
+    plugin: base
+    patches: []
+
+  code-review:
+    source: { repo: mattpocock/skills, path: skills/engineering/code-review, ref: main }
+    plugin: base
+    patches: []
+
+  codebase-design:
+    source: { repo: mattpocock/skills, path: skills/engineering/codebase-design, ref: main }
+    plugin: base
+    patches: []
+
+  diagnosing-bugs:
+    source: { repo: mattpocock/skills, path: skills/engineering/diagnosing-bugs, ref: main }
+    plugin: base
+    patches: []
+
+  domain-modeling:
+    source: { repo: mattpocock/skills, path: skills/engineering/domain-modeling, ref: main }
+    plugin: base
+    patches: []
+
+  grill-with-docs:
+    source: { repo: mattpocock/skills, path: skills/engineering/grill-with-docs, ref: main }
+    plugin: base
+    patches: []
+
+  implement:
+    source: { repo: mattpocock/skills, path: skills/engineering/implement, ref: main }
+    plugin: base
+    patches: []
+
+  improve-codebase-architecture:
+    source: { repo: mattpocock/skills, path: skills/engineering/improve-codebase-architecture, ref: main }
+    plugin: base
+    patches: []
+
+  prototype:
+    source: { repo: mattpocock/skills, path: skills/engineering/prototype, ref: main }
+    plugin: base
+    patches: []
+
+  research:
+    source: { repo: mattpocock/skills, path: skills/engineering/research, ref: main }
+    plugin: base
+    patches: []
+
+  resolving-merge-conflicts:
+    source: { repo: mattpocock/skills, path: skills/engineering/resolving-merge-conflicts, ref: main }
+    plugin: base
+    patches: []
+
+  setup-matt-pocock-skills:
+    source: { repo: mattpocock/skills, path: skills/engineering/setup-matt-pocock-skills, ref: main }
+    plugin: base
+    patches: []
+
+  tdd:
+    source: { repo: mattpocock/skills, path: skills/engineering/tdd, ref: main }
+    plugin: base
+    patches: []
+
+  to-spec:
+    source: { repo: mattpocock/skills, path: skills/engineering/to-spec, ref: main }
+    plugin: base
+    patches: []
+
+  to-tickets:
+    source: { repo: mattpocock/skills, path: skills/engineering/to-tickets, ref: main }
+    plugin: base
+    patches: []
+
+  triage:
+    source: { repo: mattpocock/skills, path: skills/engineering/triage, ref: main }
+    plugin: base
+    patches: []
+
+  wayfinder:
+    source: { repo: mattpocock/skills, path: skills/engineering/wayfinder, ref: main }
+    plugin: base
+    patches: []
+
+  grill-me:
+    source: { repo: mattpocock/skills, path: skills/productivity/grill-me, ref: main }
+    plugin: base
+    patches: []
+
+  grilling:
+    source: { repo: mattpocock/skills, path: skills/productivity/grilling, ref: main }
+    plugin: base
+    patches: []
+
+  handoff:
+    source: { repo: mattpocock/skills, path: skills/productivity/handoff, ref: main }
+    plugin: base
+    patches: []
+
+  teach:
+    source: { repo: mattpocock/skills, path: skills/productivity/teach, ref: main }
+    plugin: base
+    patches: []
+
+  writing-great-skills:
+    source: { repo: mattpocock/skills, path: skills/productivity/writing-great-skills, ref: main }
+    plugin: base
+    patches: []
+
+  # ─── plus: engineering, thinking, and tools ────────────────────────────────
+
+  docs-vs-code:
+    source: { repo: hylarucoder/hai-stack, path: skills/hai-audit-docs-against-code, ref: main }
+    plugin: plus
+    patches:
+      - { type: set_frontmatter, field: name, value: docs-vs-code }
+      - type: replace
+        pattern: "For Chinese readers, see `SKILL.zh_CN.md`. The English `SKILL.md` is the execution source of truth.\n\n"
+        with: ""
+      - { type: replace_all, pattern: hai-audit-docs-internally, with: docs-vs-docs }
+      - type: replace_all
+        pattern: "`entity-model-auditor`"
+        with: "an installed data-model auditing Skill whose description clearly matches the task"
+      - type: replace_all
+        pattern: "`hai-rewrite-doc`"
+        with: "an installed document-rewriting Skill whose description clearly matches the task"
+      - type: append_content
+        text: |
+          ## Routing Compatibility
+
+          Invoke another Skill only when an installed Skill's description clearly matches the next subtask. Otherwise, complete the subtask directly with this workflow. Never require an uninstalled Skill.
+    exclude_files:
+      - SKILL.zh_CN.md
+
+  docs-vs-docs:
+    source: { repo: hylarucoder/hai-stack, path: skills/hai-audit-docs-internally, ref: main }
+    plugin: plus
+    patches:
+      - { type: set_frontmatter, field: name, value: docs-vs-docs }
+      - type: replace
+        pattern: "For Chinese readers, see `SKILL.zh_CN.md`. The English `SKILL.md` is the execution source of truth.\n\n"
+        with: ""
+      - { type: replace_all, pattern: hai-audit-docs-against-code, with: docs-vs-code }
+      - type: replace_all
+        pattern: "`hai-prd`"
+        with: "an installed product-specification Skill whose description clearly matches the task"
+      - type: replace_all
+        pattern: "`hai-rewrite-doc`"
+        with: "an installed document-rewriting Skill whose description clearly matches the task"
+      - type: append_content
+        text: |
+          ## Routing Compatibility
+
+          Invoke another Skill only when an installed Skill's description clearly matches the next subtask. Otherwise, complete the subtask directly with this workflow. Never require an uninstalled Skill.
+    target_patches:
+      - target: agents/openai.yaml
+        patches:
+          - { type: replace_all, pattern: "$hai-audit-docs-internally", with: "$docs-vs-docs" }
+    exclude_files:
+      - SKILL.zh_CN.md
+
+  improve:
+    source: { repo: shadcn/improve, path: skills/improve, ref: main }
+    plugin: plus
+    patches: []
+
+  ocr:
+    source: { repo: alibaba/open-code-review, path: plugins/open-code-review/skills/open-code-review, ref: main }
+    plugin: plus
+    patches:
+      - { type: set_frontmatter, field: name, value: ocr }
+
+  nuclear-review:
+    source: { repo: cursor/plugins, path: cursor-team-kit/skills/thermo-nuclear-code-quality-review, ref: main }
+    plugin: plus
+    patches:
+      - { type: set_frontmatter, field: name, value: nuclear-review }
+      - type: set_frontmatter
+        field: description
+        value: Run an extremely strict maintainability review for abstraction quality, giant files, and spaghetti-condition growth. Use for a nuclear review, deep code quality audit, or especially harsh maintainability review.
+      - { type: replace_all, pattern: "Thermo-Nuclear Code Quality Review", with: "Nuclear Review" }
+    extra_mappings:
+      - from: cursor-team-kit/agents/thermo-nuclear-code-quality-review.md
+        to: plugins/plus/agents/nuclear-review.md
+        patches:
+          - { type: set_frontmatter, field: name, value: nuclear-review }
+          - type: set_frontmatter
+            field: description
+            value: Nuclear code quality audit for maintainability, structure, giant files, spaghetti growth, and code-judo opportunities. Invoked via Task after a parent gathers diff and file contents. Loads the rubric from the nuclear-review Skill in the plus plugin.
+          - { type: replace_all, pattern: thermo-nuclear-code-quality-review, with: nuclear-review }
+          - { type: replace_all, pattern: "Thermo-Nuclear Code Quality Review", with: "Nuclear Review" }
+          - { type: replace_all, pattern: "cursor-team-kit plugin", with: "plus plugin" }
+
+  geju:
+    source: { repo: hylarucoder/hai-stack, path: skills/geju, ref: main }
+    plugin: plus
+    patches:
+      - type: replace
+        pattern: "For Chinese readers, see `SKILL.zh_CN.md`. The English `SKILL.md` is the execution source of truth.\n\n"
+        with: ""
+      - { type: replace_all, pattern: hai-idea, with: idea }
+      - type: replace_all
+        pattern: "`hai-architecture`"
+        with: "an installed architecture Skill whose description clearly matches the task"
+      - type: replace_all
+        pattern: "`hai-prd`"
+        with: "an installed product-specification Skill whose description clearly matches the task"
+      - type: append_content
+        text: |
+          ## Routing Compatibility
+
+          Invoke another Skill only when an installed Skill's description clearly matches the next subtask. Otherwise, complete the subtask directly with this workflow. Never require an uninstalled Skill.
+    exclude_files:
+      - SKILL.zh_CN.md
+
+  goudi:
+    source: { repo: hylarucoder/hai-stack, path: skills/goudi, ref: main }
+    plugin: plus
+    patches:
+      - type: replace
+        pattern: "For Chinese readers, see `SKILL.zh_CN.md`. The English `SKILL.md` is the execution source of truth.\n\n"
+        with: ""
+      - { type: replace_all, pattern: hai-idea, with: idea }
+      - { type: replace_all, pattern: hai-tdd, with: tdd }
+      - type: replace_all
+        pattern: "`hai-goal`"
+        with: "an installed execution-planning Skill whose description clearly matches the task"
+      - type: append_content
+        text: |
+          ## Routing Compatibility
+
+          Invoke another Skill only when an installed Skill's description clearly matches the next subtask. Otherwise, complete the subtask directly with this workflow. Never require an uninstalled Skill.
+    exclude_files:
+      - SKILL.zh_CN.md
+
+  idea:
+    source: { repo: hylarucoder/hai-stack, path: skills/hai-idea, ref: main }
+    plugin: plus
+    patches:
+      - { type: set_frontmatter, field: name, value: idea }
+      - type: replace
+        pattern: "For Chinese readers, see `SKILL.zh_CN.md`. The English `SKILL.md` is the execution source of truth.\n\n"
+        with: ""
+      - type: replace_all
+        pattern: "`hai-goal`"
+        with: "an installed execution-planning Skill whose description clearly matches the task"
+      - type: replace_all
+        pattern: "`hai-prd`"
+        with: "an installed product-specification Skill whose description clearly matches the task"
+      - type: replace_all
+        pattern: "`hai-naming`"
+        with: "an installed naming Skill whose description clearly matches the task"
+      - type: append_content
+        text: |
+          ## Routing Compatibility
+
+          Invoke another Skill only when an installed Skill's description clearly matches the next subtask. Otherwise, complete the subtask directly with this workflow. Never require an uninstalled Skill.
+    target_patches:
+      - target: agents/openai.yaml
+        patches:
+          - { type: replace_all, pattern: "$hai-idea", with: "$idea" }
+    exclude_files:
+      - SKILL.zh_CN.md
+
+  razor:
+    source: { repo: hylarucoder/hai-stack, path: skills/hai-razor, ref: main }
+    plugin: plus
+    patches:
+      - { type: set_frontmatter, field: name, value: razor }
+      - type: replace
+        pattern: "For Chinese readers, see `SKILL.zh_CN.md`. The English `SKILL.md` is the execution source of truth.\n\n"
+        with: ""
+      - { type: replace_all, pattern: hai-razor, with: razor }
+      - { type: replace_all, pattern: hai-idea, with: idea }
+      - type: replace_all
+        pattern: "`hai-prd`"
+        with: "an installed product-specification Skill whose description clearly matches the task"
+      - type: replace_all
+        pattern: "`hai-architecture`"
+        with: "an installed architecture Skill whose description clearly matches the task"
+      - type: replace_all
+        pattern: "`hai-goal`"
+        with: "an installed execution-planning Skill whose description clearly matches the task"
+      - type: append_content
+        text: |
+          ## Routing Compatibility
+
+          Invoke another Skill only when an installed Skill's description clearly matches the next subtask. Otherwise, complete the subtask directly with this workflow. Never require an uninstalled Skill.
+    target_patches:
+      - target: agents/openai.yaml
+        patches:
+          - { type: replace_all, pattern: "$hai-razor", with: "$razor" }
+      - target: references/output-template.md
+        patches:
+          - { type: replace_all, pattern: hai-razor, with: razor }
+          - type: replace_all
+            pattern: "`hai-goal`"
+            with: "an installed execution-planning Skill whose description clearly matches the task"
+          - type: replace_all
+            pattern: " (For a Chinese-led run, see `SKILL.zh_CN.md`.)"
+            with: ""
+    exclude_files:
+      - SKILL.zh_CN.md
+  read:
+    source: { repo: tw93/Waza, path: skills/read, ref: main }
+    plugin: plus
+    patches:
+      - type: replace
+        pattern: "**Update check (non-blocking).** Once per conversation, run `bash <skill-base-dir>/scripts/check-update.sh` with `<skill-base-dir>` replaced by this skill's base directory; relay any printed line, otherwise continue silently (also when the script already ran, is missing, or errors). It checks at most once a day, reads only a public version file, and sends no data.\n\n"
+        with: ""
+    exclude_files:
+      - scripts/check-update.sh
+
+  pua:
+    source: { repo: tanweai/pua, path: skills/pua, ref: main }
+    plugin: plus
+    patches: []
+    exclude_files:
+      - references/agent-team.md
+      - references/p9-protocol.md
+      - references/p10-protocol.md
+      - references/teardown-protocol.md
+      - references/evolution-protocol.md
+      - references/survey.md
+
+  goal-gen:
+    source: { repo: joeseesun/qiaomu-goal-meta-skill, path: ., ref: main }
+    plugin: plus
+    patches:
+      - { type: set_frontmatter, field: name, value: goal-gen }
+    target_patches:
+      - target: agents/interface.yaml
+        patches:
+          - { type: replace_all, pattern: "$qiaomu-goal-meta-skill", with: "$goal-gen" }
+    exclude_files:
+      - .gitignore
+      - README.md
+      - manifest.json
+
+  i-have-adhd:
+    source: { repo: ayghri/i-have-adhd, path: skills/i-have-adhd, ref: main }
+    plugin: plus
+    patches: []
+
+  # Local Skill: plugins/plus/skills/fan-out
+  # Independent hook: plugins/plus/hooks (obra/double-shot-latte)
+
+  # ─── creative: design, writing, and visual output ──────────────────────────
+
+  ui:
+    source: { repo: tw93/Waza, path: skills/ui, ref: main }
+    plugin: creative
+    patches:
+      - { type: set_frontmatter, field: name, value: ui }
+      - type: replace
+        pattern: "**Update check (non-blocking).** Once per conversation, run `bash <skill-base-dir>/scripts/check-update.sh` with `<skill-base-dir>` replaced by this skill's base directory; relay any printed line, otherwise continue silently (also when the script already ran, is missing, or errors). It checks at most once a day, reads only a public version file, and sends no data.\n\n"
+        with: ""
+    exclude_files:
+      - scripts/check-update.sh
+
+  web:
+    source: { repo: KAOPU-XiaoPu/web-design, path: ., ref: main }
+    plugin: creative
+    patches:
+      - { type: set_frontmatter, field: name, value: web }
+      - type: replace
+        pattern: "# Web Design\n"
+        with: "# Web Design\n\n用户可以在 https://getdesign.md/ 挑选喜欢的 design，或者按照下述流程设计自己的 design。\n"
+      - type: append_content
+        text: |
+          ## Worked Example
+
+          Before drafting `DESIGN.md`, consult `docs/DESIGN.md` and its accompanying implementation as a worked example of specification structure and implementation fidelity. Treat it as a quality reference, not a visual template to copy.
+    exclude_files:
+      - .gitignore
+      - README.md
+
+  humanizer-zh:
+    source: { repo: op7418/Humanizer-zh, path: ., ref: main }
+    plugin: creative
+    patches: []
+    exclude_files:
+      - .gitignore
+      - README.md
+
+  archify:
+    source: { repo: tt-a1i/archify, path: archify, ref: main }
+    plugin: creative
+    patches:
+      - type: set_frontmatter
+        field: description
+        value: Create professional architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with SVG, pan/zoom, search, semantic relationship inspection, presentation mode, dark/light themes, optional motion, and PNG/JPEG/WebP/SVG/WebM export. Accepts plain-language descriptions or Mermaid flowchart, sequenceDiagram, and stateDiagram input, then lays diagrams out in Archify style. Use when the user asks for system or cloud architecture, infrastructure and network topology, security boundaries, technical or approval workflows, runbooks, CI/CD flows, API call sequences, request lifecycles, data pipelines, ETL/ELT, PII boundaries, data lineage, state machines, lifecycle/status transitions, or conversion/beautification of Mermaid diagrams.
+      - type: replace_all
+        pattern: "Every bundled scenario recipe is backed by a checked-in, validated example in `examples/` and a generated Proof Lab card. Use those examples as structural references rather than copying their domain facts. When changing a recipe or proof example in the repository, regenerate both `docs/guide.html` and `docs/gallery.html`; tests enforce that all 11 recipe proof IDs resolve and that each proof retains three named reader views."
+        with: "Every bundled scenario recipe is backed by a checked-in, validated JSON example in `examples/`. Use those examples as structural references rather than copying their domain facts."
+      - { type: replace_all, pattern: "`examples/web-app.html`", with: "`examples/web-app.architecture.json`" }
+    target_patches:
+      - target: package.json
+        patches:
+          - type: replace_all
+            pattern: "    \"test:webm\": \"node test/webm-artifact.smoke.mjs\",\n    \"test\": \"npm run check:validators && node test/golden.mjs && node --test test/*.test.mjs\",\n"
+            with: ""
+      - target: schemas/README.md
+        patches:
+          - { type: replace_all, pattern: "`npm test`", with: "`npm run check:validators`" }
+    exclude_files:
+      - examples/dataflow-product-analytics.html
+      - examples/lifecycle-agent-run.html
+      - examples/sequence-cache-miss-request.html
+      - examples/web-app-rendered.html
+      - examples/workflow-agent-tool-call-rendered.html
+      - test/
+
+  kami:
+    source: { repo: tw93/kami, path: plugins/kami/skills/kami, ref: main }
+    plugin: creative
+    patches:
+      - type: replace
+        pattern: "**Update check (non-blocking).** At the start of a task, run `bash scripts/check-update.sh`. It does a read-only version check at most once per day and prints one line when a newer kami is available; relay that line to the user, then continue. It sends no data, and fails silently when offline, sandboxed, or without `curl`. Never let it block the work.\n\n"
+        with: ""
+    target_patches:
+      - target: scripts/package-skill.sh
+        patches:
+          - { type: replace_all, pattern: "  \"scripts/mcp_server.py\"\n", with: "" }
+          - { type: replace_all, pattern: "|mcp_server", with: "" }
+    exclude_files:
+      - scripts/draft-release-notes.py
+      - scripts/mcp_server.py
+      - scripts/tests/test_build.py
+
+  xiaohei:
+    source: { repo: helloianneo/ian-xiaohei-illustrations, path: ian-xiaohei-illustrations, ref: main }
+    plugin: creative
+    patches:
+      - { type: set_frontmatter, field: name, value: xiaohei }
+    target_patches:
+      - target: agents/openai.yaml
+        patches:
+          - { type: replace_all, pattern: "$ian-xiaohei-illustrations", with: "$xiaohei" }
+
+  xiaohei2:
+    source: { repo: helloianneo/ian-xiaohei-scenes, path: ian-xiaohei-scenes, ref: main }
+    plugin: creative
+    patches:
+      - { type: set_frontmatter, field: name, value: xiaohei2 }
+      - { type: replace_all, pattern: "$ian-xiaohei-illustrations", with: "$xiaohei" }
+    target_patches:
+      - target: agents/openai.yaml
+        patches:
+          - { type: replace_all, pattern: "$ian-xiaohei-scenes", with: "$xiaohei2" }
+    exclude_files:
+      - .gitignore
+      - README.md

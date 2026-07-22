@@ -1,0 +1,37 @@
+name: 同步上游 Skill
+
+on:
+  schedule:
+    - cron: "0 3 * * *" # 每天 UTC 3:00（北京时间 11:00）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - run: npm ci
+
+      - name: 执行同步并递增受影响 plugin 版本
+        # 每次都按文件内容审计；有实际 Skill 变更时，同一 PR 自动递增所属 plugin 的 patch 版本。
+        run: npx tsx scripts/sync.ts --force
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 提交同步状态
+        run: |
+          git add .sync-state.json
+          git diff --cached --quiet && exit 0
+          git -c user.name="github-actions" -c user.email="actions@github.com" commit -m "chore: 更新同步状态"
+          git push

@@ -1,0 +1,30 @@
+{
+  "name": "korenkrita-skills",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "pi-package"
+  ],
+  "pi": {
+    "skills": [
+      "./plugins/*/skills"
+    ]
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "sync": "tsx scripts/sync.ts",
+    "build:marketplace": "tsx scripts/build-marketplace.ts"
+  },
+  "devDependencies": {
+    "@effect/vitest": "^0.29.0",
+    "@types/node": "^25.9.3",
+    "effect": "^3.21.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0"
+  },
+  "dependencies": {
+    "yaml": "^2.9.0"
+  }
+}

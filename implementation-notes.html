@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Implementation Notes</title>
+</head>
+<body>
+  <main>
+    <h1>Implementation Notes</h1>
+    <article id="sync-append-content-newline-2026-07-12">
+      <h2>同步补丁的结尾换行规范化</h2>
+      <p><strong>状态：</strong>agent-resolved</p>
+      <p><strong>日期：</strong>2026-07-12</p>
+      <p><strong>背景：</strong><code>overrides.yaml</code> 中使用 YAML block scalar（<code>text: |</code>）定义的 <code>append_content</code> 文本自带结尾换行；补丁引擎此前又无条件追加一个换行，导致强制同步审计生成仅多一个尾部空行的差异，并错误触发 plugin 版本升级和 PR。</p>
+      <p><strong>决策：</strong><code>append_content</code> 在拼接前对补丁文本执行 <code>trimEnd()</code>，最终统一保留一个文件结尾换行。该规范只消除补丁配置携带的尾部空白，不改变正文内部空白。</p>
+      <p><strong>验证：</strong><code>tests/patch-engine.test.ts</code> 覆盖带结尾换行的 YAML block scalar；同步 Action run <code>29180216479</code> 重新审计后，原误报的 docs-vs-code、docs-vs-docs、geju、goudi、idea、razor、web 均报告“文件内容无变化”。</p>
+    </article>
+    <article id="skill-payload-pruning-2026-07-22">
+      <h2>Skill 分发载荷精简规则</h2>
+      <p><strong>状态：</strong>user-decided</p>
+      <p><strong>日期：</strong>2026-07-22</p>
+      <p><strong>背景：</strong>上游同步会把开发测试、已渲染 golden、仓库门面文档和未接入主执行路径的参考资料一并带入 plugin；直接删除会在后续同步时恢复。</p>
+      <p><strong>决策：</strong>通过 <code>overrides.yaml</code> 的 <code>exclude_files</code> 永久屏蔽 archify 测试与 rendered HTML、kami 测试/发版/MCP 脚本、无用 README 和 <code>.gitignore</code>、goal-gen manifest、六份不可达的 pua 高阶参考，以及 hai 系列的 <code>SKILL.zh_CN.md</code>。保留各平台 agent metadata、xiaohei 示例图、web worked example、teach glossary 和所有许可证文件。</p>
+      <p><strong>实现约束：</strong><code>exclude_files</code> 中以 <code>/</code> 结尾的规则按目录前缀匹配，以便持续屏蔽后续新增的同类文件；被排除文件不得继续作为 <code>target_patches</code> 目标，并须从 <code>.sync-state.json</code> 的文件清单移除。布局测试持续验证排除规则、同步状态与发布目录一致。</p>
+      <p><strong>决策来源：</strong>用户明确选择上述保留与删除范围，并要求所有删除通过同步规则屏蔽，避免后续同步重新带回。</p>
+    </article>
+  </main>
+</body>
+</html>
