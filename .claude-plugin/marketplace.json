@@ -22,7 +22,7 @@
     },
     {
       "name": "plus",
-      "version": "0.0.3",
+      "version": "0.0.4",
       "source": "./plugins/plus",
       "description": "工程审计、决策方法、研究工具与 Claude Code 自动续跑",
       "strict": false,
