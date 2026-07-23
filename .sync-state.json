@@ -201,13 +201,13 @@
     ]
   },
   "ocr": {
-    "sha": "484b513aee28fd80fac875d09c568fff528ab379",
+    "sha": "aeea6342fc50d92867a8bc045c35418ba5c2f5e7",
     "files": [
       "SKILL.md"
     ]
   },
   "nuclear-review": {
-    "sha": "3fe2823ce17c1656c222d4b7c59d3f82fbf20143",
+    "sha": "02c03a9deddad3aef581da053cecf9603b8caba1",
     "files": [
       "SKILL.md"
     ]
@@ -298,7 +298,7 @@
     ]
   },
   "i-have-adhd": {
-    "sha": "d82d286c7c9dd4dc5735175b32e494f179fe44ac",
+    "sha": "d94521dbfd53019b016891859c9d26af45c8ee16",
     "files": [
       "SKILL.md",
       "agents/gemini.toml",
@@ -449,12 +449,14 @@
     ]
   },
   "archify": {
-    "sha": "3be59a0b40e48f0218b3c68f667e2e027596db46",
+    "sha": "f85e85bdd3e71145420707e98a4d050f8967dfb9",
     "files": [
       "LICENSE",
       "SKILL.md",
       "assets/template.html",
       "bin/archify.mjs",
+      "bin/open-artifact.mjs",
+      "bin/preview.mjs",
       "examples/agent-run.lifecycle.json",
       "examples/agent-tool-call.workflow.json",
       "examples/async-job-roundtrip.sequence.json",
