@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { esc, renderDefinitions, renderSemanticSigil, textUnits } from '../shared/utils.mjs';
 import { animateAttr, focusEdgeAttrs, focusNodeAttrs, focusNodeTitle, loadDiagram, writeDiagram, svgAccessibleText, svgRootAttrs } from '../shared/cli.mjs';
 import { componentBox, boundaryBox, connectionPath } from '../shared/layout-report.mjs';
+import { throwDiagnosticProblems } from '../shared/diagnostics.mjs';
 import { gridLayout, resolveComponentPos, validateGridPlacement } from './grid.mjs';
 import {
   asArray,
@@ -14,9 +15,11 @@ import {
   cleanAmbiguousCorridorProblems,
   cleanBorderRunProblems,
   cleanRouteRhythmProblems,
+  cleanLabelRouteClearanceProblems,
   suggestLabelObstacleFix,
   suggestComponentSeparation,
   anchor,
+  automaticPortSpread,
   defaultFromSide,
   defaultToSide,
   chosenSide,
@@ -33,7 +36,7 @@ import {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const layoutJsonMode = process.argv.includes('--layout-json');
 const cliArgs = process.argv.filter((arg) => arg !== '--layout-json');
-const { diagram: arch, template, outPath } = loadDiagram({
+const { diagram: arch, template, outPath, sourceEvidence } = loadDiagram({
   rendererDir: __dirname,
   diagramType: 'architecture',
   defaultExample: 'web-app.architecture.json',
@@ -250,11 +253,11 @@ function validateArchitecture() {
 
   // Connection labels must not land on top of components.
   const labelRects = [];
-  for (const conn of asArray(arch.connections)) {
+  for (const [connectionIndex, conn] of asArray(arch.connections).entries()) {
     if (!conn.label || !components.has(conn.from) || !components.has(conn.to)) continue;
     const [lx, ly] = labelPoint(conn, pathFor(conn).points);
     const w = Math.max(30, textUnits(conn.label) * 4.8 + 10);
-    labelRects.push({ label: conn.label, x: lx - w / 2, y: ly - 10, width: w, height: 14, lx, ly });
+    labelRects.push({ relation: conn, relationIndex: connectionIndex, label: conn.label, x: lx - w / 2, y: ly - 10, width: w, height: 14, lx, ly });
   }
   for (const rect of labelRects) {
     for (const c of components.values()) {
@@ -263,9 +266,20 @@ function validateArchitecture() {
       }
     }
   }
+  problems.push(...cleanLabelRouteClearanceProblems({
+    relations: arch.connections,
+    labels: labelRects,
+    endpointIds: new Set(components.keys()),
+    pathFor,
+    diagramType: 'architecture',
+    relationCollection: 'connections',
+    profile: arch.meta?.quality_profile,
+  }));
 
   if (problems.length) {
-    throw new Error(`Architecture layout validation failed:\n- ${problems.join('\n- ')}`);
+    throwDiagnosticProblems('Architecture layout validation failed', problems, {
+      subject: { diagramType: 'architecture' },
+    });
   }
 }
 
@@ -350,12 +364,14 @@ function routeVia(conn, from, to, start, end) {
 }
 
 const pathCache = new Map();
+const automaticPorts = automaticPortSpread(arch.connections, components);
 function pathFor(conn) {
   if (pathCache.has(conn)) return pathCache.get(conn);
   const from = components.get(conn.from);
   const to = components.get(conn.to);
-  const start = anchor(from, chosenSide(conn.fromSide, defaultFromSide(from, to)));
-  const end = anchor(to, chosenSide(conn.toSide, defaultToSide(from, to)));
+  const ports = automaticPorts.get(conn);
+  const start = ports?.from || anchor(from, chosenSide(conn.fromSide, defaultFromSide(from, to)));
+  const end = ports?.to || anchor(to, chosenSide(conn.toSide, defaultToSide(from, to)));
   const points = [start, ...routeVia(conn, from, to, start, end), end];
   const routed = { d: roundedPath(points, 8), points };
   pathCache.set(conn, routed);
@@ -474,4 +490,5 @@ writeDiagram({
   footerLabel: 'Architecture diagram',
   svg: renderSvg(),
   cards: arch.cards,
+  sourceEvidence,
 });
