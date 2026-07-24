@@ -201,13 +201,13 @@
     ]
   },
   "ocr": {
-    "sha": "aeea6342fc50d92867a8bc045c35418ba5c2f5e7",
+    "sha": "69e68a93173826aa81bfce13264048a7647bb8b9",
     "files": [
       "SKILL.md"
     ]
   },
   "nuclear-review": {
-    "sha": "02c03a9deddad3aef581da053cecf9603b8caba1",
+    "sha": "04166ac89136d36de2a87f24429e6cc307594953",
     "files": [
       "SKILL.md"
     ]
@@ -298,7 +298,7 @@
     ]
   },
   "i-have-adhd": {
-    "sha": "d94521dbfd53019b016891859c9d26af45c8ee16",
+    "sha": "16a42a01f7783e29db8557dfc46226baf8015618",
     "files": [
       "SKILL.md",
       "agents/gemini.toml",
@@ -449,7 +449,7 @@
     ]
   },
   "archify": {
-    "sha": "f85e85bdd3e71145420707e98a4d050f8967dfb9",
+    "sha": "eb847fa65afd8f0913dd9d8915d0895771545c89",
     "files": [
       "LICENSE",
       "SKILL.md",
@@ -457,10 +457,13 @@
       "bin/archify.mjs",
       "bin/open-artifact.mjs",
       "bin/preview.mjs",
+      "delta/architecture-delta.mjs",
       "examples/agent-run.lifecycle.json",
       "examples/agent-tool-call.workflow.json",
       "examples/async-job-roundtrip.sequence.json",
       "examples/cache-miss-request.sequence.json",
+      "examples/checkout-platform.base.architecture.json",
+      "examples/checkout-platform.head.architecture.json",
       "examples/deployment-release.lifecycle.json",
       "examples/event-stream.dataflow.json",
       "examples/incident-response.workflow.json",
@@ -480,9 +483,12 @@
       "renderers/sequence/README.md",
       "renderers/sequence/render-sequence.mjs",
       "renderers/shared/cli.mjs",
+      "renderers/shared/diagnostics.mjs",
+      "renderers/shared/engineering-profiles.mjs",
       "renderers/shared/generated-validators.mjs",
       "renderers/shared/geometry.mjs",
       "renderers/shared/layout-report.mjs",
+      "renderers/shared/repository-evidence.mjs",
       "renderers/shared/utils.mjs",
       "renderers/shared/validator.mjs",
       "renderers/workflow/README.md",
