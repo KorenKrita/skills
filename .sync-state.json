@@ -201,7 +201,7 @@
     ]
   },
   "ocr": {
-    "sha": "69e68a93173826aa81bfce13264048a7647bb8b9",
+    "sha": "c9b145635c6b6343b108941c2a627ac636836c6b",
     "files": [
       "SKILL.md"
     ]
@@ -246,7 +246,7 @@
     ]
   },
   "read": {
-    "sha": "c1a0d6e38c47636a50e40f3123c3e66cb832587d",
+    "sha": "b3937a42fa8692e658209220e220e2cb4f9bce60",
     "files": [
       "SKILL.md",
       "references/read-methods.md",
@@ -306,7 +306,7 @@
     ]
   },
   "ui": {
-    "sha": "c1a0d6e38c47636a50e40f3123c3e66cb832587d",
+    "sha": "b3937a42fa8692e658209220e220e2cb4f9bce60",
     "files": [
       "SKILL.md",
       "references/design-aesthetic-quality.md",
@@ -449,7 +449,7 @@
     ]
   },
   "archify": {
-    "sha": "eb847fa65afd8f0913dd9d8915d0895771545c89",
+    "sha": "d6a429e865ca013979172c7fc431c44a42622b3f",
     "files": [
       "LICENSE",
       "SKILL.md",
