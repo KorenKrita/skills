@@ -22,7 +22,8 @@ level, so unknown fields are rejected rather than silently ignored.
 Every `meta` object also accepts `animation: "trace"` for opt-in SVG/CSS motion
 in generated HTML. Omit it, or set `"none"`, for the default static output.
 `visual_preset` accepts `classic` (the stable default), `signal-flow` (luminous
-motion-forward presentation), or `blueprint` (high-contrast engineering review).
+motion-forward presentation), `blueprint` (high-contrast engineering review),
+or `editorial` (warm publication-style design review and documentation).
 Presets change only viewer styling; they do not alter semantic IDs or geometry.
 It may also include up to five guided `views`. Each view has a unique `id`, a
 reader-facing `label`, a non-empty `focus` list of existing semantic node IDs,
@@ -74,6 +75,36 @@ The shared loader then checks cross-collection facts that JSON Schema cannot
 express cleanly here: duplicate view IDs, duplicate focus IDs, focus IDs that do
 not exist in the diagram's semantic collection, and duplicate authored
 relationship IDs within the mode's relationship collection.
+
+Architecture additionally supports opt-in, revision-pinned repository evidence.
+`meta.repository` names a public GitHub URL and full commit SHA; a component may
+carry one to three `sources` with repo-relative POSIX paths, optional line
+ranges, and optional labels. Shape is schema-checked, then the renderer requires
+`--repo-root`: the local Git origin must match, and Git must prove the commit,
+blobs, and requested lines. Verified evidence is embedded outside the canonical
+SVG for the Semantic Passport and Node Finder; ordinary documents and visual
+exports carry no repository evidence.
+
+## Visual quality and engineering truth
+
+`meta.quality_profile` and `meta.engineering_profile` answer different
+questions. `quality_profile` is available in all five modes and controls how
+strictly Archify judges composition. `engineering_profile` is an optional
+Architecture-only semantic contract; omitting it preserves the ordinary v1
+behavior.
+
+The first engineering profile is `deployment-ownership`. Enable it only when
+the user wants a fail-closed deployment review and the source facts are known.
+It requires every non-external component to name an owner in `tag` and belong
+to exactly one `region`; the document must contain both `region` and
+`security-group` boundaries; every `database` must be inside a
+`security-group`; each security group must contain members from one shared
+region; and every connection whose region or security-group membership changes
+must name the real crossing mechanism in `label`.
+
+The profile validates only authored IR. It does not discover infrastructure,
+infer owners, or prove that a diagram matches a live environment. If a fact is
+unknown, leave the profile unset or obtain the fact instead of inventing it.
 
 `npm run check:validators` runs the generator in check mode and fails when the committed
 validators drift from their schemas.

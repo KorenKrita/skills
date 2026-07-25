@@ -2,6 +2,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { esc, renderDefinitions, renderSemanticSigil, textUnits } from '../shared/utils.mjs';
 import { animateAttr, focusEdgeAttrs, focusNodeAttrs, focusNodeTitle, loadDiagram, writeDiagram, svgAccessibleText, svgRootAttrs } from '../shared/cli.mjs';
+import { throwDiagnosticProblems } from '../shared/diagnostics.mjs';
 import {
   asArray,
   isFinitePoint,
@@ -11,9 +12,11 @@ import {
   cleanAmbiguousCorridorProblems,
   cleanBorderRunProblems,
   cleanRouteRhythmProblems,
+  cleanLabelRouteClearanceProblems,
   suggestLabelObstacleFix,
   suggestLabelPairFix,
   anchor,
+  automaticPortSpread,
   defaultFromSide,
   defaultToSide,
   chosenSide,
@@ -244,13 +247,13 @@ function validateLifecycle() {
   }));
 
   const labelRects = [];
-  for (const transition of asArray(lifecycle.transitions)) {
+  for (const [transitionIndex, transition] of asArray(lifecycle.transitions).entries()) {
     if (!transition.label || !states.has(transition.from) || !states.has(transition.to)) continue;
     const [lx, ly] = labelPoint(transition, pathFor(transition).points);
     const longestLine = Math.max(textUnits(transition.label), textUnits(transition.note || ''));
     const width = Math.max(32, longestLine * 4.9 + 12);
     const height = transition.note ? 27 : 16;
-    labelRects.push({ label: transition.label, x: lx - width / 2, y: ly - 11, width, height, lx, ly });
+    labelRects.push({ relation: transition, relationIndex: transitionIndex, label: transition.label, x: lx - width / 2, y: ly - 11, width, height, lx, ly });
   }
   for (const rect of labelRects) {
     for (const state of states.values()) {
@@ -266,9 +269,20 @@ function validateLifecycle() {
       }
     }
   }
+  problems.push(...cleanLabelRouteClearanceProblems({
+    relations: lifecycle.transitions,
+    labels: labelRects,
+    endpointIds: new Set(states.keys()),
+    pathFor,
+    diagramType: 'lifecycle',
+    relationCollection: 'transitions',
+    profile: lifecycle.meta?.quality_profile,
+  }));
 
   if (problems.length) {
-    throw new Error(`Lifecycle layout validation failed:\n- ${problems.join('\n- ')}`);
+    throwDiagnosticProblems('Lifecycle layout validation failed', problems, {
+      subject: { diagramType: 'lifecycle' },
+    });
   }
 }
 
@@ -307,14 +321,21 @@ function routeVia(transition, from, to, start, end) {
 }
 
 const pathCache = new Map();
+const automaticPorts = automaticPortSpread(lifecycle.transitions, states);
 
 function pathFor(transition) {
   if (pathCache.has(transition)) return pathCache.get(transition);
   const from = states.get(transition.from);
   const to = states.get(transition.to);
-  const start = anchor(from, chosenSide(transition.fromSide, defaultFromSide(from, to)));
-  const end = anchor(to, chosenSide(transition.toSide, defaultToSide(from, to)));
-  const points = [start, ...routeVia(transition, from, to, start, end), end];
+  const ports = automaticPorts.get(transition);
+  const start = ports?.from || anchor(from, chosenSide(transition.fromSide, defaultFromSide(from, to)));
+  const end = ports?.to || anchor(to, chosenSide(transition.toSide, defaultToSide(from, to)));
+  let via = routeVia(transition, from, to, start, end);
+  if (ports && !via.length && Math.abs(start[0] - end[0]) >= 4 && Math.abs(start[1] - end[1]) >= 4) {
+    const midX = (start[0] + end[0]) / 2;
+    via = [[midX, start[1]], [midX, end[1]]];
+  }
+  const points = [start, ...via, end];
   const routed = {
     d: roundedPath(points, transition.cornerRadius ?? 10),
     points
