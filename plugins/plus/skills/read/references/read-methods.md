@@ -91,19 +91,20 @@ Resolve the built-in helper script directory once. This works from a single-skil
 ```bash
 READ_SCRIPT_DIR=""
 for candidate in \
-  "${CLAUDE_SKILL_DIR:+$CLAUDE_SKILL_DIR/scripts}" \
-  "${CLAUDE_SKILL_DIR:+$CLAUDE_SKILL_DIR/skills/read/scripts}" \
-  "./skills/read/scripts"; do
-  if [ -n "$candidate" ] && [ -f "$candidate/fetch_feishu.py" ]; then
+  "<skill-base-dir>/scripts" \
+  "<skill-base-dir>/skills/read/scripts"; do
+  if [ -f "$candidate/fetch_feishu.py" ]; then
     READ_SCRIPT_DIR="$candidate"
     break
   fi
 done
 if [ -z "$READ_SCRIPT_DIR" ]; then
-  echo "read helper scripts not found; set CLAUDE_SKILL_DIR or run from the Waza repo root" >&2
+  echo "read helper scripts not found under the installed skill base; reinstall Waza" >&2
   exit 1
 fi
 ```
+
+Replace `<skill-base-dir>` with the installed Read skill or Waza dispatcher directory.
 
 Requires `requests` and Feishu app credentials:
 
