@@ -34,7 +34,7 @@ MARKDOWN_RESIDUE_MARKERS = (
     ("markdown thematic break", MARKDOWN_THEMATIC_BREAK),
     ("unconverted bold marker", re.compile(r"\*\*")),
     ("unconverted inline-code marker", re.compile(r"`")),
-    # Em dash is banned in every deliverable (writing.md, anti-patterns #27).
+    # Em dash is banned in every deliverable (writing.md, anti-patterns #28).
     # It keeps leaking past the prose-level rule, so it is a machine gate here.
     ("em dash (banned punctuation)", re.compile("\u2014")),
 )
@@ -369,13 +369,21 @@ def _density_bucket(empty: float, warn_pct: float, sparse_pct: float) -> str:
     return "OK"
 
 
-def scan_density(paths: list[str]) -> tuple[int, int, int, int] | None:
+def scan_density(paths: list[str], scan_single_page: bool = False) -> tuple[int, int, int, int] | None:
     """Scan PDFs and print SPARSE/WARN lines.
 
     Returns (sparse, warn, missing, scanned), or None if PyMuPDF is missing.
     Thresholds (warn_pct, sparse_pct, dpi) come from
     references/checks_thresholds.json. Public: verify.py runs the same scan
     as its advisory pass.
+
+    Page 1 is skipped as a cover exemption, which left a one-page document with
+    no scanned page at all: the single-page templates (one-pager, letter) were
+    silently exempt from the only layout gate that reads a rendered page. When
+    `scan_single_page` is set, a one-page PDF has that page scanned instead.
+    It stays opt-in because the no-arg repo sweep reads example PDFs built from
+    unfilled placeholder skeletons, which are sparse by construction and would
+    turn the sweep permanently red without describing a real defect.
     """
     try:
         fitz = require_pymupdf()
@@ -406,8 +414,9 @@ def scan_density(paths: list[str]) -> tuple[int, int, int, int] | None:
             continue
         scanned += 1
         rel = rel_to_root(path)
+        single_page = len(doc) == 1
         for page_num in range(len(doc)):
-            if page_num == 0:
+            if page_num == 0 and not (single_page and scan_single_page):
                 continue
             page = doc[page_num]
             pix = page.get_pixmap(dpi=dpi)
@@ -431,13 +440,14 @@ def scan_density(paths: list[str]) -> tuple[int, int, int, int] | None:
 def check_density(paths: list[str]) -> int:
     """Scan PDF pages for sparse content (large trailing whitespace from
     break-inside:avoid pushing content to the next page)."""
+    explicit = bool(paths)
     if not paths:
         paths = default_example_pdfs()
         if not paths:
             print("ERROR: no PDF files to scan")
             return 2
 
-    result = scan_density(paths)
+    result = scan_density(paths, scan_single_page=explicit)
     if result is None:
         return 2
     sparse, warn, missing, scanned = result

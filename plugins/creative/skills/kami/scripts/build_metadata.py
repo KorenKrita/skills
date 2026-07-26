@@ -17,6 +17,10 @@ Generated files:
   - plugins/kami/.claude-plugin/plugin.json
   - plugins/kami/.codex-plugin/plugin.json
   - plugins/kami/skills/kami/
+  - .well-known/agent-skills/index.json
+  - .well-known/mcp/server-card.json
+  - feeds/catalog.jsonld
+  - schemamap.xml
 
 Modes:
   --write  (default)  regenerate plugin files from source
@@ -28,10 +32,19 @@ Run as: python3 scripts/build_metadata.py [--check] [--root PATH]
 from __future__ import annotations
 
 import argparse
+import ast
 import difflib
+import hashlib
 import json
 import shutil
 from pathlib import Path
+
+from shared import (
+    DIAGRAM_TEMPLATES,
+    HTML_TEMPLATES,
+    PUBLIC_DOCUMENT_TEMPLATE_KINDS,
+    public_template_kind,
+)
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -39,6 +52,7 @@ PLUGIN_NAME = "kami"
 CODEX_CATEGORY = "Productivity"
 HOMEPAGE = "https://github.com/tw93/kami"
 REPOSITORY = "https://github.com/tw93/kami"
+SITE = "https://kami.tw93.fun"
 
 AUTHOR = {
     "name": "Tw93",
@@ -223,6 +237,277 @@ def build_claude_marketplace(version: str) -> dict:
     }
 
 
+# --- Public site machine-readable surfaces -------------------------------
+#
+# The site is a static Vercel deploy of this repository, so every agent-facing
+# discovery document is a committed file. They are generated here (rather than
+# hand-edited) because each one restates the version, the tool list, or the
+# template registry, and a stale copy is worse than no copy: agents read these
+# instead of the HTML.
+
+SKILL_WHEN_TO_USE = (
+    "Use when a user asks for a finished document whose appearance matters: a "
+    "resume, one-pager, letter, portfolio, long report, slide deck, equity "
+    "report, changelog, or a landing page. Kami fills a constrained parchment "
+    "template and exports HTML to PDF, PNG, or editable PPTX, then verifies "
+    "the result with deterministic and perceptual checks. Skip it when the "
+    "user only wants the text."
+)
+
+# Public document kinds, in the order the site presents them, with the
+# one-line purpose used in the catalog feed.
+DOCUMENT_TEMPLATE_NOTES = {
+    "one-pager": ("One-Pager", "Single-page brief for a product, project, or pitch."),
+    "letter": ("Letter", "Formal correspondence: offers, notices, cover letters."),
+    "long-doc": ("Long Document", "Multi-page report or spec with running headers."),
+    "portfolio": ("Portfolio", "Case-study layout for work samples."),
+    "resume": ("Resume", "One or two page CV with a fixed density budget."),
+    "slides": ("Slides", "Deck rendered to PDF, with an editable PPTX fallback."),
+    "equity-report": ("Equity Report", "Company or stock analysis with data tables."),
+    "changelog": ("Changelog", "Release notes grouped by version."),
+}
+
+DIAGRAM_NOTES = {
+    "diagram-architecture": ("Architecture", "System components and the connections between them."),
+    "diagram-architecture-board": ("Architecture Board", "Wide board view of a system, sized for slides."),
+    "diagram-flowchart": ("Flowchart", "Process and decision flow."),
+    "diagram-quadrant": ("Quadrant", "Two-axis positioning of options or competitors."),
+    "diagram-bar-chart": ("Bar Chart", "Comparison across categories."),
+    "diagram-line-chart": ("Line Chart", "Trend across an ordered axis."),
+    "diagram-donut-chart": ("Donut Chart", "Share of a whole."),
+    "diagram-state-machine": ("State Machine", "States and the transitions between them."),
+    "diagram-timeline": ("Timeline", "Milestones along a time axis."),
+    "diagram-swimlane": ("Swimlane", "Process split across owners or teams."),
+    "diagram-tree": ("Tree", "Hierarchy or breakdown structure."),
+    "diagram-layer-stack": ("Layer Stack", "Stacked layers of a system."),
+    "diagram-venn": ("Venn", "Overlap between sets."),
+    "diagram-candlestick": ("Candlestick", "Open-high-low-close price movement."),
+    "diagram-waterfall": ("Waterfall", "Cumulative contribution to a total."),
+    "diagram-sequence": ("Sequence", "Messages exchanged between participants over time."),
+    "diagram-class": ("Class", "Class structure and relationships."),
+    "diagram-er": ("ER", "Entities and their relationships."),
+}
+
+_TEMPLATE_LOCALES = {"": "zh-CN", "-en": "en", "-ko": "ko"}
+
+
+def _module_constants(source: str) -> dict:
+    """Return top-level string constants of a module without importing it.
+
+    scripts/mcp_server.py imports the render and check stack, which pulls in
+    optional third-party dependencies. The generator only needs its declared
+    tool names, descriptions, and protocol version, so it reads the syntax
+    tree instead of the module.
+    """
+    tree = ast.parse(source)
+    constants: dict = {}
+    for node in tree.body:
+        if not isinstance(node, ast.Assign) or len(node.targets) != 1:
+            continue
+        target = node.targets[0]
+        if not isinstance(target, ast.Name):
+            continue
+        if isinstance(node.value, ast.Constant):
+            constants[target.id] = node.value.value
+        elif isinstance(node.value, ast.List):
+            constants[target.id] = node.value
+    return constants
+
+
+def read_mcp_surface(root: Path) -> tuple[str, list[dict]]:
+    """Return (protocol version, [{name, description}]) declared by the server."""
+    server_file = root / "scripts" / "mcp_server.py"
+    if not server_file.exists():
+        raise SystemExit(f"ERROR: missing MCP server at {server_file}")
+    constants = _module_constants(server_file.read_text(encoding="utf-8"))
+
+    protocol = constants.get("PROTOCOL_VERSION")
+    if not isinstance(protocol, str):
+        raise SystemExit("ERROR: could not read PROTOCOL_VERSION from mcp_server.py")
+
+    tools_node = constants.get("TOOLS")
+    if not isinstance(tools_node, ast.List):
+        raise SystemExit("ERROR: could not read TOOLS from mcp_server.py")
+
+    tools: list[dict] = []
+    for element in tools_node.elts:
+        if not isinstance(element, ast.Dict):
+            continue
+        entry = {}
+        for key, value in zip(element.keys, element.values):
+            if (
+                isinstance(key, ast.Constant)
+                and key.value in ("name", "description")
+                and isinstance(value, ast.Constant)
+            ):
+                entry[key.value] = value.value
+        if "name" in entry and "description" in entry:
+            tools.append(entry)
+    if not tools:
+        raise SystemExit("ERROR: no MCP tools parsed from mcp_server.py")
+    return protocol, tools
+
+
+def template_locales(kind: str) -> list[str]:
+    """Return the languages a public document kind ships in."""
+    locales = []
+    for name in HTML_TEMPLATES:
+        if public_template_kind(name) != kind:
+            continue
+        suffix = ""
+        for candidate in ("-en", "-ko"):
+            if name.endswith(candidate):
+                suffix = candidate
+                break
+        locale = _TEMPLATE_LOCALES[suffix]
+        if locale not in locales:
+            locales.append(locale)
+    return locales
+
+
+def build_agent_skills_index(version: str, skill_digest: str) -> dict:
+    return {
+        "$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+        "skills": [
+            {
+                "name": PLUGIN_NAME,
+                "type": "skill-md",
+                "description": SKILL_WHEN_TO_USE,
+                "url": "/SKILL.md",
+                "digest": skill_digest,
+                "version": version,
+                "license": "MIT",
+                "homepage": SITE,
+                "repository": REPOSITORY,
+                "documentation": f"{SITE}/developers.md",
+            }
+        ],
+    }
+
+
+def build_mcp_server_card(version: str, protocol: str, tools: list[dict]) -> dict:
+    return {
+        "name": PLUGIN_NAME,
+        "title": "Kami",
+        "description": (
+            "Render and verify Kami documents locally: list templates and "
+            "content schemas, render filled HTML to PDF, run the deterministic "
+            "checks, and rasterize pages for a perceptual review pass."
+        ),
+        "version": version,
+        "protocolVersion": protocol,
+        "license": "MIT",
+        "homepage": SITE,
+        "repository": REPOSITORY,
+        "documentation": f"{SITE}/developers.md",
+        # Kami runs on the user's machine and reads and writes local files, so
+        # there is no hosted endpoint to advertise. Agents install the package
+        # and speak stdio; `remotes` stays empty on purpose.
+        "transports": ["stdio"],
+        "remotes": [],
+        "packages": [
+            {
+                "registryType": "github",
+                "identifier": "tw93/kami",
+                "version": version,
+                "transport": {"type": "stdio"},
+                "runtimeHint": "python3",
+                "install": f"claude mcp add {PLUGIN_NAME} -- python3 <checkout>/scripts/mcp_server.py",
+            }
+        ],
+        "tools": tools,
+    }
+
+
+def build_catalog_feed(root: Path) -> str:
+    """Return the JSON-LD catalog of every public template and diagram type."""
+    documents = []
+    for position, kind in enumerate(
+        [k for k in DOCUMENT_TEMPLATE_NOTES if k in PUBLIC_DOCUMENT_TEMPLATE_KINDS], start=1
+    ):
+        name, description = DOCUMENT_TEMPLATE_NOTES[kind]
+        documents.append(
+            {
+                "@type": "ListItem",
+                "position": position,
+                "item": {
+                    "@type": "CreativeWork",
+                    "@id": f"{SITE}/#template-{kind}",
+                    "identifier": kind,
+                    "name": name,
+                    "description": description,
+                    "genre": "document template",
+                    "inLanguage": template_locales(kind),
+                    "encodingFormat": ["text/html", "application/pdf"],
+                },
+            }
+        )
+
+    diagrams = []
+    for position, key in enumerate(DIAGRAM_TEMPLATES, start=1):
+        name, description = DIAGRAM_NOTES[key]
+        diagrams.append(
+            {
+                "@type": "ListItem",
+                "position": position,
+                "item": {
+                    "@type": "CreativeWork",
+                    "@id": f"{SITE}/#{key}",
+                    "identifier": key,
+                    "name": f"{name} Diagram",
+                    "description": description,
+                    "genre": "diagram template",
+                    "encodingFormat": ["image/svg+xml", "text/html"],
+                },
+            }
+        )
+
+    schemas = sorted(p.stem for p in (root / "references" / "schemas").glob("*.json"))
+
+    graph = {
+        "@context": "https://schema.org",
+        "@id": f"{SITE}/feeds/catalog.jsonld",
+        "@type": "ItemList",
+        "name": "Kami template catalog",
+        "description": (
+            "Every document template and diagram type Kami ships, plus the "
+            "content schema types an agent can validate against before layout."
+        ),
+        "url": f"{SITE}/developers",
+        "numberOfItems": len(documents) + len(diagrams),
+        "itemListElement": documents + diagrams,
+        "about": {
+            "@type": "SoftwareApplication",
+            "@id": f"{SITE}/#kami",
+            "name": "Kami",
+            "url": SITE,
+        },
+        "mainEntityOfPage": f"{SITE}/developers",
+        "keywords": [f"content-schema:{name}" for name in schemas],
+    }
+    return render_json(graph)
+
+
+def build_schemamap() -> str:
+    """Return the schema map: which JSON-LD endpoint describes which page."""
+    resources = [
+        (f"{SITE}/developers", f"{SITE}/feeds/catalog.jsonld", ["ItemList", "CreativeWork"]),
+    ]
+    lines = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<schemamap xmlns="https://specification.website/schemas/schemamap/0.1">',
+    ]
+    for loc, jsonld, types in resources:
+        lines.append("  <resource>")
+        lines.append(f"    <loc>{loc}</loc>")
+        lines.append(f"    <jsonld>{jsonld}</jsonld>")
+        for type_name in types:
+            lines.append(f"    <type>{type_name}</type>")
+        lines.append("  </resource>")
+    lines.append("</schemamap>")
+    return "\n".join(lines) + "\n"
+
+
 def should_include_skill_mirror_file(path: Path) -> bool:
     if any(part in SKILL_MIRROR_IGNORED_DIRS for part in path.parts):
         return False
@@ -289,10 +574,10 @@ def bytes_diff(label: str, expected: bytes, actual: bytes) -> str:
     )
 
 
-def check_generated(root: Path, generated_json_files: list[tuple[Path, str]], plugin_tree: dict[str, bytes]) -> int:
+def check_generated(root: Path, generated_files: list[tuple[Path, str]], plugin_tree: dict[str, bytes]) -> int:
     drift = False
 
-    for generated_path, expected in generated_json_files:
+    for generated_path, expected in generated_files:
         actual = generated_path.read_text() if generated_path.exists() else ""
         if actual != expected:
             rel = generated_path.relative_to(root).as_posix()
@@ -335,14 +620,14 @@ def check_generated(root: Path, generated_json_files: list[tuple[Path, str]], pl
     if drift:
         return 1
 
-    for generated_path, _ in generated_json_files:
+    for generated_path, _ in generated_files:
         print(f"OK: {generated_path.relative_to(root)} matches generator")
     print("OK: plugins/kami plugin tree matches generator")
     return 0
 
 
-def write_generated(root: Path, generated_json_files: list[tuple[Path, str]], plugin_tree: dict[str, bytes]) -> int:
-    for generated_path, expected in generated_json_files:
+def write_generated(root: Path, generated_files: list[tuple[Path, str]], plugin_tree: dict[str, bytes]) -> int:
+    for generated_path, expected in generated_files:
         generated_path.parent.mkdir(parents=True, exist_ok=True)
         generated_path.write_text(expected)
         print(f"OK: wrote {generated_path.relative_to(root)} ({len(expected)} bytes)")
@@ -379,14 +664,28 @@ def main() -> int:
     claude_plugin_rendered = render_json(build_claude_plugin(version))
     claude_marketplace_rendered = render_json(build_claude_marketplace(version))
     plugin_tree = collect_plugin_tree(root, codex_plugin_rendered, claude_plugin_rendered)
-    generated_json_files = [
+
+    skill_digest = "sha256:" + hashlib.sha256((root / "SKILL.md").read_bytes()).hexdigest()
+    protocol, tools = read_mcp_surface(root)
+
+    generated_files = [
         (root / ".claude-plugin" / "marketplace.json", claude_marketplace_rendered),
         (root / ".agents" / "plugins" / "marketplace.json", codex_marketplace_rendered),
+        (
+            root / ".well-known" / "agent-skills" / "index.json",
+            render_json(build_agent_skills_index(version, skill_digest)),
+        ),
+        (
+            root / ".well-known" / "mcp" / "server-card.json",
+            render_json(build_mcp_server_card(version, protocol, tools)),
+        ),
+        (root / "feeds" / "catalog.jsonld", build_catalog_feed(root)),
+        (root / "schemamap.xml", build_schemamap()),
     ]
 
     if args.check:
-        return check_generated(root, generated_json_files, plugin_tree)
-    return write_generated(root, generated_json_files, plugin_tree)
+        return check_generated(root, generated_files, plugin_tree)
+    return write_generated(root, generated_files, plugin_tree)
 
 
 if __name__ == "__main__":

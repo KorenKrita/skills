@@ -147,46 +147,48 @@ Any font-family that may render Chinese or Japanese must include a CJK fallback,
 
 ```css
 .card {
-  background: var(--ivory);
-  border: 0.5pt solid var(--border-cream);
-  border-radius: 8pt;
+  background: var(--ivory);       /* the fill IS the lift; no closed border */
+  border-radius: 4pt;
   padding: 16pt 20pt;
-  transition: box-shadow 0.2s;
-}
-.card:hover {
-  box-shadow: 0 4pt 24pt rgba(0, 0, 0, 0.05);  /* whisper shadow */
 }
 ```
 
-### Tag (default lightest solid)
+A sub-1pt closed border plus a radius renders as a double ring (production.md
+pitfall #2) and fails `scripts/build.py --check`. To give a card more weight,
+mark one edge with `border-left: 1.4pt solid var(--brand)`.
+
+### Tag (solid fill, never rgba)
 
 ```css
 .tag {
-  background: #EEF2F7;            /* 0.08 equivalent */
+  background: var(--tag-bg);
   color: var(--brand);
-  font-size: 9pt; font-weight: 600;
+  font-size: 9pt; font-weight: 500;
   padding: 1pt 5pt;
-  border-radius: 2pt;
-  letter-spacing: 0.4pt;
-  text-transform: uppercase;
+  border-radius: 3pt;
+  letter-spacing: 0.3pt;
 }
 ```
 
-### Section title (brand left bar is the signature move)
+### Section title
 
 ```css
-.section-title {
+h2 {
   font-family: var(--serif);
-  font-size: 14pt; font-weight: 500;
+  font-size: 16pt; font-weight: 500;
   color: var(--near-black);
-  margin: 24pt 0 10pt 0;
-  border-left: 2.5pt solid var(--brand);
-  border-radius: 1.5pt;
-  padding-left: 8pt;
+  margin-bottom: 6pt;
 }
 ```
 
-Resume exception: `resume*.html` uses a quiet bottom rule instead of the brand left bar. Keep project rows borderless so section titles do not create double rules or lonely page-top lines.
+Type carries the hierarchy; a section head needs no rule, bar, or underline.
+`changelog*.html` is the one template that adds `border-left: 2.5pt solid
+var(--brand)` to `h2`, because release notes are scanned for group boundaries
+rather than read straight through. Do not carry that bar into other documents:
+repeated down a page it turns every heading into a container and is the single
+most common way a kami document stops looking like one. `resume*.html` uses a
+quiet bottom rule, and keeps project rows borderless so section titles never
+create double rules or lonely page-top lines.
 
 ### Table (kami-table)
 
@@ -346,15 +348,14 @@ Resume visual rule: header and section titles carry the only structural rules. T
 | Need                | Use                                                            |
 | ------------------- | -------------------------------------------------------------- |
 | Headline            | serif 500, line-height 1.10-1.30                               |
-| Reading body (EN)   | serif 400, 9.5-10pt, 1.55                                      |
-| Reading body (CN)   | sans 400, 9.5-10pt, 1.55                                       |
+| Reading body        | serif 400, 9.5-10pt, 1.55 (CN pins `--sans: var(--serif)`)     |
 | Emphasize a number  | `color: var(--brand)`, no bold                                 |
-| Divide two sections | 2.5pt brand left bar, or 0.5pt warm dotted                     |
-| Quote               | 2pt brand left border + olive color                            |
-| Code                | ivory bg + 0.5pt border + 6pt radius + mono                    |
-| Primary button      | brand fill + ivory text                                        |
-| Secondary button    | warm-sand + dark-warm                                          |
-| Chapter start       | serif heading + 2.5pt brand left bar                           |
+| Raise a passage     | `.callout`: ivory fill + 2pt brand left rule + 3pt radius        |
+| Quote               | same 2pt left rule + olive, no fill (fill is what makes a callout) |
+| Code                | `long-doc` `pre` / `code`: ivory fill, 4pt / 2pt radius, no border |
+| Key figures         | `one-pager` `.metric`: baseline row, transparent, not a card    |
+| Buttons             | `landing-page` `.btn-primary` / `.btn-ghost` (screen only)      |
+| Section start       | `long-doc` `h2`: serif, no bar (`changelog` `h2` is the exception) |
 | Cover               | Display heading + right-aligned author/date + heavy whitespace |
 | Figure SVG          | `width: 100%; height: auto; max-height: <safe>`. Never `max-height` alone (starves width on wide viewBoxes; production.md #17). |
 | Metric labels (4-col) | Soft cap 14-18 chars at 9pt Charter; trim context, don't wrap (production.md #18). |

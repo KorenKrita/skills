@@ -224,7 +224,7 @@ pip install python-pptx --break-system-packages --quiet
 - **4:3 traditional**: 10 × 7.5 inch
 - **Safe zone**: 0.5 inch margin on all sides (projector crop), plus 0.3 inch at bottom for page number
 
-### Palette (1:1 with design.md)
+### Palette (mirrors `assets/templates/slides.py`)
 
 ```python
 from pptx.dml.color import RGBColor
@@ -234,11 +234,12 @@ IVORY       = RGBColor(0xfa, 0xf9, 0xf5)
 BRAND       = RGBColor(0x1B, 0x36, 0x5D)
 NEAR_BLACK  = RGBColor(0x14, 0x14, 0x13)
 DARK_WARM   = RGBColor(0x3d, 0x3d, 0x3a)
-OLIVE       = RGBColor(0x5e, 0x5d, 0x59)
-STONE       = RGBColor(0x87, 0x86, 0x7f)
-BORDER_WARM = RGBColor(0xe8, 0xe6, 0xdc)
-TAG_BG      = RGBColor(0xee, 0xf2, 0xf7)
+OLIVE       = RGBColor(0x50, 0x4e, 0x49)
+STONE       = RGBColor(0x6b, 0x6a, 0x64)
+BORDER      = RGBColor(0xe8, 0xe6, 0xdc)
 ```
+
+The PPTX path defines no tag constant; tag styling is print- and screen-only. `references/tokens.json` is the source of truth for the values; `scripts/tokens.py` pins the ones in its `PY_TOKEN_MAP` (`BORDER` is not among them, so change it in `slides.py` and here together).
 
 ### Type (bigger than print, optimized for projection)
 
@@ -429,8 +430,15 @@ pdftoppm -png -r 300 out.pdf inspect
 ### Did the font actually load?
 
 ```bash
-pdffonts output.pdf
+python3 scripts/build.py --check-fonts output.pdf   # verdict, from the PDF's span table
+pdffonts output.pdf                                 # raw font table, if you want to look yourself
 ```
+
+`--check-fonts` reads which family drew the body ideographs and fails on two
+states `pdffonts` will not tell you apart: a sans substitution (the page reads
+fine and looks cheap), and CJK text split across two families (per-glyph
+fontconfig fallback, which breaks single words down the middle). Prefer it over
+reading the font table by eye, and never sign off a CJK deliverable without it.
 
 If the output shows `DejaVuSerif` / `Bitstream Vera` - your specified font didn't load, fell through to system ultimate fallback. Expected: `Charter`, `Georgia`, `TsangerJinKai02`, or a Japanese Mincho face such as `YuMincho`, `Hiragino-Mincho`, `Noto-Serif-CJK-JP`, or `Source-Han-Serif-JP`.
 
@@ -519,29 +527,13 @@ Severity scale: **(P0)** render-breaking, must fix before delivery. **(P1)** bre
 **Fix**: Tag backgrounds must be solid hex. No rgba.
 
 ```css
-/* avoid */ .tag { background: rgba(201, 100, 66, 0.18); }
-/* use   */ .tag { background: #E4ECF5; }
+/* avoid */ .tag { background: rgba(27, 54, 93, 0.18); }
+/* use   */ .tag { background: var(--tag-bg); }
 ```
 
-**rgba -> solid conversion** (parchment `#f5f4ed` base + ink-blue `#1B365D`):
+Kami ships two registered tints for this, `--tag-bg` and `--brand-tint`; `references/design.md` «Tags» owns which one to pick. A tint outside those two needs a `tokens.json` entry first, or `scripts/tokens.py` fails the sync guard.
 
-| rgba alpha | Solid hex |
-|---|---|
-| 0.08 | `#EEF2F7` |
-| 0.14 | `#E4ECF5` |
-| **0.18** | **`#E4ECF5`** ← default |
-| 0.22 | `#D0DCE9` |
-| 0.30 | `#D6E1EE` |
-
-Formula: `solid_channel = base + (foreground - base) × alpha`. Different base colors (e.g. ivory) need re-computing.
-
-**Want "breathing" texture?** Use `linear-gradient` - the whole tag rasterizes as one bitmap, no alpha compositing:
-
-```css
-.tag { background: linear-gradient(to right, #D6E1EE, #E4ECF5 70%, #EEF2F7); }
-```
-
-**Aesthetic warning**: gradients work engineering-wise but usually oversell the tag. Priority order: lightest solid (`#EEF2F7`) > standard solid (`#E4ECF5`) > gradient (rarely). If the reader's eye lands on the tag background shape before the text inside - you went too far.
+If you genuinely need a texture, `linear-gradient` is safe engineering-wise (the tag rasterizes as one bitmap, no alpha compositing), but at tag size it oversells every time. Solid is the answer.
 
 ### 2. (P0) Thin border + radius = double circle
 
@@ -610,13 +602,38 @@ apt install fonts-noto-cjk
 mkdir -p ~/.fonts && cp *.ttf ~/.fonts/ && fc-cache -f
 ```
 
+### 4.1 (P1) Latin-first font stack splits CJK inside inline SVG
+
+**Symptom**: labels inside an embedded SVG render in two typefaces at once,
+often mid-word (`提交` in one face, `请` in another). The stack names a CJK
+family, and a rendered PDF still shows two.
+
+**Root cause**: for SVG text, a leading Latin serif (`Charter, Georgia, ...`)
+ends the CSS stack walk. Characters it has no glyph for go to fontconfig
+per glyph rather than continuing down the declared list, so the CJK families
+written after it never get their turn and each ideograph lands wherever
+fontconfig prefers (`Hiragino-Mincho` for some, `Songti-SC` for others).
+
+**Fix**: in SVG `text` rules, put the CJK families first and let Latin faces
+trail. `@font-face` fonts do resolve inside inline SVG, so `TsangerJinKai02`
+leading the stack draws both scripts from one family:
+
+```css
+/* wrong: CJK after Latin, splits per glyph */
+text { font-family: Charter, Georgia, "TsangerJinKai02", "Songti SC", serif; }
+/* right: one family draws the whole label */
+text { font-family: "TsangerJinKai02", "Source Han Serif SC", "Songti SC", Charter, Georgia, serif; }
+```
+
+`--check-fonts` catches this state; a page render at normal size usually does not.
+
 ### 5. (P2) CJK and Latin crowding (Chinese mode only)
 
 **Symptom**: "125.4k GitHub Stars" - k and G feel glued.
 
 **Wrong fixes**: hand-added `&nbsp;` / `margin-left: 2mm` (misaligns adjacent elements).
 
-**Right fix**: separate spans with flex gap:
+**Right fix**: separate spans and let flex `gap` carry the space, never a hand-added `&nbsp;` or margin:
 
 ```html
 <div class="metric">
@@ -625,8 +642,10 @@ mkdir -p ~/.fonts && cp *.ttf ~/.fonts/ && fc-cache -f
 </div>
 ```
 ```css
-.metric { display: flex; align-items: baseline; gap: 6pt; }
+.metric { display: flex; gap: 6pt; }   /* direction: see pitfall #20 */
 ```
+
+The `gap` is the fix here. Whether the pair sits inline or stacks is a separate call, and pitfall #20 owns it.
 
 ### 6. (P2) Full-width vs half-width spaces (Chinese mode)
 
@@ -841,14 +860,14 @@ Quick check before building any demo: `rg 'src="(\.\./|/Users/|file://)' assets/
 **Fix**: Stack vertically (`flex-direction: column`). All numbers sit on the same top edge, all labels start at the same y below the numbers, and label wrap only extends each column's bottom, which is invisible on a slide / page.
 
 ```css
-/* avoid: breaks visually when one label wraps */
-.metric { display: flex; align-items: baseline; gap: 8pt; }
+/* inline: only when every label in the row is short and single-line */
+.metric { display: flex; align-items: baseline; }
 
-/* use: vertical stack, number above label */
-.metric { display: flex; flex-direction: column; gap: 6pt; }
+/* stack: the default whenever a label can wrap */
+.metric { display: flex; flex-direction: column; }
 ```
 
-This is especially important on slides where metrics often sit on a baseline strip at the bottom of the page; even a single multi-line label among 3 columns breaks the rhythm.
+The shipped templates follow exactly that split: `equity-report*.html` keeps the inline baseline because its labels are fixed short strings, while every `landing-page*.html` stacks, because a screen label is translated, retitled, and read at 375px. On slides, where metrics sit on a baseline strip at the bottom, one multi-line label among three columns is enough to break the rhythm, so stack there too.
 
 ### 21. (P2) Slide bullets: prefer short numerals or `•` over en-dash
 
