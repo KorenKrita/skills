@@ -39,9 +39,12 @@ SITE_LOCALE_PAGES = (
 
 # Every surface that must carry the full public fact set. Derived from the
 # locale-page tuple so adding a locale automatically joins both checks.
+# index.md is the Markdown twin agents read instead of the homepage, so it
+# carries the same install and product facts.
 FULL_PUBLIC_FACT_FILES = (
     "README.md",
     "llms.txt",
+    "index.md",
     SITE_BASE_PAGE,
     *SITE_LOCALE_PAGES,
 )
@@ -249,6 +252,41 @@ def site_fact_issues(files: Mapping[str, str] | None = None) -> list[str]:
     return issues
 
 
+# The site teaches CSS recipes in prose, outside any code fence, so
+# `--check-docs` (which reads Markdown fences) cannot see them. That is how the
+# homepage kept advertising a 0.5pt closed border with a radius long after the
+# linter started failing templates for it, in five locales at once. This guard
+# reads the rendered copy of every locale page and fails on the combinations the
+# design system forbids outright, so the public surface cannot drift past the
+# rules the repository enforces on itself.
+FORBIDDEN_SITE_RECIPES = (
+    (
+        re.compile(r"0\.5pt\s*(?:border|枠線|邊框|边框)[^.。]{0,40}(?:radius|圆角|圓角|角丸)", re.I),
+        "sub-1pt closed border paired with a radius (production.md pitfall #2)",
+    ),
+    (
+        re.compile(r"border:\s*0\.5pt\s+solid\s+var\(--brand\)", re.I),
+        "closed 0.5pt brand border; mark one edge with border-left instead",
+    ),
+)
+
+
+def site_recipe_issues(files: Mapping[str, str] | None = None) -> list[str]:
+    """Flag CSS recipes on the public pages that the design system forbids."""
+    texts, issues = _file_texts(files)
+    if SITE_SURFACE_ABSENT in texts:
+        return []
+    for rel in (SITE_BASE_PAGE, *SITE_LOCALE_PAGES):
+        raw = texts.get(rel)
+        if raw is None:
+            continue
+        visible = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", raw))
+        for pattern, why in FORBIDDEN_SITE_RECIPES:
+            if pattern.search(visible):
+                issues.append(f"{rel}: teaches {why}")
+    return issues
+
+
 def check_site_facts(verbose: bool = False) -> int:
     if not any((ROOT / rel).exists() for rel in (*FULL_PUBLIC_FACT_FILES, REDIRECT_SITE_FILE)):
         print("OK: public site facts skipped (site files absent)")
@@ -266,6 +304,17 @@ def check_site_facts(verbose: bool = False) -> int:
             print(f"  {issue}")
         if verbose:
             print("  source: shared public constants and template registries")
+        result = 1
+
+    recipe_issues = site_recipe_issues()
+    if not recipe_issues:
+        print(f"OK: no forbidden CSS recipes across {len(SITE_LOCALE_PAGES) + 1} public page(s)")
+    else:
+        print(f"\nERROR: [site-recipe-drift] {len(recipe_issues)}")
+        for issue in recipe_issues:
+            print(f"  {issue}")
+        if verbose:
+            print("  source: references/design.md and production.md pitfall #2")
         result = 1
 
     structure_issues = site_structure_issues()

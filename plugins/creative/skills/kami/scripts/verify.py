@@ -15,17 +15,19 @@ from pathlib import Path
 
 from checks import scan_density
 from lint import scan_file
-from optional_deps import MissingDepError, require_pypdf_reader
+from optional_deps import MissingDepError, require_pymupdf, require_pypdf_reader
 from render import build_slides, render_pdf
 from shared import (
     DIAGRAMS,
     EXAMPLES,
+    ROOT,
     TEMPLATES,
     build_targets,
     default_example_pdfs,
     diagram_targets,
     load_checks_thresholds,
     pptx_targets,
+    rel_to_root,
     screen_targets,
 )
 
@@ -33,6 +35,33 @@ from shared import (
 CN_PRIMARY_FONTS = {"TsangerJinKai02"}
 EN_PRIMARY_FONTS = {"Charter"}
 KO_PRIMARY_FONTS = {"Source-Han-Serif-K", "SourceHanSerifK"}
+
+# Serif families that keep a CJK page readable when the primary is unavailable.
+# Falling through to one of these is a degradation, not a defect: the page still
+# carries the serif texture every size, tracking and leading value was tuned for.
+CJK_SERIF_MARKERS = (
+    "TsangerJinKai",
+    "SourceHanSerif",
+    "NotoSerifCJK",
+    "NotoSerifSC",
+    "NotoSerifTC",
+    "NotoSerifJP",
+    "NotoSerifKR",
+    "Songti",
+    "STSong",
+    "SimSun",
+    "STZhongsong",
+    "STKaiti",
+    "KaiTi",
+    "MSung",
+    "MingLiU",
+    "HiraginoMincho",
+    "HiraMinPro",
+    "YuMincho",
+)
+# A CJK run needs at least this many ideographs before its dominant font is
+# worth judging: a stray glyph in an otherwise Latin document proves nothing.
+MIN_CJK_CHARS_TO_JUDGE = 20
 RECOGNIZABLE_FALLBACK_FONT_MARKERS = (
     "Georgia",
     "Palatino",
@@ -93,6 +122,188 @@ def _pdf_font_names(pdf_path: Path) -> set[str]:
     except Exception as exc:
         print(f"  WARN: could not read font names from PDF: {exc}")
         return set()
+
+
+def _normalize_font_name(name: str) -> str:
+    """Reduce a PDF BaseFont entry to comparable letters and digits.
+
+    Embedded names arrive subset-prefixed and punctuated in every combination
+    ('ABCDEF+NotoSerifCJKsc-Regular', 'Noto Serif CJK SC'), so markers are
+    matched against a stripped, lowercased form instead of the raw string.
+    """
+    return re.sub(r"[^a-z0-9]", "", name.lower())
+
+
+def _classify_cjk_font(font_name: str) -> str:
+    """Return 'primary', 'serif' or 'other' for one font name.
+
+    'other' covers both a system sans substitution and a family nobody here
+    recognizes. Naming which of the two it is would need a second marker table
+    to maintain, and would change nothing: both fail, both take the same fix,
+    and the message already prints the family that drew the text.
+    """
+    normalized = _normalize_font_name(font_name)
+    if any(_normalize_font_name(m) in normalized for m in CN_PRIMARY_FONTS | KO_PRIMARY_FONTS):
+        return "primary"
+    if any(_normalize_font_name(m) in normalized for m in CJK_SERIF_MARKERS):
+        return "serif"
+    return "other"
+
+
+def _cjk_font_usage(pdf_path: Path) -> dict[str, int]:
+    """Return {font name: ideographs it drew} across the whole document.
+
+    Judging the font table alone cannot tell which family actually set the body
+    text: a document can embed a serif for two glyphs and a sans for the other
+    three thousand. Walking spans attributes every ideograph to the font that
+    drew it, so the verdict is about the text a reader sees.
+    """
+    fitz = require_pymupdf()
+    per_font: dict[str, int] = {}
+    with fitz.open(str(pdf_path)) as doc:
+        for page in doc:
+            for block in page.get_text("dict").get("blocks", []):
+                for line in block.get("lines", []):
+                    for span in line.get("spans", []):
+                        ideographs = sum(
+                            1 for ch in span.get("text", "")
+                            if "㐀" <= ch <= "鿿" or "가" <= ch <= "힯"
+                        )
+                        if ideographs:
+                            font = span.get("font", "") or "(unnamed)"
+                            per_font[font] = per_font.get(font, 0) + ideographs
+    return per_font
+
+
+# A second CJK family this far into the text is per-glyph fontconfig fallback,
+# not a design decision: it splits single words down the middle. Below it, a
+# stray symbol picked up elsewhere is not worth a failure.
+MIXED_FAMILY_MIN_SHARE = 0.05
+MIXED_FAMILY_MIN_CHARS = 3
+
+# Weight and style words a PDF appends to the family it subsets. Bold body text
+# is a second BaseFont entry off one family (TsangerJinKai02 plus
+# TsangerJinKai02-Medium), which the mixed-family rule must not read as two
+# typefaces. Longest first so 'semibold' strips before 'bold'.
+# Two-letter abbreviations (Md, Rg, Bd) are deliberately absent: no font seen
+# here uses them, and they are short enough to bite a real family name.
+_FONT_STYLE_SUFFIXES = (
+    "extralight", "semibold", "demibold", "oblique", "regular", "medium",
+    "italic", "mediu", "light", "black", "heavy", "roman", "book", "bold",
+    "thin", "lig",
+)
+
+
+# Numeric weight markers: TsangerJinKai ships W04/W05, other foundries use a
+# three-digit CSS weight. Both name one family at two weights.
+_FONT_WEIGHT_CODE = re.compile(r"(?:w\d{2}|\d{3})$")
+
+
+def _font_family_key(name: str) -> str:
+    """Reduce a font name to its family, dropping trailing weight/style words."""
+    key = _normalize_font_name(name)
+    changed = True
+    while changed:
+        changed = False
+        for suffix in _FONT_STYLE_SUFFIXES:
+            if key.endswith(suffix) and len(key) > len(suffix):
+                key = key[: -len(suffix)]
+                changed = True
+                break
+        stripped = _FONT_WEIGHT_CODE.sub("", key)
+        if stripped != key and stripped:
+            key = stripped
+            changed = True
+    return key
+
+
+FONT_RECOVERY_HINT = (
+    "  fix: bash scripts/ensure-fonts.sh (installs a CJK serif into the user font dir), "
+    "or `brew install --cask font-source-han-serif-sc` on macOS, "
+    "or `apt-get install fonts-noto-cjk` on Linux, then render again"
+)
+
+
+def check_fonts(paths: list[str]) -> int:
+    """CLI: --check-fonts doc.pdf [more.pdf ...]
+
+    Deterministic gate on the one failure a perceptual pass reliably misses.
+    A missing CJK serif does not produce fallback boxes; it silently swaps in a
+    sans that still reads, so both the agent and the author sign off on a page
+    whose typography is no longer the system's. The rendered PDF's own span
+    table settles it: whichever font drew the body ideographs is the verdict.
+    """
+    files = [p for p in paths if not p.startswith("-")]
+    if not files:
+        print("ERROR: usage: --check-fonts path/to/doc.pdf [more.pdf ...]")
+        return 2
+
+    failures = 0
+    for raw in files:
+        pdf = Path(raw)
+        if not pdf.is_absolute():
+            pdf = ROOT / pdf
+        rel = rel_to_root(pdf)
+        if not pdf.exists():
+            print(f"ERROR: {raw}: file not found")
+            failures += 1
+            continue
+        try:
+            usage = _cjk_font_usage(pdf)
+        except MissingDepError as exc:
+            print(f"ERROR: {exc}")
+            return 2
+        except Exception as exc:
+            print(f"ERROR: {rel}: could not read text spans: {exc}")
+            failures += 1
+            continue
+
+        count = sum(usage.values())
+        if not usage or count < MIN_CJK_CHARS_TO_JUDGE:
+            print(f"OK: {rel}: no CJK body text to judge ({count} ideograph(s))")
+            continue
+
+        # Collapse weight variants into their family before counting families.
+        families: dict[str, tuple[str, int]] = {}
+        for name, chars in usage.items():
+            key = _font_family_key(name)
+            label, total = families.get(key, (name, 0))
+            if chars > usage.get(label, 0):
+                label = name
+            families[key] = (label, total + chars)
+
+        dominant = max(families, key=lambda k: families[k][1])
+        font, font_chars = families[dominant]
+        others = [
+            (label, chars) for key, (label, chars) in families.items()
+            if key != dominant
+            and chars >= MIXED_FAMILY_MIN_CHARS
+            and chars / count >= MIXED_FAMILY_MIN_SHARE
+        ]
+        if others:
+            detail = ", ".join(f"{name} ({chars})" for name, chars in sorted(others))
+            print(f"ERROR: {rel}: CJK text split across families: {font} ({font_chars}), {detail}")
+            print("  per-glyph fallback breaks single words across two typefaces; "
+                  "one page carries one serif")
+            print(FONT_RECOVERY_HINT)
+            failures += 1
+            continue
+
+        verdict = _classify_cjk_font(font)
+        if verdict == "primary":
+            print(f"OK: {rel}: CJK body text in {font} ({count} ideographs)")
+        elif verdict == "serif":
+            print(f"WARN: {rel}: CJK body text in {font}, a serif fallback, not the kami primary")
+            print("  acceptable, but the page is not the reference rendering")
+        else:
+            print(f"ERROR: {rel}: CJK body text in {font}, not a CJK serif")
+            print("  the parchment metrics are tuned for serif stroke density; a sans "
+                  "substitution reads heavier and flatter at the same size, with no "
+                  "fallback box to make it obvious")
+            print(FONT_RECOVERY_HINT)
+            failures += 1
+
+    return 0 if failures == 0 else 1
 
 
 def _check_font_sources(html_path: Path) -> list[str]:

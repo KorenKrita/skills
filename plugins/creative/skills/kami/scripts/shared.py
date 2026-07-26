@@ -186,7 +186,8 @@ PUBLIC_DOCUMENT_TEMPLATE_KINDS = {
 }
 
 
-def _public_template_kind(name: str) -> str:
+def public_template_kind(name: str) -> str:
+    """Map a registry template name to the public kind it belongs to."""
     for suffix in ("-en", "-ko"):
         if name.endswith(suffix):
             name = name[: -len(suffix)]
@@ -199,9 +200,9 @@ def _public_template_kind(name: str) -> str:
 def public_document_template_kinds() -> set[str]:
     """Return public document-template kinds represented by HTML_TEMPLATES."""
     return {
-        _public_template_kind(name)
+        public_template_kind(name)
         for name in HTML_TEMPLATES
-        if _public_template_kind(name) in PUBLIC_DOCUMENT_TEMPLATE_KINDS
+        if public_template_kind(name) in PUBLIC_DOCUMENT_TEMPLATE_KINDS
     }
 
 

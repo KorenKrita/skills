@@ -41,7 +41,7 @@ labels render and embed correctly. Keep these hex values in sync with `tokens.js
 ## Most cases: edit a ready template
 
 Kami ships `sequence`, `class`, and `er` as static Kami-styled diagrams (joining the
-14 hand-drawn ones). The common case needs **no tooling at all**: copy the nearest
+15 hand-drawn ones). The common case needs **no tooling at all**: copy the nearest
 `assets/diagrams/*.html`, edit the text labels, embed the `<svg>` into your document.
 beautiful-mermaid is the *source* of these diagrams; you do not need it to use them.
 

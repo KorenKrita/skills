@@ -18,6 +18,7 @@ from pathlib import Path
 
 from optional_deps import MissingDepError, require_pymupdf
 from shared import ROOT, load_checks_thresholds, rel_to_root
+from verify import check_fonts
 
 # Distilled from references/design.md and references/production.md Part 4.
 # Keep entries stable: hosts learn to walk this list page by page.
@@ -136,6 +137,13 @@ def check_visual(paths: list[str]) -> int:
             print(f"  {rel_to_root(page)}")
 
     if rendered:
+        # The first checklist entry ("no fallback boxes or mixed families") is the
+        # one an eyeball pass fails at: a missing CJK serif substitutes a sans that
+        # reads perfectly well, so nothing looks broken enough to catch. Settle it
+        # mechanically here rather than leaving it to the reviewer's judgement.
+        print("Font check (deterministic, settles checklist item 1):")
+        if check_fonts([str(pdf) for pdf, _ in rendered]) != 0:
+            failures += 1
         print("Review checklist (view every page image before shipping):")
         for item in REVIEW_CHECKLIST:
             print(f"  - {item}")

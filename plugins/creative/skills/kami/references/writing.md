@@ -279,7 +279,7 @@ Structure is necessary but not sufficient. These bars define what separates comp
 
 **Term consistency self-check**: after drafting, list every domain term that appears 3 or more times (product names, feature names, roles, metrics). Confirm there is exactly one spelling and capitalization for each. Inconsistent casing ("LLM" vs "llm" vs "large language model") signals an unreviewed draft.
 
-**Caption quality bar**: every cap must answer "why does this slide matter": give a tradeoff, an applicability boundary, a next step, or the insight the diagram alone cannot say. Two failure modes both waste the cap's attention slot: restating the slide title in different words (anti-pattern #29), or restating the flow diagram in prose (anti-pattern #26). If removing the cap would make the slide weaker, it is doing its job; if removing it changes nothing, rewrite it.
+**Caption quality bar**: every cap must answer "why does this slide matter": give a tradeoff, an applicability boundary, a next step, or the insight the diagram alone cannot say. Two failure modes both waste the cap's attention slot: restating the slide title in different words (anti-pattern #30), or restating the flow diagram in prose (anti-pattern #27). If removing the cap would make the slide weaker, it is doing its job; if removing it changes nothing, rewrite it.
 
 **Term annotation half-life**: decks 超过 10 张时，跨越 10-slide 窗口再出现的术语需重标。见 core principle #7。
 
@@ -460,7 +460,7 @@ Run through before shipping every draft:
 - [ ] Number format consistent (commas, percent signs, arrows)?
 - [ ] Chinese punctuation and Chinese / Latin spacing consistent where applicable?
 - [ ] Page count within the document's constraint (resume 2, one-pager 1, letter 1)?
-- [ ] Any AI writing cliches? CN: 本质是 / 这意味着 / 值得注意的是 / 不仅...而且 / 破折号堆砌。EN: em dashes, "It's worth noting", "This means that". See anti-patterns #27.
+- [ ] Any AI writing cliches? CN: 本质是 / 这意味着 / 值得注意的是 / 不仅...而且 / 破折号堆砌。EN: em dashes, "It's worth noting", "This means that". See anti-patterns #28.
 - [ ] Multi-page docs (>8 pages / >10 slides): domain terms re-annotated beyond the half-life window? See principle #7.
 - [ ] Multilingual surfaces: native-reader localization pass done per locale, rewrite counts reported?
 
