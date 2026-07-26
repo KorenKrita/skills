@@ -308,10 +308,7 @@ skills:
   read:
     source: { repo: tw93/Waza, path: skills/read, ref: main }
     plugin: plus
-    patches:
-      - type: replace
-        pattern: "**Update check (non-blocking).** Once per conversation, run `bash <skill-base-dir>/scripts/check-update.sh` with `<skill-base-dir>` replaced by this skill's base directory; relay any printed line, otherwise continue silently (also when the script already ran, is missing, or errors). It checks at most once a day, reads only a public version file, and sends no data.\n\n"
-        with: ""
+    patches: []
     exclude_files:
       - scripts/check-update.sh
 
@@ -356,9 +353,6 @@ skills:
     plugin: creative
     patches:
       - { type: set_frontmatter, field: name, value: ui }
-      - type: replace
-        pattern: "**Update check (non-blocking).** Once per conversation, run `bash <skill-base-dir>/scripts/check-update.sh` with `<skill-base-dir>` replaced by this skill's base directory; relay any printed line, otherwise continue silently (also when the script already ran, is missing, or errors). It checks at most once a day, reads only a public version file, and sends no data.\n\n"
-        with: ""
     exclude_files:
       - scripts/check-update.sh
 
