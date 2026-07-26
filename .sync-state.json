@@ -201,13 +201,13 @@
     ]
   },
   "ocr": {
-    "sha": "c9b145635c6b6343b108941c2a627ac636836c6b",
+    "sha": "0ced7165718725e15223c3e5a506df7b7e9de51f",
     "files": [
       "SKILL.md"
     ]
   },
   "nuclear-review": {
-    "sha": "04166ac89136d36de2a87f24429e6cc307594953",
+    "sha": "d45ad028b7d50fca8550a33e7b40842e67fea284",
     "files": [
       "SKILL.md"
     ]
@@ -246,7 +246,7 @@
     ]
   },
   "read": {
-    "sha": "b3937a42fa8692e658209220e220e2cb4f9bce60",
+    "sha": "9c97ccb6d96e776bf814e27498d0afc0ed3d1e94",
     "files": [
       "SKILL.md",
       "references/read-methods.md",
@@ -306,13 +306,16 @@
     ]
   },
   "ui": {
-    "sha": "b3937a42fa8692e658209220e220e2cb4f9bce60",
+    "sha": "9c97ccb6d96e776bf814e27498d0afc0ed3d1e94",
     "files": [
       "SKILL.md",
       "references/design-aesthetic-quality.md",
       "references/design-data-viz.md",
       "references/design-reference.md",
-      "references/durable-context.md"
+      "references/durable-context.md",
+      "references/mode-generated-asset.md",
+      "references/mode-quick-fix.md",
+      "references/mode-screenshot-iteration.md"
     ]
   },
   "web": {
@@ -506,7 +509,7 @@
     ]
   },
   "kami": {
-    "sha": "21fa0b19e8f3af58208a9354560e89565131a93a",
+    "sha": "8fb9f26dc7a88a9f3c7daad65db93d17a2f89362",
     "files": [
       "CHEATSHEET.md",
       "LICENSE",
@@ -578,6 +581,7 @@
       "references/brand-profile.md",
       "references/brand.example.md",
       "references/checks_thresholds.json",
+      "references/deck-preflight.md",
       "references/design.md",
       "references/diagrams.md",
       "references/mermaid-theme.json",
