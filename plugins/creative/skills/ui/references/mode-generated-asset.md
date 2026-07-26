@@ -1,0 +1,36 @@
+# Mode: Generated Image Asset
+
+For diagrams, architecture illustrations, covers, and social cards produced by generation rather than laid out in code. The failure this mode exists to stop is the rejection loop: generate, get "ugly", tweak a color, generate again, seven rounds later the subject was never the disagreement.
+
+## Spec Before Pixels
+
+Write the spec and get it approved before generating anything. Six lines, no more:
+
+- **One sentence on what the image says.** Not the topic, the claim. "A terminal tool that cleans a Mac" is a claim; "architecture diagram" is a topic.
+- **Language** of every string in the frame.
+- **Aspect and where it will be seen** (README header, social preview, release body, docs inline). Legibility at the smallest place it appears is the constraint that decides type size.
+- **Palette count**, stated as a number. Generated art defaults to more colors than a diagram can carry.
+- **Reference**: an existing image the user already accepted, or a named product whose asset style to sit next to.
+- **Must not appear**: the exclusion list. Version numbers and changelog content belong here by default.
+
+A spec approved for one repo carries to its sibling repos unchanged. Re-deriving it per repo is how the same six corrections get spoken six times.
+
+## Two Rejections Is A Hard Stop
+
+Count rejections on look, not on content. After the second, stop generating and re-align: restate the one sentence, ask which existing image to sit next to, confirm the exclusion list. A third blind regeneration treats the rejection as parameter noise, and the version after it can be worse than the version before, which is the tell that nothing was anchored.
+
+When a version is partly right, name the part that survives before generating again. "Keep the composition, change the palette" converges; "make it better" does not.
+
+## Decoration Debt
+
+Every mark must encode information. Sweep the output for these before showing it:
+
+- **Removable-test each rule, border, frame, and divider.** If deleting it loses no information, it was decoration.
+- **Arrowheads at the smallest legible size**, not the generator's default. Oversized arrows read as clip art and are the single most common rejection.
+- **Logos on transparent or matched ground.** A white halo around a logo on a dark field means the source had a matte; fix the source, do not paint over it.
+- **Flat field.** Gradients, glows, and drop shadows in a diagram add depth that carries no meaning and muddies the darkest region.
+- **Line count.** Connectors and separators multiply faster than the information they carry; if two boxes are adjacent, adjacency already says it.
+
+## Scope It To What The Thing Is
+
+An asset describing what changed in one version is stale the day the next version ships. Diagrams, covers, and social cards describe the product, not the release. Keep version strings, changelog entries, and "new in" framing out of the frame; those live in the text beside it, which is cheap to update.
