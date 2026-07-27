@@ -201,7 +201,7 @@
     ]
   },
   "ocr": {
-    "sha": "25c3661c62c6fa5be2dee7ce6706c4f1517672cb",
+    "sha": "33a77d6f8fcd8c650d5ebfd23db68fe7af3d764a",
     "files": [
       "SKILL.md"
     ]
@@ -298,7 +298,7 @@
     ]
   },
   "i-have-adhd": {
-    "sha": "16a42a01f7783e29db8557dfc46226baf8015618",
+    "sha": "c784dcb56b07c8c103323f308b25f7b055008baa",
     "files": [
       "SKILL.md",
       "agents/gemini.toml",
