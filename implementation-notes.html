@@ -34,6 +34,15 @@
       <p><strong>实现约束：</strong>同步脚本按 upstream SHA 命名分支，被取代的旧 SHA PR（#147/#148）需人工关闭；关闭 PR 后 <code>--force</code> 重跑才会重建分支。重跑生成的 PR 基于旧 main，若期间 main 已递增同一 plugin 版本，需 rebase 后手工把版本号继续 +0.0.1 并重新 <code>build:marketplace</code>（本次 creative 0.0.11 → 0.0.12）。</p>
       <p><strong>验证：</strong><code>npm test</code>（45 passed）；合并后分支 SKILL.md 中 “update check” 匹配数为 0；PR #153/#154/#155 均以 MERGEABLE/CLEAN 合并。</p>
     </article>
+    <article id="archify-2-12-patch-drift-2026-07-28">
+      <h2>archify 2.12 上游改版导致三处补丁失效</h2>
+      <p><strong>状态：</strong>agent-resolved</p>
+      <p><strong>日期：</strong>2026-07-28</p>
+      <p><strong>背景：</strong>tt-a1i/archify 在 <code>3b5035f</code> 把 SKILL.md 从 423 行精简为 103 行并新增 <code>references/</code> 三份文档，同时把 <code>package.json</code> 的 <code>test</code> 脚本从 <code>node --test test/*.test.mjs</code> 改为 <code>node ../scripts/run-tests.mjs</code>。<code>overrides.yaml</code> 的两处 SKILL.md <code>replace_all</code> 目标段落已被上游整体删除，<code>package.json</code> 补丁则因脚本值变化而无法匹配，同步产出 <code>[补丁失败]</code> 草稿 PR #156，并把引用 <code>test/</code> 的脚本带进发布载荷。</p>
+      <p><strong>决策：</strong>删除两处已无对应内容的 SKILL.md <code>replace_all</code>（上游新 SKILL.md 已不再提及 <code>docs/guide.html</code>、<code>docs/gallery.html</code>、<code>examples/web-app.html</code>，补丁失去意义）；把单条多行 <code>package.json</code> 补丁拆成 <code>test:webm</code> 与 <code>test</code> 两条独立 <code>replace_all</code>，降低上游改动一行即整条失配的耦合。</p>
+      <p><strong>实现约束：</strong><code>test/</code> 目录仍由 <code>exclude_files</code> 屏蔽，因此 <code>package.json</code> 不得残留任何指向 <code>test/</code> 的脚本；布局测试原先只检查 SKILL.md 单文件的过期引用，现改为遍历 archify 全部 <code>.md</code>，使新增的 <code>references/</code> 文档同样受约束。</p>
+      <p><strong>验证：</strong><code>npx vitest run</code>（45 passed）；对 upstream 实时 <code>package.json</code> 重放新补丁两条均匹配且结果不含 <code>test/</code>；<code>node bin/archify.mjs doctor</code> 全项 ok，<code>validate architecture examples/web-app.architecture.json --quality showcase</code> 返回 <code>ok: true</code>。</p>
+    </article>
   </main>
 </body>
 </html>

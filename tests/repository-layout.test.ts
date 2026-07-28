@@ -188,13 +188,15 @@ describe("repository layout", () => {
     )
     expect(schemaReadme).not.toContain("`npm test`")
     expect(schemaReadme).toContain("`npm run check:validators`")
-    const skill = readFileSync(
-      join(ROOT, "plugins", "creative", "skills", "archify", "SKILL.md"),
-      "utf-8",
-    )
-    expect(skill).not.toContain("docs/guide.html")
-    expect(skill).not.toContain("examples/web-app.html")
-    expect(skill).toContain("examples/web-app.architecture.json")
+    const archifyDocs = textFiles(join(ROOT, "plugins", "creative", "skills", "archify"))
+      .filter((path) => path.endsWith(".md"))
+    for (const path of archifyDocs) {
+      const doc = readFileSync(path, "utf-8")
+      expect(doc, path).not.toContain("docs/guide.html")
+      expect(doc, path).not.toContain("docs/gallery.html")
+      expect(doc, path).not.toContain("examples/web-app.html")
+      expect(doc, path).not.toContain("web-app-rendered.html")
+    }
   })
 
   it("keeps nuclear-review renamed throughout runtime files", () => {
