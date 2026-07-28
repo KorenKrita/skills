@@ -201,13 +201,13 @@
     ]
   },
   "ocr": {
-    "sha": "33a77d6f8fcd8c650d5ebfd23db68fe7af3d764a",
+    "sha": "d03e47db3379392492a68f0135e57b363bd92750",
     "files": [
       "SKILL.md"
     ]
   },
   "nuclear-review": {
-    "sha": "ba7b5907843e1e21ec692418c180e1f912cbf7d3",
+    "sha": "91be0f994b5de7a75f4d6f2b3b00958126d9195e",
     "files": [
       "SKILL.md"
     ]
@@ -452,7 +452,7 @@
     ]
   },
   "archify": {
-    "sha": "d6a429e865ca013979172c7fc431c44a42622b3f",
+    "sha": "3b5035f94760b28296408114b9780afa12ad128d",
     "files": [
       "LICENSE",
       "SKILL.md",
@@ -477,6 +477,9 @@
       "package-lock.json",
       "package.json",
       "recipes/scenarios.mjs",
+      "references/authoring-contract.md",
+      "references/delivery-contract.md",
+      "references/viewer-runtime.md",
       "renderers/architecture/grid.mjs",
       "renderers/architecture/render-architecture.mjs",
       "renderers/dataflow/README.md",
