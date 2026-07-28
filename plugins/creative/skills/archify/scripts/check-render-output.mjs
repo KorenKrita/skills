@@ -68,11 +68,11 @@ if (svgMatches.length === 1) {
   const legendStart = svg.indexOf('<!-- Legend -->');
   const beforeLegend = legendStart >= 0 ? svg.slice(0, legendStart) : svg;
   const arrows = collectArrows(beforeLegend);
-  const diagonal = arrows.filter((arrow) => isTwoPointDiagonal(arrow));
+  const diagonal = arrows.flatMap((arrow) => diagonalStraightSegments(arrow).map((segment) => ({ arrow, ...segment })));
   addCheck(
     'orthogonal_arrows',
     diagonal.length === 0,
-    diagonal.map((arrow) => `${arrow.kind} ${arrow.index}: ${arrow.raw}`),
+    diagonal.map(({ arrow, segmentIndex }) => `${arrow.kind} ${arrow.index} segment ${segmentIndex + 1}: ${arrow.raw}`),
   );
   const relationshipCrossings = collectRelationshipCrossings(arrows);
   const compositionFrames = collectCompositionFrames(beforeLegend);
@@ -526,10 +526,12 @@ function straightPathSegments(d) {
   return segments.filter(({ start: a, end: b }) => isPoint(a) && isPoint(b));
 }
 
-function isTwoPointDiagonal(arrow) {
-  if (arrow.segments.length !== 1) return false;
-  const { start, end } = arrow.segments[0];
-  return Math.abs(start[0] - end[0]) > 0.01 && Math.abs(start[1] - end[1]) > 0.01;
+function diagonalStraightSegments(arrow) {
+  return arrow.borderSegments.flatMap(({ start, end }, segmentIndex) => (
+    Math.abs(start[0] - end[0]) > 0.01 && Math.abs(start[1] - end[1]) > 0.01
+      ? [{ segmentIndex, start, end }]
+      : []
+  ));
 }
 
 function collectLegendBoxes(fragment) {

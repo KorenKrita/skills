@@ -4543,7 +4543,7 @@
     </div>
 
     <!-- Main Diagram -->
-    <div class="diagram-container" data-detail-level="map">
+    <div class="diagram-container" data-detail-level="read">
       <!-- ARCHIFY:SVG_SLOT_START -->
       <svg viewBox="0 0 1000 680" role="img" aria-label="[PROJECT NAME] architecture diagram">
         <!-- Definitions -->
@@ -10166,7 +10166,7 @@
       function detailLevel() {
         if (state.mode === 'semantic') return 'full';
         if (state.scale >= 1.75) return 'full';
-        if (state.scale >= 1.25) return 'read';
+        if (state.scale >= 1) return 'read';
         return 'map';
       }
       function renderControls() {

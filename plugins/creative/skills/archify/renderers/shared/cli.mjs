@@ -36,7 +36,7 @@ export function writeDiagram({ outPath, template, diagramType, meta, footerLabel
   const guidedHint = Array.isArray(meta.views) && meta.views.length
     ? ' &bull; <kbd>[</kbd>/<kbd>]</kbd> views &bull; <kbd>P</kbd> play story'
     : '';
-  const startUrl = `https://tt-a1i.github.io/archify/start.html?type=${esc(diagramType)}`;
+  const startUrl = `https://tt-a1i.github.io/archify/start.html?type=${esc(diagramType)}&amp;source=artifact`;
   fs.writeFileSync(outPath, applyTemplate(template, {
     title: meta.title,
     subtitle: meta.subtitle,

@@ -10,6 +10,7 @@ import {
   isFinitePoint,
   rectsOverlap,
   segmentIntersectsRect,
+  cleanEndpointSideProblems,
   cleanFlowProblems,
   cleanCrossingProblems,
   cleanAmbiguousCorridorProblems,
@@ -20,9 +21,12 @@ import {
   suggestComponentSeparation,
   anchor,
   automaticPortSpread,
+  automaticPortRhythmBridge,
   defaultFromSide,
   defaultToSide,
   chosenSide,
+  routeHonorsEndpointSides,
+  normalizeRoutePoints,
   polylinePath,
   routePointsValue,
   roundedPath,
@@ -202,6 +206,16 @@ function validateArchitecture() {
     }
   }
 
+  problems.push(...cleanEndpointSideProblems({
+    relations: arch.connections,
+    endpointIds: new Set(components.keys()),
+    pathFor,
+    diagramType: 'architecture',
+    relationCollection: 'connections',
+    fromSideFor: (conn) => inferredAutoSide(conn, 'source'),
+    toSideFor: (conn) => inferredAutoSide(conn, 'target'),
+    routeHint: 'keep automatic routing so the renderer can use a side-aware bridge, or set truthful fromSide/toSide with perpendicular via segments',
+  }));
   problems.push(...cleanFlowProblems({
     relations: arch.connections,
     endpointIds: new Set(components.keys()),
@@ -330,7 +344,89 @@ function routeClearsComponents(conn, points, clearance = 2) {
   return true;
 }
 
-function routeVia(conn, from, to, start, end) {
+function routeClearsEndpointComponents(points, from, to) {
+  const lastSegment = points.length - 2;
+  for (let index = 0; index <= lastSegment; index += 1) {
+    const segment = { start: points[index], end: points[index + 1] };
+    if (index > 0 && segmentIntersectsRect(segment, from)) return false;
+    if (index < lastSegment && segmentIntersectsRect(segment, to)) return false;
+  }
+  return true;
+}
+
+const OUTWARD_SIDE_VECTOR = {
+  left: [-1, 0],
+  right: [1, 0],
+  top: [0, -1],
+  bottom: [0, 1],
+};
+
+function outwardStub(point, side, distance = 24) {
+  const [dx, dy] = OUTWARD_SIDE_VECTOR[side] || [0, 0];
+  return [point[0] + dx * distance, point[1] + dy * distance];
+}
+
+function collinearBacktrack(a, b, c) {
+  const first = [b[0] - a[0], b[1] - a[1]];
+  const second = [c[0] - b[0], c[1] - b[1]];
+  const cross = first[0] * second[1] - first[1] * second[0];
+  const dot = first[0] * second[0] + first[1] * second[1];
+  return Math.abs(cross) <= 0.0001 && dot < -0.0001;
+}
+
+function sideAwareBridgeCandidates(start, end, fromSide, toSide) {
+  const startStub = outwardStub(start, fromSide);
+  const endStub = outwardStub(end, toSide);
+  const rawCandidates = [];
+  const minimumBridge = 16;
+  const verticalSides = new Set(['top', 'bottom']);
+  const horizontalSides = new Set(['left', 'right']);
+
+  // Port spreading can leave parallel-side anchors only a few pixels apart.
+  // Route through a bounded outside channel so we keep both endpoint normals
+  // without introducing a tiny, noisy connector between the two stubs.
+  if (verticalSides.has(fromSide) && verticalSides.has(toSide)
+      && Math.abs(start[0] - end[0]) < minimumBridge) {
+    for (const channelX of [
+      Math.max(start[0], end[0]) + minimumBridge,
+      Math.min(start[0], end[0]) - minimumBridge,
+    ]) {
+      rawCandidates.push([
+        startStub,
+        [channelX, startStub[1]],
+        [channelX, endStub[1]],
+        endStub,
+      ]);
+    }
+  }
+  if (horizontalSides.has(fromSide) && horizontalSides.has(toSide)
+      && Math.abs(start[1] - end[1]) < minimumBridge) {
+    for (const channelY of [
+      Math.max(start[1], end[1]) + minimumBridge,
+      Math.min(start[1], end[1]) - minimumBridge,
+    ]) {
+      rawCandidates.push([
+        startStub,
+        [startStub[0], channelY],
+        [endStub[0], channelY],
+        endStub,
+      ]);
+    }
+  }
+
+  rawCandidates.push(
+    [startStub, [endStub[0], startStub[1]], endStub],
+    [startStub, [startStub[0], endStub[1]], endStub],
+  );
+  return rawCandidates.map((candidate) => normalizeRoutePoints([start, ...candidate, end]))
+    .filter((points) => points.length >= 2)
+    .filter((points) => !collinearBacktrack(points[0], points[1], points[2] || points[1]))
+    .filter((points) => !collinearBacktrack(points.at(-3) || points.at(-2), points.at(-2), points.at(-1)))
+    .filter((points) => routeHonorsEndpointSides(points, fromSide, toSide))
+    .map((points) => points.slice(1, -1));
+}
+
+function routeVia(conn, from, to, start, end, fromSide, toSide) {
   if (conn.via) return conn.via;
   switch (conn.route || 'auto') {
     case 'straight':
@@ -346,33 +442,114 @@ function routeVia(conn, from, to, start, end) {
     case 'auto':
     default: {
       // Direct line unless the anchors are clearly orthogonal-friendly.
-      if (Math.abs(start[0] - end[0]) < 4 || Math.abs(start[1] - end[1]) < 4) return [];
+      const deltaX = Math.abs(start[0] - end[0]);
+      const deltaY = Math.abs(start[1] - end[1]);
+      if ((deltaX < 4 || deltaY < 4) && routeHonorsEndpointSides([start, end], fromSide, toSide)) return [];
+
+      const rhythmBridge = automaticPortRhythmBridge(start, end, fromSide, toSide, {
+        accept: (points) => (
+          routeClearsEndpointComponents(points, from, to)
+          && routeClearsComponents(conn, points)
+        ),
+      });
+      if (rhythmBridge) return rhythmBridge.slice(1, -1);
+
+      // Automatic port spreading can leave otherwise aligned endpoints only a
+      // few pixels apart. A midpoint route would split that tiny difference
+      // into two unreadable endpoint stubs, so take a bounded outside channel
+      // when both anchors sit on parallel component sides.
+      const minimumStub = 8;
+      const fromVerticalSide = start[1] === from.y || start[1] === from.y + from.height;
+      const toVerticalSide = end[1] === to.y || end[1] === to.y + to.height;
+      if (fromVerticalSide && toVerticalSide && deltaX < minimumStub * 2) {
+        const outsideChannels = [
+          Math.max(start[0], end[0]) + minimumStub * 2,
+          Math.min(start[0], end[0]) - minimumStub * 2,
+        ];
+        for (const channelX of outsideChannels) {
+          const candidate = [[channelX, start[1]], [channelX, end[1]]];
+          const points = [start, ...candidate, end];
+          if (routeHonorsEndpointSides(points, fromSide, toSide) && routeClearsComponents(conn, points)) return candidate;
+        }
+      }
+
+      const fromHorizontalSide = start[0] === from.x || start[0] === from.x + from.width;
+      const toHorizontalSide = end[0] === to.x || end[0] === to.x + to.width;
+      if (fromHorizontalSide && toHorizontalSide && deltaY < minimumStub * 2) {
+        const outsideChannels = [
+          Math.max(start[1], end[1]) + minimumStub * 2,
+          Math.min(start[1], end[1]) - minimumStub * 2,
+        ];
+        for (const channelY of outsideChannels) {
+          const candidate = [[start[0], channelY], [end[0], channelY]];
+          const points = [start, ...candidate, end];
+          if (routeHonorsEndpointSides(points, fromSide, toSide) && routeClearsComponents(conn, points)) return candidate;
+        }
+      }
+
       const midX = (start[0] + end[0]) / 2;
       const horizontalFirst = [[midX, start[1]], [midX, end[1]]];
-      if (routeClearsComponents(conn, [start, ...horizontalFirst, end])) return horizontalFirst;
-
-      // The only fallback is the complementary in-bounds dogleg. Both
-      // candidates stay between the authored anchors, preserve two bends, and
-      // remain deterministic. If neither is safe, keep the original route so
-      // the universal Clean Flow gate returns the actionable hard failure.
       const midY = (start[1] + end[1]) / 2;
       const verticalFirst = [[start[0], midY], [end[0], midY]];
-      if (routeClearsComponents(conn, [start, ...verticalFirst, end])) return verticalFirst;
-      return horizontalFirst;
+      const candidates = [horizontalFirst, verticalFirst];
+      const sideSafe = candidates.filter((candidate) => (
+        routeHonorsEndpointSides([start, ...candidate, end], fromSide, toSide)
+      ));
+      const sideAware = sideAwareBridgeCandidates(start, end, fromSide, toSide);
+      const nearParallelPorts = (
+        ((fromSide === 'top' || fromSide === 'bottom')
+          && (toSide === 'top' || toSide === 'bottom')
+          && deltaX < minimumStub * 2)
+        || ((fromSide === 'left' || fromSide === 'right')
+          && (toSide === 'left' || toSide === 'right')
+          && deltaY < minimumStub * 2)
+      );
+      const ordered = [
+        ...(nearParallelPorts ? sideAware : sideSafe),
+        ...(nearParallelPorts ? sideSafe : sideAware),
+        ...candidates.filter((candidate) => !sideSafe.includes(candidate)),
+      ];
+      for (const candidate of ordered) {
+        const points = [start, ...candidate, end];
+        if (routeClearsEndpointComponents(points, from, to) && routeClearsComponents(conn, points)) return candidate;
+      }
+
+      // Both bounded doglegs are blocked. Keep the best endpoint-safe route
+      // when one exists so the universal Clean Flow gate reports the actual
+      // obstacle; otherwise preserve the historical deterministic fallback
+      // and let the endpoint-direction gate explain the side mismatch.
+      return sideSafe[0] || sideAware[0] || horizontalFirst;
     }
   }
 }
 
 const pathCache = new Map();
 const automaticPorts = automaticPortSpread(arch.connections, components);
+function connectionSides(conn) {
+  const from = components.get(conn.from);
+  const to = components.get(conn.to);
+  return {
+    fromSide: chosenSide(conn.fromSide, defaultFromSide(from, to)),
+    toSide: chosenSide(conn.toSide, defaultToSide(from, to)),
+  };
+}
+
+function inferredAutoSide(conn, endpoint) {
+  const field = endpoint === 'source' ? 'fromSide' : 'toSide';
+  if (conn[field] && conn[field] !== 'auto') return conn[field];
+  if (conn.via || (conn.route && conn.route !== 'auto')) return null;
+  return connectionSides(conn)[field];
+}
+
 function pathFor(conn) {
   if (pathCache.has(conn)) return pathCache.get(conn);
   const from = components.get(conn.from);
   const to = components.get(conn.to);
   const ports = automaticPorts.get(conn);
-  const start = ports?.from || anchor(from, chosenSide(conn.fromSide, defaultFromSide(from, to)));
-  const end = ports?.to || anchor(to, chosenSide(conn.toSide, defaultToSide(from, to)));
-  const points = [start, ...routeVia(conn, from, to, start, end), end];
+  const { fromSide, toSide } = connectionSides(conn);
+  const start = ports?.from || anchor(from, fromSide);
+  const end = ports?.to || anchor(to, toSide);
+  const points = [start, ...routeVia(conn, from, to, start, end, fromSide, toSide), end];
   const routed = { d: roundedPath(points, 8), points };
   pathCache.set(conn, routed);
   return routed;
