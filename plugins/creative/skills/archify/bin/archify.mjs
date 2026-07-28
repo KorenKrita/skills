@@ -694,9 +694,11 @@ async function commandDeliver(args) {
 
   const renderer = rendererPath(type);
   const inputPath = path.resolve(input);
+  let specification;
   let diagram;
   try {
-    diagram = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
+    specification = fs.readFileSync(inputPath);
+    diagram = JSON.parse(specification.toString('utf8'));
   } catch (error) {
     const repair = inputDiagnostic(error, inputPath);
     reportDeliveryFailure({
@@ -764,9 +766,32 @@ async function commandDeliver(args) {
     return;
   }
   const candidatePath = path.join(stagingDirectory, path.basename(outputPath));
+  const specificationSnapshotPath = path.join(stagingDirectory, 'specification.snapshot.json');
 
   try {
-    const render = runNode([renderer, inputPath, candidatePath], {
+    try {
+      fs.writeFileSync(specificationSnapshotPath, specification, { flag: 'wx' });
+    } catch (error) {
+      const message = `Could not freeze the delivery specification: ${error.message}`;
+      reportDeliveryFailure({
+        json,
+        stage: 'prepare',
+        type,
+        input: inputPath,
+        output: outputPath,
+        error: message,
+        diagnostics: [diagnostic({
+          code: 'delivery/freeze-specification',
+          message,
+          subject: { input: inputPath },
+          evidence: { ...(error?.code ? { systemCode: error.code } : {}), reason: error.message },
+          supportedFixes: ['choose a writable output directory on the target filesystem'],
+        })],
+      });
+      return;
+    }
+
+    const render = runNode([renderer, specificationSnapshotPath, candidatePath], {
       stdio: 'pipe',
       env: rendererEnv(qualityArgs.quality, repoArgs.repoRoot, true),
     });
@@ -882,6 +907,10 @@ async function commandDeliver(args) {
       type,
       input: inputPath,
       output: outputPath,
+      specification: {
+        sha256: createHash('sha256').update(specification).digest('hex'),
+        bytes: specification.byteLength,
+      },
       artifact: {
         sha256: createHash('sha256').update(artifact).digest('hex'),
         bytes: artifact.byteLength,
@@ -1044,6 +1073,18 @@ async function commandDoctor() {
     label: 'Scenario recipe guide',
     ok: fs.existsSync(scenarioGuide),
     missing: fs.existsSync(scenarioGuide) ? 0 : 1,
+  });
+
+  const authoringReferences = [
+    path.join(skillRoot, 'references', 'authoring-contract.md'),
+    path.join(skillRoot, 'references', 'viewer-runtime.md'),
+    path.join(skillRoot, 'references', 'delivery-contract.md'),
+  ];
+  const authoringReferencesMissing = authoringReferences.filter((file) => !fs.existsSync(file)).length;
+  checks.push({
+    label: 'Progressive authoring references',
+    ok: authoringReferencesMissing === 0,
+    missing: authoringReferencesMissing,
   });
 
   const compareRuntime = path.join(skillRoot, 'delta/architecture-delta.mjs');

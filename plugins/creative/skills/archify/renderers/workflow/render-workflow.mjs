@@ -97,6 +97,26 @@ function measureNode(node) {
   };
 }
 
+const nodeTextFit = {
+  widthFactor: 0.6,
+  horizontalPadding: 8,
+  labelPreferred: 11,
+  labelMinimum: 9,
+  sublabelPreferred: 8,
+  sublabelMinimum: 6,
+};
+
+function fittedNodeFontSize(text, width, preferred, minimum) {
+  const units = Math.max(1, textUnits(text));
+  const available = Math.max(1, width - nodeTextFit.horizontalPadding);
+  const fitted = Math.min(preferred, available / (units * nodeTextFit.widthFactor));
+  return Math.max(minimum, Math.floor(fitted * 10) / 10);
+}
+
+function minimumNodeTextWidth(text, minimum) {
+  return textUnits(text) * minimum * nodeTextFit.widthFactor;
+}
+
 const nodes = new Map(asArray(workflow.nodes).map((node) => [node.id, measureNode(node)]));
 
 function workflowCompositionFrames() {
@@ -207,6 +227,13 @@ function validateWorkflow() {
     if (estLabelW > node.width + 6) {
       problems.push(`Label "${node.label}" (~${Math.round(estLabelW)}px) is wider than node "${node.id}" (${node.width}px) — shorten the label, move detail to sublabel, or increase node.width.`);
     }
+    if (node.sublabel) {
+      const minimumSublabelW = minimumNodeTextWidth(node.sublabel, nodeTextFit.sublabelMinimum);
+      const availableSublabelW = node.width - nodeTextFit.horizontalPadding;
+      if (minimumSublabelW > availableSublabelW) {
+        problems.push(`Sublabel "${node.sublabel}" needs ~${Math.ceil(minimumSublabelW)}px at the ${nodeTextFit.sublabelMinimum}px legible minimum, but node "${node.id}" provides ${availableSublabelW}px — shorten the sublabel or increase node.width.`);
+      }
+    }
 
     const top = laneTop(node.lane);
     const contentTop = top + layout.laneTitleH;
@@ -219,6 +246,7 @@ function validateWorkflow() {
     }
   }
 
+  const phaseRanges = [];
   for (const phase of asArray(workflow.phases)) {
     if (!Number.isInteger(phase.fromCol) || !Number.isInteger(phase.toCol)) {
       problems.push(`Phase "${phase.id}" must use integer fromCol/toCol values.`);
@@ -226,11 +254,22 @@ function validateWorkflow() {
     }
     if (phase.fromCol < 0 || phase.toCol >= layout.colXs.length || phase.fromCol > phase.toCol) {
       problems.push(`Phase "${phase.id}" uses invalid columns ${phase.fromCol}..${phase.toCol}; use an ordered range within 0..${layout.colXs.length - 1}.`);
+    } else {
+      phaseRanges.push(phase);
     }
     const estLabelW = textUnits(phase.label) * 5.6;
     const width = spanForCols(phase.fromCol, phase.toCol).width;
     if (estLabelW > width + 8) {
       problems.push(`Phase label "${phase.label}" (~${Math.round(estLabelW)}px) is wider than its ${Math.round(width)}px span — shorten the label or widen the phase range.`);
+    }
+  }
+  phaseRanges.sort((a, b) => a.fromCol - b.fromCol || a.toCol - b.toCol);
+  for (let i = 0; i < phaseRanges.length; i += 1) {
+    for (let j = i + 1; j < phaseRanges.length; j += 1) {
+      const earlier = phaseRanges[i];
+      const later = phaseRanges[j];
+      if (later.fromCol > earlier.toCol) break;
+      problems.push(`Phase "${later.id}" (${later.fromCol}..${later.toCol}) overlaps phase "${earlier.id}" (${earlier.fromCol}..${earlier.toCol}) — start at col ${earlier.toCol + 1} or later, or end the earlier phase at col ${later.fromCol - 1}.`);
     }
   }
 
@@ -499,8 +538,12 @@ function renderNode(node) {
   const fill = componentFill[node.type] || 'c-external';
   const accent = componentText[node.type] || 't-muted';
   const hasSub = node.sublabel != null && node.sublabel !== '';
+  const labelFontSize = fittedNodeFontSize(node.label, node.width, nodeTextFit.labelPreferred, nodeTextFit.labelMinimum);
+  const sublabelFontSize = hasSub
+    ? fittedNodeFontSize(node.sublabel, node.width, nodeTextFit.sublabelPreferred, nodeTextFit.sublabelMinimum)
+    : nodeTextFit.sublabelPreferred;
   const sub = hasSub
-    ? `\n          <text data-detail="context" x="${node.cx}" y="${node.y + 38}" class="t-muted" font-size="8" text-anchor="middle">${esc(node.sublabel)}</text>`
+    ? `\n          <text data-detail="context" x="${node.cx}" y="${node.y + 38}" class="t-muted" font-size="${sublabelFontSize}" text-anchor="middle">${esc(node.sublabel)}</text>`
     : '';
   const tag = node.tag
     ? `\n        <text data-detail="fine" x="${node.cx}" y="${node.y + node.height - 12}" class="${accent}" font-size="7" text-anchor="middle">${esc(node.tag)}</text>`
@@ -511,7 +554,7 @@ function renderNode(node) {
           <rect x="${node.x}" y="${node.y}" width="${node.width}" height="${node.height}" rx="6" class="c-mask"/>
           <rect x="${node.x}" y="${node.y}" width="${node.width}" height="${node.height}" rx="6" class="${fill}"${animateAttr(workflow.meta, 'node', nodeStep(node))} stroke-width="1.5"/>
           ${renderSemanticSigil(node.type, { x: node.x + 6, y: node.y + 6 })}
-          <text${hasSub ? ' data-detail-anchor' : ''} x="${node.cx}" y="${node.y + 21}" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">${esc(node.label)}</text>${sub}${tag}
+          <text${hasSub ? ' data-detail-anchor' : ''} x="${node.cx}" y="${node.y + 21}" class="t-primary" font-size="${labelFontSize}" font-weight="600" text-anchor="middle">${esc(node.label)}</text>${sub}${tag}
         </g>`;
 }
 

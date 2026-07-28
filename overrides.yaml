@@ -388,16 +388,30 @@ skills:
       - type: set_frontmatter
         field: description
         value: Create professional architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with SVG, pan/zoom, search, semantic relationship inspection, presentation mode, dark/light themes, optional motion, and PNG/JPEG/WebP/SVG/WebM export. Accepts plain-language descriptions or Mermaid flowchart, sequenceDiagram, and stateDiagram input, then lays diagrams out in Archify style. Use when the user asks for system or cloud architecture, infrastructure and network topology, security boundaries, technical or approval workflows, runbooks, CI/CD flows, API call sequences, request lifecycles, data pipelines, ETL/ELT, PII boundaries, data lineage, state machines, lifecycle/status transitions, or conversion/beautification of Mermaid diagrams.
-      - type: replace_all
-        pattern: "Every bundled scenario recipe is backed by a checked-in, validated example in `examples/` and a generated Proof Lab card. Use those examples as structural references rather than copying their domain facts. When changing a recipe or proof example in the repository, regenerate both `docs/guide.html` and `docs/gallery.html`; tests enforce that all 11 recipe proof IDs resolve and that each proof retains three named reader views."
-        with: "Every bundled scenario recipe is backed by a checked-in, validated JSON example in `examples/`. Use those examples as structural references rather than copying their domain facts."
-      - { type: replace_all, pattern: "`examples/web-app.html`", with: "`examples/web-app.architecture.json`" }
     target_patches:
       - target: package.json
         patches:
           - type: replace_all
-            pattern: "    \"test:webm\": \"node test/webm-artifact.smoke.mjs\",\n    \"test\": \"npm run check:validators && node test/golden.mjs && node --test test/*.test.mjs\",\n"
+            pattern: "    \"test:webm\": \"node test/webm-artifact.smoke.mjs\",\n"
             with: ""
+          - type: replace_all
+            pattern: "    \"test\": \"npm run check:validators && node test/golden.mjs && node ../scripts/run-tests.mjs\",\n"
+            with: ""
+          - type: replace_all
+            pattern: "    \"build:gallery\": \"node ../scripts/build-gallery.mjs ../docs\",\n"
+            with: ""
+          - type: replace_all
+            pattern: "    \"build:guide\": \"node ../scripts/build-guide.mjs ../docs/guide.html\",\n"
+            with: ""
+          - type: replace_all
+            pattern: "    \"build:start\": \"node ../scripts/build-start.mjs ../docs/start.html\",\n"
+            with: ""
+          - type: replace_all
+            pattern: "    \"build:readme-showcase\": \"node ../scripts/build-readme-showcase.mjs\",\n"
+            with: ""
+          - type: replace_all
+            pattern: "    \"check:validators\": \"node scripts/generate-validators.mjs --check\",\n    \"render:examples\": \"node scripts/render-examples.mjs ../examples\"\n"
+            with: "    \"check:validators\": \"node scripts/generate-validators.mjs --check\"\n"
       - target: schemas/README.md
         patches:
           - { type: replace_all, pattern: "`npm test`", with: "`npm run check:validators`" }

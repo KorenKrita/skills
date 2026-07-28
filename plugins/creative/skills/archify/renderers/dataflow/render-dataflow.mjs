@@ -162,6 +162,17 @@ function validateDataflow() {
       const [start, end] = [routed.points[0], routed.points[routed.points.length - 1]];
       const distance = Math.hypot(end[0] - start[0], end[1] - start[1]);
       if (distance < 34) problems.push(`Flow "${flow.label}" is too short (${Math.round(distance)}px; minimum 34px) — route it through a channel or spread its nodes.`);
+      if (Array.isArray(flow.via)) {
+        for (let segmentIndex = 0; segmentIndex < routed.points.length - 1; segmentIndex += 1) {
+          const segmentStart = routed.points[segmentIndex];
+          const segmentEnd = routed.points[segmentIndex + 1];
+          const isDiagonal = Math.abs(segmentStart[0] - segmentEnd[0]) > 0.01
+            && Math.abs(segmentStart[1] - segmentEnd[1]) > 0.01;
+          if (!isDiagonal) continue;
+          const viaIndex = Math.min(segmentIndex, flow.via.length - 1);
+          problems.push(`Flow "${flow.label}" has a diagonal segment from (${segmentStart.join(', ')}) to (${segmentEnd.join(', ')}) — align via[${viaIndex}] with its adjacent point by sharing the same x or y coordinate.`);
+        }
+      }
     }
   }
 
