@@ -397,6 +397,21 @@ skills:
           - type: replace_all
             pattern: "    \"test\": \"npm run check:validators && node test/golden.mjs && node ../scripts/run-tests.mjs\",\n"
             with: ""
+          - type: replace_all
+            pattern: "    \"build:gallery\": \"node ../scripts/build-gallery.mjs ../docs\",\n"
+            with: ""
+          - type: replace_all
+            pattern: "    \"build:guide\": \"node ../scripts/build-guide.mjs ../docs/guide.html\",\n"
+            with: ""
+          - type: replace_all
+            pattern: "    \"build:start\": \"node ../scripts/build-start.mjs ../docs/start.html\",\n"
+            with: ""
+          - type: replace_all
+            pattern: "    \"build:readme-showcase\": \"node ../scripts/build-readme-showcase.mjs\",\n"
+            with: ""
+          - type: replace_all
+            pattern: "    \"check:validators\": \"node scripts/generate-validators.mjs --check\",\n    \"render:examples\": \"node scripts/render-examples.mjs ../examples\"\n"
+            with: "    \"check:validators\": \"node scripts/generate-validators.mjs --check\"\n"
       - target: schemas/README.md
         patches:
           - { type: replace_all, pattern: "`npm test`", with: "`npm run check:validators`" }

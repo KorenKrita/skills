@@ -181,7 +181,13 @@ describe("repository layout", () => {
     const manifest = JSON.parse(
       readFileSync(join(ROOT, "plugins", "creative", "skills", "archify", "package.json"), "utf-8"),
     ) as { scripts?: Record<string, string> }
-    expect(Object.values(manifest.scripts ?? {}).join("\n")).not.toContain("test/")
+    const archifyScripts = Object.values(manifest.scripts ?? {})
+    expect(archifyScripts.join("\n")).not.toContain("test/")
+    // The published payload root is skills/archify, so "../scripts" and
+    // "../docs" resolve outside it and can never run for an installed skill.
+    for (const script of archifyScripts) {
+      expect(script, script).not.toContain("../")
+    }
     const schemaReadme = readFileSync(
       join(ROOT, "plugins", "creative", "skills", "archify", "schemas", "README.md"),
       "utf-8",
