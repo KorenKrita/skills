@@ -201,7 +201,7 @@
     ]
   },
   "ocr": {
-    "sha": "3017dc160bc1171e228481d838e8c67e3eaaf72f",
+    "sha": "2640f5830caa5998f29ee4c266f09df65bb952c2",
     "files": [
       "SKILL.md"
     ]
@@ -452,7 +452,7 @@
     ]
   },
   "archify": {
-    "sha": "3b5035f94760b28296408114b9780afa12ad128d",
+    "sha": "7b49d0b715fd4ba48116bcdecd1ba3789a279613",
     "files": [
       "LICENSE",
       "SKILL.md",
