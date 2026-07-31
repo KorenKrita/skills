@@ -201,13 +201,13 @@
     ]
   },
   "ocr": {
-    "sha": "2640f5830caa5998f29ee4c266f09df65bb952c2",
+    "sha": "75589cfcd8618e27e65eba4a1053eb2e3e9696fe",
     "files": [
       "SKILL.md"
     ]
   },
   "nuclear-review": {
-    "sha": "45c66fde1f1681a902a30d1ae8bca1cc64465d6e",
+    "sha": "15ef02d9719259476fbd13de1b2db35d79f04797",
     "files": [
       "SKILL.md"
     ]
@@ -298,7 +298,7 @@
     ]
   },
   "i-have-adhd": {
-    "sha": "07684c4ab625dd7d1ea6e99e065f60bc0ac6a1ba",
+    "sha": "34f746dda9664fb5ea52149be5dbab2adc6e60d3",
     "files": [
       "SKILL.md",
       "agents/gemini.toml",
