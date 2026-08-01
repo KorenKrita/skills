@@ -201,13 +201,13 @@
     ]
   },
   "ocr": {
-    "sha": "75589cfcd8618e27e65eba4a1053eb2e3e9696fe",
+    "sha": "f29659bbc0e487cc52becc381f687cf1d4b41d37",
     "files": [
       "SKILL.md"
     ]
   },
   "nuclear-review": {
-    "sha": "15ef02d9719259476fbd13de1b2db35d79f04797",
+    "sha": "14d9dfa06283faa94bf9931d3e98c189bc375680",
     "files": [
       "SKILL.md"
     ]
@@ -246,7 +246,7 @@
     ]
   },
   "read": {
-    "sha": "9c97ccb6d96e776bf814e27498d0afc0ed3d1e94",
+    "sha": "95b7d7426d34a05faa0b002e3c8f83a6d615ee81",
     "files": [
       "SKILL.md",
       "references/read-methods.md",
@@ -298,7 +298,7 @@
     ]
   },
   "i-have-adhd": {
-    "sha": "34f746dda9664fb5ea52149be5dbab2adc6e60d3",
+    "sha": "d05af1e4ac2259846e81686d14180d46d84acc2d",
     "files": [
       "SKILL.md",
       "agents/gemini.toml",
@@ -306,7 +306,7 @@
     ]
   },
   "ui": {
-    "sha": "9c97ccb6d96e776bf814e27498d0afc0ed3d1e94",
+    "sha": "95b7d7426d34a05faa0b002e3c8f83a6d615ee81",
     "files": [
       "SKILL.md",
       "references/design-aesthetic-quality.md",
@@ -512,7 +512,7 @@
     ]
   },
   "kami": {
-    "sha": "8fb9f26dc7a88a9f3c7daad65db93d17a2f89362",
+    "sha": "a211e7bbf9470493debfbbf0fe4645c05eaa546f",
     "files": [
       "CHEATSHEET.md",
       "LICENSE",
