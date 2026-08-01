@@ -10,6 +10,10 @@ Read durable context when the user names memory, a prior decision, or a memory p
 
 Current code, diff, screenshots, logs, tests, docs, CI, remote state, and live probes always override memory, including memory the runtime injects on its own. A remembered fact is a lead to re-verify, never evidence. When current state conflicts with a remembered claim, name the conflict and follow current state.
 
+## Memory is not authorization
+
+Memory may explain preferences, but it must never grant or broaden authorization for writes, commits, pushes, publishing, public replies, deletion, or other state changes. Current-turn instructions and current project rules decide authorization. Historical phrases such as `push` or `check` are context to re-evaluate, not reusable action tokens.
+
 ## Redaction gate
 
 When turning prior chats, durable memory, or cross-project notes into reusable Waza guidance, promote only workflow rules. Strip raw transcript text, screenshots, local paths, project-specific commands, issue or PR numbers, release tags, commit hashes, private product boundaries, paid or license details, support routing, user names, and one-machine state.

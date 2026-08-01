@@ -13,7 +13,7 @@ Write the spec and get it approved before generating anything. Six lines, no mor
 - **Reference**: an existing image the user already accepted, or a named product whose asset style to sit next to.
 - **Must not appear**: the exclusion list. Version numbers and changelog content belong here by default.
 
-A spec approved for one repo carries to its sibling repos unchanged. Re-deriving it per repo is how the same six corrections get spoken six times.
+Across sibling repos, carry over only approved visual-system constraints. Rebuild the claim, language, use, and exclusions for each repo.
 
 ## Two Rejections Is A Hard Stop
 
@@ -33,4 +33,4 @@ Every mark must encode information. Sweep the output for these before showing it
 
 ## Scope It To What The Thing Is
 
-An asset describing what changed in one version is stale the day the next version ships. Diagrams, covers, and social cards describe the product, not the release. Keep version strings, changelog entries, and "new in" framing out of the frame; those live in the text beside it, which is cheap to update.
+Evergreen assets describe the product, not a release. Keep version strings, changelog entries, and "new in" framing in adjacent text by default. When the user explicitly asks for a release card or other release-specific asset, include the requested release content and treat its shorter shelf life as intentional.
