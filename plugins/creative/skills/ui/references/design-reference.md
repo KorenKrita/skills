@@ -243,16 +243,16 @@ For a single component or quick prototype, skip this. The three-line thesis in S
 
 ## Pre-Handoff Checklist: Strategic Omissions
 
-These are the items most frequently missing from AI-generated UIs because they require intentional product thinking, not visual judgment. Run through them before every handoff.
+These are audit prompts, not automatic implementation scope. Run through them before handoff and report material omissions. Add one only when the current task or target project's public requirements include that surface; never create a route, footer link, consent flow, or policy page as incidental visual polish.
 
-- [ ] **Custom 404 page**: a generic framework 404 is a broken experience. Build a branded page with a clear path back (home link, search, or most-used nav items).
+- [ ] **Custom 404 page**: if the task includes routing or production hardening, a branded page needs a clear path back (home link, search, or most-used nav items).
 - [ ] **Back navigation**: every page reachable by user action must have a clear, functional path back. Dead-end pages (detail views, confirmation screens, modal-only flows) are UX failures.
 - [ ] **Form client-side validation**: email fields validate format before submit; required fields show inline errors; error messages appear adjacent to the field, not only at form top.
 - [ ] **Skip-to-content link**: a visually hidden `<a href="#main-content">Skip to main content</a>` as the first focusable element in the document. Required for keyboard accessibility.
-- [ ] **Cookie consent**: if the product operates in the EU or California, cookie consent UI is not optional. Scope the implementation to the jurisdiction.
-- [ ] **Footer Privacy and Terms links**: every product page needs these. Their absence signals "demo", not "product".
+- [ ] **Cookie consent**: if the product's actual tracking and jurisdiction require consent, flag the missing flow and scope it to that requirement.
+- [ ] **Footer Privacy and Terms links**: if the product's legal and distribution requirements call for them, verify they are discoverable without inventing a new footer in an unrelated task.
 
-These are not visual polish items. They are the difference between a demo and a shippable product.
+These are product-readiness questions. A visual-polish request may surface them, but does not authorize building them.
 
 ## AI Slop Test
 
