@@ -201,13 +201,13 @@
     ]
   },
   "ocr": {
-    "sha": "f29659bbc0e487cc52becc381f687cf1d4b41d37",
+    "sha": "5829539379ecc3c2e43c36061b73469f7a261f8d",
     "files": [
       "SKILL.md"
     ]
   },
   "nuclear-review": {
-    "sha": "14d9dfa06283faa94bf9931d3e98c189bc375680",
+    "sha": "b047069f4f3a73e87dd1f11f7913386d25876b91",
     "files": [
       "SKILL.md"
     ]
@@ -246,7 +246,7 @@
     ]
   },
   "read": {
-    "sha": "95b7d7426d34a05faa0b002e3c8f83a6d615ee81",
+    "sha": "663f27eb136118c0a3aa78b5ce9e712b7aee7f0a",
     "files": [
       "SKILL.md",
       "references/read-methods.md",
@@ -306,7 +306,7 @@
     ]
   },
   "ui": {
-    "sha": "95b7d7426d34a05faa0b002e3c8f83a6d615ee81",
+    "sha": "663f27eb136118c0a3aa78b5ce9e712b7aee7f0a",
     "files": [
       "SKILL.md",
       "references/design-aesthetic-quality.md",
@@ -512,7 +512,7 @@
     ]
   },
   "kami": {
-    "sha": "a211e7bbf9470493debfbbf0fe4645c05eaa546f",
+    "sha": "fbdb54f59b7f224db55322357e5739b9ef9687f4",
     "files": [
       "CHEATSHEET.md",
       "LICENSE",
@@ -613,6 +613,7 @@
       "scripts/mermaid_normalize.py",
       "scripts/optional_deps.py",
       "scripts/package-skill.sh",
+      "scripts/release_gate.py",
       "scripts/render.py",
       "scripts/shared.py",
       "scripts/site_facts.py",
