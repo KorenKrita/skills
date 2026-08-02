@@ -29,15 +29,15 @@ Skip and fall back to the brand profile defaults if the referenced path does not
 
 ## Step 1 · Decide the language
 
-**Match the user's language.** Chinese -> `*.html` / `slides-weasy.html`. English -> `*-en.html` / `slides-weasy-en.html`. Japanese -> CJK path (`.html` / `slides-weasy.html`) as best-effort, JP Mincho first, visual QA before shipping. Korean -> dedicated `*-ko.html` / `slides-weasy-ko.html` family as best-effort, visual QA before shipping. Reference docs are shared English specs.
+**Match the user's language.** Chinese -> `*.html` / `slides-weasy.html`. English -> `*-en.html` / `slides-weasy-en.html`. Japanese -> CJK path (`.html` / `slides-weasy.html` / `slides-marp.md`) as best-effort, JP Mincho first, visual QA before shipping. Korean -> dedicated `*-ko.html` / `slides-weasy-ko.html` family, with `slides-marp.md` as the best-effort Markdown path, visual QA before shipping. Reference docs are shared English specs.
 
-| User language | HTML templates | Slides (PDF default) | Slides (PPTX fallback) |
-|---|---|---|---|
-| Chinese (primary) | `*.html` | `slides-weasy.html` | `slides.py` |
-| English | `*-en.html` | `slides-weasy-en.html` | `slides-en.py` |
-| Japanese (best-effort) | `*.html` | `slides-weasy.html` | `slides.py` |
-| Korean (best-effort) | `*-ko.html` | `slides-weasy-ko.html` | n/a (use `slides-en.py` only if PPTX is required) |
-| Other languages (best-effort) | choose CJK or EN path by script coverage, then verify manually | choose `slides-weasy.html` or `slides-weasy-en.html`, then verify manually | use `slides.py` / `slides-en.py` only if PPTX is required |
+| User language | HTML templates | Slides (PDF default) | Slides (PPTX fallback) | Slides (Marp) |
+|---|---|---|---|---|
+| Chinese (primary) | `*.html` | `slides-weasy.html` | `slides.py` | `slides-marp.md` |
+| English | `*-en.html` | `slides-weasy-en.html` | `slides-en.py` | `slides-marp-en.md` |
+| Japanese (best-effort) | `*.html` | `slides-weasy.html` | `slides.py` | `slides-marp.md` |
+| Korean (best-effort) | `*-ko.html` | `slides-weasy-ko.html` | n/a (use `slides-en.py` only if PPTX is required) | `slides-marp.md` |
+| Other languages (best-effort) | choose CJK or EN path by script coverage, then verify manually | choose `slides-weasy.html` or `slides-weasy-en.html`, then verify manually | use `slides.py` / `slides-en.py` only if PPTX is required | choose `slides-marp.md` or `slides-marp-en.md`, then verify manually |
 
 > Default to the WeasyPrint HTML path; fall back to PPTX (`slides*.py`) only when the user explicitly needs an editable deck.
 
@@ -58,6 +58,17 @@ Before creating or modifying an output, lock the contract: language, template, o
 Use the nearest existing template and verification path. Do not add a new template, shared CSS layer, dependency, script flag, or optional mode unless the current request cannot be satisfied without it.
 
 If a change touches `SKILL.md`, templates, scripts, references, or package inputs, decide whether `dist/kami.zip` must be refreshed before handoff. Shipped behavior is not ready until the package contains the changed files.
+
+### Work mode
+
+Route by the artifact's current state before loading more guidance. This is an internal branch, not a new user-facing command.
+
+| Current task | Mode | Contract |
+|---|---|---|
+| New document or substantial restructuring | **New document** | Lock the execution contract, write `content.json` with `brief` + `content`, then fill and verify |
+| Text replacement, translation, or factual correction in an existing artifact | **Content-only** | Preserve CSS and layout unless the new copy proves a fit defect |
+| User supplies a render or screenshot and rejects how it looks | **Visual repair** | Treat the render as the current brief, lock target + preserve boundary, make the smallest fix, then verify the affected matrix |
+| Standalone generated illustration, cover, social card, or redraw | **Generated asset** | Lock the semantic image brief before pixels; preserve accepted parts across iterations |
 
 ---
 
@@ -133,10 +144,10 @@ Three routes inside that file, by trigger:
 
 Inline diagrams above are vector SVGs you assemble by hand. For a standalone raster illustration, or a redraw of a figure, photo, or screenshot in the Kami look, delegate the drawing to the host's own image generation. Never call an external image API or require a key; rendering is the host's job.
 
-- If the running host can generate images (for example ChatGPT), apply the brief below and render the image directly.
-- If it cannot (Claude, Codex, most coding agents), output the brief as text so the user can paste it into any image model.
+- If the running host exposes image generation, apply the brief below and render the image directly.
+- If image generation is unavailable, output the same complete brief as text. Route from observed capability, not a remembered list of host names.
 
-Brief: warm parchment (`#f5f4ed`) background, never pure white; one accent only, ink blue (`#1B365D`); all else warm gray with a yellow-brown undertone, no other colors; thin single-line geometric strokes and simple flat icons; no gradients, drop shadows, or 3D; serif labels; generous whitespace, composed like a figure in a well-typeset report. Full brief skeleton, icon rules, and QC checklist: `references/diagrams.md` «Illustration briefs».
+Brief: first state the claim the image must communicate, its destination and smallest display size, the accepted reference it should sit beside, and what must not appear. Then apply the Kami visual system: warm parchment (`#f5f4ed`) background, never pure white; one accent only, ink blue (`#1B365D`); all else warm gray with a yellow-brown undertone, no other colors; thin single-line geometric strokes and simple flat icons; no gradients, drop shadows, or 3D; serif labels; generous whitespace, composed like a figure in a well-typeset report. Full brief skeleton, icon rules, and QC checklist: `references/diagrams.md` «Illustration briefs».
 
 Switch to this path (instead of enlarging a hand-assembled SVG) when a figure needs more detail than SVG assembly holds at the target display width, typically web-article figures at teaching depth (see `references/diagrams.md` density tiers). When one deliverable needs several generated images, drive them through a single handoff file: one line per image (slot, aspect ratio, shared style anchor, prompt, status), generate in batches of at most 5, update the status column after each batch, and check existing generated output before regenerating. The style anchor is shared by the whole batch; per-image style drift is the failure mode.
 
@@ -168,7 +179,7 @@ After the material check, output a structured status block before continuing. Th
 Materials status:
 - Logo: OK assets/client-logo.svg
 - Brand colors: OK #1B365D mapped to --brand
-- Product screenshot: MISSING (proceeding with kami default placeholder)
+- Product screenshot: MISSING (using a pure-text layout; no placeholder image)
 - UI screenshot: not required for this doc type
 ```
 
@@ -192,13 +203,34 @@ Then proceed to Step 2.6 (slides) or the layout note (all other doc types) with 
 
 ### Persist the distilled content as a content IR (new documents)
 
-When building a new document (not a text tweak on an existing one), write the distilled result to a `content.json` next to your working HTML before filling:
+When building a new document (not a text tweak on an existing one), write the distilled result and the locked execution contract to a `content.json` next to your working HTML before filling:
 
 ```json
-{"type": "resume", "lang": "cn", "content": { ... }}
+{
+  "type": "resume",
+  "lang": "cn",
+  "brief": {
+    "audience": "Hiring manager for a senior product role",
+    "job": "Earn an interview by proving scope and outcomes",
+    "template": "resume",
+    "formats": ["html", "pdf"],
+    "page_target": 2,
+    "narrative": "Scope first, then evidence, then fit",
+    "required_facts": ["team size", "measured outcomes"],
+    "required_assets": [],
+    "acceptance_checks": ["two pages", "all atomic facts survive"],
+    "preserve": [],
+    "explicit_deviations": []
+  },
+  "content": { ... }
+}
 ```
 
-`type` is one of the schema names in `references/schemas/` (one-pager, letter, resume, long-doc, portfolio, slides, equity-report, changelog, landing-page). Read the matching schema before writing: its `$comment` notes carry the per-field quality bar. Then validate before any layout work:
+`type` is one of the schema names in `references/schemas/` (one-pager, letter, resume, long-doc, portfolio, slides, equity-report, changelog, landing-page). `brief` records why this artifact exists and how it will be judged; it is not audience copy. Only `brief.required_assets` joins the content-to-HTML coverage gate. For a visual repair, add `target`, `evidence`, and `preserve` so the fix cannot silently grow beyond the reported surface. Older IR files without `brief` remain valid, but every new document should write it. Read the matching content schema before writing: its `$comment` notes carry the per-field quality bar. Then validate before any layout work:
+
+The top-level envelope is strict: it contains only `type`, `lang`, `brief`, and `content`.
+Use a language tag such as `cn`, `en`, `ko`, or `zh-TW`; misspelled tags and extra
+top-level fields fail before template filling begins.
 
 ```bash
 python3 scripts/build.py --check-content content.json
@@ -365,6 +397,7 @@ python3 scripts/build.py --check-resume-balance path/to/resume.pdf
 python3 scripts/build.py --check-density path/to/filled.pdf  # page whitespace (one-page docs included)
 python3 scripts/build.py --check-density              # repo sweep (skips cover and template skeletons)
 python3 scripts/build.py --check-rhythm slides slides-en   # warn on monotonous slide sequences
+python3 scripts/build.py --doctor         # installed render/check/font capability report
 python3 scripts/build.py --check            # lint + token/theme + public-site fact checks
 python3 scripts/build_metadata.py --check   # Claude/Codex plugin mirror + marketplace drift check
 ```
@@ -374,6 +407,8 @@ python3 scripts/build_metadata.py --check   # Claude/Codex plugin mirror + marke
 > **Perceptual verify (PDF deliverables)**: geometry checks cannot see a fallback glyph or an arrow crossing a label. Before shipping a filled PDF, run `python3 scripts/build.py --check-visual path/to/filled.pdf`, then view every exported page image against the printed checklist. One hit means a whole-document sweep for that class of issue. If your host cannot view images, send the image paths and checklist to the user instead of skipping the pass. `--check-visual` runs the font gate for you and prints its verdict above the checklist.
 
 > **Font verify (CJK deliverables)**: a missing CJK serif produces no fallback boxes. It silently substitutes a sans that still reads, so the page passes an eyeball pass while carrying typography the parchment metrics were never tuned for, and the result reads heavy and flat without anything looking obviously broken. `--check-fonts` settles it from the rendered PDF's own span table: it names the family that drew the body ideographs and fails on a sans substitution or on text split across two families. Never report a CJK document as visually verified without it, and never assume a sandbox has the fonts: the commercial TsangerJinKai02 files never ship inside the skill package.
+
+> **Fresh review**: after the mechanical and perceptual checks pass, review once from the artifact contract rather than from the builder's rationale. Read `brief`, the content-coverage result, and the rendered evidence; check every acceptance item and every `preserve` boundary; report P0/P1 findings with the page, viewport, or element that proves them. Use an isolated reviewer when the host supports one. Otherwise reload those three evidence surfaces and do a distinct second pass. Fix P0/P1 findings before handoff; do not let the same pass that made the artifact approve its own intentions.
 
 Source templates intentionally keep `{{...}}` fields. Run placeholder checks on completed documents, not on the template library.
 
@@ -398,11 +433,18 @@ Two facts worth carrying here: the commercial TsangerJinKai02 files stay in the 
 
 ## Feedback protocol
 
-When the user gives **vague visual feedback** ("looks off", "太挤了", "not elegant"), do not guess. Ask back naming the element and its current value, offering 2 in-spec alternatives.
+When the user gives visual feedback ("looks off", "太挤了", "not elegant"), inspect the current render before asking them to choose a value. The render is the evidence; the user's negative label is the acceptance signal.
 
-Template response: "X is currently set to Y. Would you like (a) [specific alternative within spec] or (b) [another option]?"
+1. Name the concrete defect in one sentence: page or surface, viewport or state, and whether the problem is density, hierarchy, alignment, type, color, cropping, or text fit.
+2. Lock the repair boundary: `target` is allowed to change; `preserve` names the adjacent pages, sections, content, and shared tokens that must remain stable. Ask only when two plausible targets would produce materially different artifacts.
+3. Make the smallest content, geometry, spacing, typography, crop, or token change that fixes the defect. Never hide a content problem by shrinking type first.
+4. Verify the affected matrix rather than one screenshot:
+   - PDF: target page, neighboring pages, total page count, font result, and every locale or template variant reached by a shared token.
+   - Screen: 1280px and 375px, plus 320px when CTA or nav width is involved; every shipped locale; affected default, focus/selected, loading, empty/error, and transition state only when the surface actually has them.
+   - PPTX: editable source plus a rendered PDF or opened-deck inspection.
+   - Generated asset: target slot at its smallest display size plus sibling assets in the same deliverable.
 
-Never say "I'll adjust the spacing" without naming the exact property and its new value.
+If no rendered evidence exists and the feedback still leaves two materially different fixes, ask once by naming the current property and offering two in-spec alternatives. Never say "I'll adjust the spacing" without naming the exact property and its new value.
 
 **Escalate after two rounds.** If the same element is still not approved after two adjustment rounds, stop nudging values: produce one comparison artifact instead: the current state plus 2-3 labeled variants (A/B/C) of the same content in the same frame, and let the user pick. For choices with no objective criterion (typeface, accent color, logo), skip the nudging entirely and start with a specimen sheet: up to 5 candidates, each a labeled half-page block of identical title-plus-paragraph content. One round of "pick one" converges where five rounds of "try again" do not; after the pick, apply it everywhere and rebuild affected demos in the same round.
 
@@ -415,4 +457,3 @@ Never say "I'll adjust the spacing" without naming the exact property and its ne
 - Need saturated multi-color (this has one accent)
 - Need cartoon / animation / illustration style (this is editorial)
 - Web dynamic app UI (this is for print / static documents)
-

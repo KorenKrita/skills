@@ -1,5 +1,5 @@
 /* @theme kami */
-/* Kami Marp theme (CN). Mirrors slides-weasy.html tokens. */
+/* Kami Marp theme (CJK). Mirrors slides-weasy.html tokens. */
 
 @font-face {
   font-family: "TsangerJinKai02";
@@ -31,9 +31,9 @@
   --border:     #e8e6dc;
   --border-soft:#e5e3d8;
 
-  --serif: "TsangerJinKai02", "Source Han Serif SC", "Source Han Serif CN", "Noto Serif CJK SC", "Noto Serif SC", "Songti SC", "STSong", "SimSun", Georgia, serif;
+  --serif: "TsangerJinKai02", "Source Han Serif SC", "Source Han Serif K", "Source Han Serif KR", "Source Han Serif CN", "Noto Serif CJK SC", "Noto Serif CJK KR", "Noto Serif SC", "Noto Serif KR", "Songti SC", "STSong", AppleMyungjo, Batang, "SimSun", Georgia, serif;
   --sans:  var(--serif);
-  --mono:  "JetBrains Mono", "SF Mono", "Fira Code", Consolas, Monaco, "TsangerJinKai02", "Source Han Serif SC", monospace;
+  --mono:  "JetBrains Mono", "SF Mono", "Fira Code", Consolas, Monaco, "TsangerJinKai02", "Source Han Serif SC", "Source Han Serif K", "Source Han Serif KR", monospace;
 
   --rhythm-module:  14pt;
   --rhythm-section: 18pt;

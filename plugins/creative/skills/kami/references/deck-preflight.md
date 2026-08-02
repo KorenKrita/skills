@@ -12,7 +12,7 @@ Default to the WeasyPrint HTML path. Switch to pptx only if the user explicitly 
 |---|---|---|
 | WeasyPrint HTML → PDF (default) | `slides-weasy.html` / `slides-weasy-en.html` / `slides-weasy-ko.html` | All cases unless PPTX or Marp is required |
 | python-pptx → PPTX (fallback) | `slides.py` / `slides-en.py` | User explicitly requires editable PPTX |
-| Marp Markdown (variant) | `assets/templates/marp/slides-marp.md` (+ `slides-marp.css`) / `slides-marp-en.md` (+ `slides-marp-en.css`) | User explicitly asks for Marp, "markdown slides", or a `.md` deck. Shipped `.md` is a working demo of Kami Marp itself; copy it, swap content, keep the structure. Renders via local `marp` CLI; not bundled. |
+| Marp Markdown (variant) | `assets/templates/marp/slides-marp.md` (+ `slides-marp.css`) / `slides-marp-en.md` (+ `slides-marp-en.css`) | User explicitly asks for Marp, "markdown slides", or a `.md` deck. Use the CJK variant for Chinese and as the best-effort Japanese/Korean path; use `-en` for English. Copy the shipped working deck, swap content, keep the structure, and render via the local `marp` CLI (not bundled). |
 
 ## Page size
 

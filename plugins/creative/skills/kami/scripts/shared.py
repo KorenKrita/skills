@@ -148,6 +148,13 @@ PPTX_TEMPLATES: dict[str, str] = {
     "slides-en": "slides-en.py",
 }
 
+# Markdown-first Marp slide variants. The Markdown files are the authoring
+# entry points; their sibling CSS themes stay self-contained for the Marp CLI.
+MARP_TEMPLATES: dict[str, str] = {
+    "slides-marp":    "marp/slides-marp.md",
+    "slides-marp-en": "marp/slides-marp-en.md",
+}
+
 # Diagram HTMLs live in assets/diagrams and have no page-count contract.
 # Registered here (not in build.py) so all template registries share one home.
 # The Mermaid-sourced ones are produced via scripts/mermaid_normalize.py.
@@ -273,6 +280,11 @@ def screen_targets() -> dict[str, str]:
 def pptx_targets() -> dict[str, str]:
     """Return target -> source mapping for python-pptx slide scripts."""
     return dict(PPTX_TEMPLATES)
+
+
+def marp_targets() -> dict[str, str]:
+    """Return target -> source mapping for Markdown-first Marp decks."""
+    return dict(MARP_TEMPLATES)
 
 
 def diagram_targets() -> dict[str, str]:

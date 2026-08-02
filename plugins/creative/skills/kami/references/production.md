@@ -352,9 +352,9 @@ Use the `npx @marp-team/marp-cli@latest ...` form below for zero-install. For re
 
 | Asset | Path |
 |---|---|
-| CN theme | `assets/templates/marp/slides-marp.css` (theme name: `kami`) |
+| CJK theme (CN, JP/KO best-effort) | `assets/templates/marp/slides-marp.css` (theme name: `kami`) |
 | EN theme | `assets/templates/marp/slides-marp-en.css` (theme name: `kami-en`) |
-| CN sample deck | `assets/templates/marp/slides-marp.md` |
+| CJK sample deck | `assets/templates/marp/slides-marp.md` |
 | EN sample deck | `assets/templates/marp/slides-marp-en.md` |
 
 ### Render commands

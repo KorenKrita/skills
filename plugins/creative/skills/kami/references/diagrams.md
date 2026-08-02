@@ -650,11 +650,15 @@ For raster illustrations delegated to the host's image generation (SKILL.md «Il
 
 **Brief skeleton**, in order:
 
-1. Canvas: warm parchment `#f5f4ed`, never pure white; generous whitespace; composed like a figure in a well-typeset report.
-2. Accent: ink blue `#1B365D` on the 1-2 focal elements only; everything else warm gray with a yellow-brown undertone; no second hue anywhere.
-3. Strokes and icons: thin single-line geometric strokes; flat icons matching section 6 (rounded line style, no fills beyond the two sanctioned ones); no gradients, drop shadows, or 3D.
-4. Labels: serif, few, short. Prefer single words; image models misspell long phrases, and a misspelled label voids the image. If a label must be a phrase, plan to typeset it in HTML over the image instead.
-5. Content spec: the same complexity budget as section 2 (state the tier: 4/10 editorial or 6-7/10 teaching), what is focal, and the reading direction.
+1. Claim: one sentence stating what the reader should conclude. Name the assertion, not the topic: “review protects the release boundary”, not “software workflow”.
+2. Placement: destination, aspect ratio, and smallest display size. README inline, social card, slide, and report figure have different type floors.
+3. Reference: the accepted sibling image or named visual system this must sit beside. State what survives from that reference: composition, density, line language, or crop.
+4. Exclusions: what must not appear. Version strings, release copy, invented UI, unrelated atmosphere, extra hues, and private identifiers stay out unless the task explicitly needs them.
+5. Canvas: warm parchment `#f5f4ed`, never pure white; generous whitespace; composed like a figure in a well-typeset report.
+6. Accent: ink blue `#1B365D` on the 1-2 focal elements only; everything else warm gray with a yellow-brown undertone; no second hue anywhere.
+7. Strokes and icons: thin single-line geometric strokes; flat icons matching section 6 (rounded line style, no fills beyond the two sanctioned ones); no gradients, drop shadows, or 3D.
+8. Labels: serif, few, short. Prefer single words; image models misspell long phrases, and a misspelled label voids the image. If a label must be a phrase, plan to typeset it in HTML over the image instead.
+9. Content spec: the same complexity budget as section 2 (state the tier: 4/10 editorial or 6-7/10 teaching), what is focal, and the reading direction.
 
 **QC before placing a generated image** (regenerate on any failure, do not retouch expectations):
 
@@ -662,7 +666,11 @@ For raster illustrations delegated to the host's image generation (SKILL.md «Il
 - No gradient, shadow, or 3D crept in.
 - Text in the image is spelled correctly and minimal; anything wrong or verbose gets re-briefed with fewer words.
 - Composition reads as a report figure (balanced margins, clear focal point), not as a poster or clip art.
+- The claim is legible at the stated smallest display size; a detail visible only in the full-resolution source does not count.
+- Every exclusion holds, especially version text, invented product surfaces, unrelated decoration, and private identifiers.
 - Style matches the other generated images in the same deliverable (shared style anchor, see SKILL.md batch rule).
+
+After a partly successful generation, name what survives before changing the brief. After two look-based rejections, stop blind regeneration and use the SKILL.md comparison protocol: preserve the accepted part, show labeled alternatives in the same frame, and realign on the claim, reference, and exclusions.
 
 ---
 

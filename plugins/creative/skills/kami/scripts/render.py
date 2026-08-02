@@ -13,6 +13,7 @@ import functools
 import os
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 from highlight import highlight_code_blocks
@@ -108,11 +109,22 @@ def render_pdf(src: Path, out: Path) -> int:
     HTML = require_weasyprint_html()
     PdfReader = require_pypdf_reader()
 
-    html_text = highlight_code_blocks(src.read_text(encoding="utf-8"))
     out.parent.mkdir(parents=True, exist_ok=True)
-    HTML(string=html_text, base_url=str(src.parent)).write_pdf(str(out))
-    set_pdf_metadata(out, author=infer_author())
-    return len(PdfReader(str(out)).pages)
+    html_text = highlight_code_blocks(src.read_text(encoding="utf-8"))
+    # Build and validate beside the destination, then atomically replace it.
+    # Metadata stamping and the final page read can still fail after WeasyPrint
+    # succeeds; writing straight to `out` would destroy the last good artifact
+    # before the caller learns that the render failed.
+    with tempfile.TemporaryDirectory(
+        dir=out.parent,
+        prefix=f".{out.name}-",
+    ) as staging_dir:
+        candidate = Path(staging_dir) / out.name
+        HTML(string=html_text, base_url=str(src.parent)).write_pdf(str(candidate))
+        set_pdf_metadata(candidate, author=infer_author())
+        page_count = len(PdfReader(str(candidate)).pages)
+        os.replace(candidate, out)
+    return page_count
 
 
 def build_slides(name: str = "slides") -> bool:
