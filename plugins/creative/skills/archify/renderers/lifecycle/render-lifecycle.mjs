@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { esc, renderDefinitions, renderSemanticSigil, textUnits } from '../shared/utils.mjs';
 import { animateAttr, focusEdgeAttrs, focusNodeAttrs, focusNodeTitle, loadDiagram, writeDiagram, svgAccessibleText, svgRootAttrs } from '../shared/cli.mjs';
 import { throwDiagnosticProblems } from '../shared/diagnostics.mjs';
+import { resolveLegend, renderLegend as renderResolvedLegend } from '../shared/legend.mjs';
 import {
   asArray,
   isFinitePoint,
@@ -73,7 +74,14 @@ const textClass = {
 };
 
 function legendY() {
-  return viewBox[1] - 98;
+  return viewBox[1] - 36;
+}
+
+// Keep the authored state-placement contract independent from the measured
+// legend's lower baseline. Moving legend chrome must not admit new state
+// geometry into the reserved outcome/legend band.
+function lifecycleAreaBottom() {
+  return viewBox[1] - 122;
 }
 
 // Lane semantics are fixed: lane id "main" maps to the top phase band, lane id
@@ -130,9 +138,9 @@ function validateLifecycle() {
   if (lifecycle.cards !== undefined && !Array.isArray(lifecycle.cards)) problems.push('Lifecycle "cards" must be an array.');
   if (states.size !== asArray(lifecycle.states).length) problems.push('State ids must be unique.');
 
-  // The three bands are fixed at y=112/264/436; the legend (viewBox[1] - 98)
-  // must clear the outcome band's header zone.
-  if (legendY() - 20 < 448) {
+  // The three bands are fixed at y=112/264/436. Preserve the original
+  // outcome/legend reserve even though measured legend rows now sit lower.
+  if (lifecycleAreaBottom() + 4 < 448) {
     problems.push(`viewBox height ${viewBox[1]} is too short for the fixed band layout — set meta.viewBox[1] to at least 566.`);
   }
 
@@ -164,8 +172,8 @@ function validateLifecycle() {
     if (state.x < 32 || state.x + state.width > viewBox[0] - 32) {
       problems.push(`State "${state.id}" exceeds the horizontal bounds of the diagram — reduce state.width or increase meta.viewBox[0].`);
     }
-    if (state.y < 64 || state.y + state.height > legendY() - 24) {
-      problems.push(`State "${state.id}" exceeds the vertical lifecycle area — keep y between 64 and ${legendY() - 24} (adjust yOffset or increase meta.viewBox[1]).`);
+    if (state.y < 64 || state.y + state.height > lifecycleAreaBottom()) {
+      problems.push(`State "${state.id}" exceeds the vertical lifecycle area — keep y between 64 and ${lifecycleAreaBottom()} (adjust yOffset or increase meta.viewBox[1]).`);
     }
     const estLabelW = textUnits(state.label) * 6.2;
     if (estLabelW > state.width + 6) {
@@ -413,27 +421,32 @@ function renderTransitionLabel(transition, index) {
         </g>`;
 }
 
+const LEGEND_CATALOG = [
+  ['start', 'start'],
+  ['active', 'active state'],
+  ['waiting', 'waiting'],
+  ['decision', 'decision'],
+  ['success', 'terminal success'],
+  ['failure', 'failure / exit'],
+  ['neutral', 'neutral'],
+  ['external', 'external'],
+].map(([kind, label]) => ({ kind, label }));
+
 function renderLegend() {
-  const y = legendY();
-  return `        <g data-legend-bridge>
-          <text x="220" y="${y - 20}" class="t-primary" font-size="10" font-weight="600">Legend</text>
-        <g data-legend-kind="active">
-          <rect x="220" y="${y - 8}" width="14" height="9" rx="2" class="c-backend" stroke-width="1"/>
-          <text x="240" y="${y}" class="t-muted" font-size="7">active state</text>
-        </g>
-        <g data-legend-kind="waiting">
-          <rect x="325" y="${y - 8}" width="14" height="9" rx="2" class="c-cloud" stroke-width="1"/>
-          <text x="345" y="${y}" class="t-muted" font-size="7">waiting</text>
-        </g>
-        <g data-legend-kind="success">
-          <rect x="415" y="${y - 8}" width="14" height="9" rx="2" class="c-database" stroke-width="1"/>
-          <text x="435" y="${y}" class="t-muted" font-size="7">terminal success</text>
-        </g>
-        <g data-legend-kind="failure">
-          <rect x="560" y="${y - 8}" width="14" height="9" rx="2" class="c-security" stroke-width="1"/>
-          <text x="580" y="${y}" class="t-muted" font-size="7">failure / exit</text>
-        </g>
-        </g>`;
+  const presentKinds = new Set([...states.values()].map((state) => state.type));
+  const entries = resolveLegend(lifecycle.meta?.legend, LEGEND_CATALOG, presentKinds);
+  return renderResolvedLegend({
+    entries,
+    layout: {
+      x: 40,
+      baselineY: legendY(),
+      width: viewBox[0] - 80,
+      minTitleY: lifecycleAreaBottom() + 8,
+      unfit: lifecycle.meta?.legend === undefined ? 'hide' : 'error',
+      diagramType: 'lifecycle',
+    },
+    renderSwatch: (entry) => `<rect x="${entry.x}" y="${entry.baseline - 8}" width="14" height="9" rx="2" class="${typeClass[entry.kind] || 'c-external'}" stroke-width="1"/>`,
+  });
 }
 
 function renderLifecycleRail() {

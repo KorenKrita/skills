@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { esc, renderDefinitions, renderSemanticSigil, textUnits } from '../shared/utils.mjs';
 import { animateAttr, focusEdgeAttrs, focusNodeAttrs, focusNodeTitle, loadDiagram, writeDiagram, svgAccessibleText, svgRootAttrs } from '../shared/cli.mjs';
 import { throwDiagnosticProblems } from '../shared/diagnostics.mjs';
+import { resolveLegend, renderLegend as renderResolvedLegend } from '../shared/legend.mjs';
 import {
   asArray,
   isFinitePoint,
@@ -576,31 +577,33 @@ function renderEdgeLabel(edge, index) {
         </g>`;
 }
 
+const LEGEND_CATALOG = [
+  ['frontend', 'User UI'],
+  ['backend', 'Agent logic'],
+  ['security', 'Policy'],
+  ['messagebus', 'Tool action'],
+  ['database', 'Context / trace'],
+  ['cloud', 'Cloud service'],
+  ['external', 'External system'],
+].map(([kind, label]) => ({ kind, label }));
+
 function renderLegend() {
-  const y = legendY();
-  return `        <g data-legend-bridge>
-          <text x="175" y="${y - 20}" class="t-primary" font-size="10" font-weight="600">Legend</text>
-        <g data-legend-kind="frontend">
-          <rect x="175" y="${y - 8}" width="14" height="9" rx="2" class="c-frontend" stroke-width="1"/>
-          <text x="195" y="${y}" class="t-muted" font-size="7">User UI</text>
-        </g>
-        <g data-legend-kind="backend">
-          <rect x="260" y="${y - 8}" width="14" height="9" rx="2" class="c-backend" stroke-width="1"/>
-          <text x="280" y="${y}" class="t-muted" font-size="7">Agent logic</text>
-        </g>
-        <g data-legend-kind="security">
-          <rect x="370" y="${y - 8}" width="14" height="9" rx="2" class="c-security" stroke-width="1"/>
-          <text x="390" y="${y}" class="t-muted" font-size="7">Policy</text>
-        </g>
-        <g data-legend-kind="messagebus">
-          <rect x="455" y="${y - 8}" width="14" height="9" rx="2" class="c-messagebus" stroke-width="1"/>
-          <text x="475" y="${y}" class="t-muted" font-size="7">Tool action</text>
-        </g>
-        <g data-legend-kind="database">
-          <rect x="565" y="${y - 8}" width="14" height="9" rx="2" class="c-database" stroke-width="1"/>
-          <text x="585" y="${y}" class="t-muted" font-size="7">Context / trace</text>
-        </g>
-        </g>`;
+  const presentKinds = new Set([...nodes.values()].map((node) => node.type));
+  const entries = resolveLegend(workflow.meta?.legend, LEGEND_CATALOG, presentKinds);
+  return renderResolvedLegend({
+    entries,
+    layout: {
+      x: 20,
+      baselineY: legendY(),
+      width: viewBox[0] - 40,
+      fontSize: 7,
+      itemGap: 7,
+      minTitleY: lastLaneBottom() + 8,
+      unfit: workflow.meta?.legend === undefined ? 'hide' : 'error',
+      diagramType: 'workflow',
+    },
+    renderSwatch: (entry) => `<rect x="${entry.x}" y="${entry.baseline - 8}" width="14" height="9" rx="2" class="${componentFill[entry.kind] || 'c-external'}" stroke-width="1"/>`,
+  });
 }
 
 function renderSvg() {

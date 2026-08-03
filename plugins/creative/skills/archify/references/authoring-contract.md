@@ -12,6 +12,25 @@ Read both the mode schema and `schemas/common.schema.json`. The mode schemas use
 
 Do not invent fields. Use the nearest matching example for structure, then author fresh IDs, wording, facts, and layout.
 
+## Legend contract
+
+Omit `meta.legend` for the truthful default: `auto` lists only semantic kinds
+present in typed IR. Use `mode: "all"` for a renderer reference or
+`mode: "hidden"` to remove the full legend. Under `entries`, only keys listed
+by the selected mode schema are valid; each key accepts `label`, `visible`, or
+both. `visible: true` may show an unused supported convention, while
+`visible: false` hides it. `hidden` cannot be overridden.
+
+A label override changes reader wording only. Never infer a kind from prose or
+use the legend to compensate for missing nodes, states, messages, or flows.
+Long labels are measured and wrap into deterministic rows. Architecture's
+implicit automatic viewBox grows from that same measured footprint. For
+backwards compatibility, a legacy document with no `meta.legend` may omit an
+implicit auto legend that cannot fit its explicit viewBox; this never changes
+its typed topology. Adding `meta.legend` makes the presentation intentional and
+strict: if its resolved labels cannot fit the authored viewBox, shorten or hide
+them, or widen the viewBox using the emitted diagnostic.
+
 ## Executable geometry rules
 
 - Node anchors are side midpoints. `left`/`right` change the horizontal endpoint; `top`/`bottom` change the vertical endpoint.

@@ -409,6 +409,7 @@ function renderValidatedArchitecture(inputPath, outputPath, quality, repoRoot) {
 }
 
 async function commandCompare(args) {
+  const { resolveOutputPath } = await import('../renderers/shared/output-path.mjs');
   const qualityArgs = extractQualityArgs(args);
   const repoArgs = extractRepoRootArgs(qualityArgs.rest);
   const options = extractCompareOptions(repoArgs.rest);
@@ -436,10 +437,51 @@ async function commandCompare(args) {
 
   const basePath = path.resolve(baseInput);
   const headPath = path.resolve(headInput);
-  const outputPath = path.resolve(requestedOutput || 'architecture-delta.html');
-  const receiptPath = path.resolve(options.receipt || compareReceiptPath(outputPath));
-  if (outputPath === receiptPath) fail('Compare artifact and receipt must use different paths.');
-
+  let outputPath;
+  try {
+    ({ outputPath } = resolveOutputPath({
+      requestedOutput,
+      defaultOutput: 'architecture-delta.html',
+      inputPaths: [basePath, headPath],
+    }));
+  } catch (error) {
+    const outputDiagnostic = error.archifyDiagnostics?.[0];
+    reportCompareFailure({
+      json: options.json,
+      stage: 'prepare',
+      error: error.message,
+      code: outputDiagnostic?.code || 'output/path-resolution',
+      details: {
+        ...(outputDiagnostic?.subject || {}),
+        ...(outputDiagnostic?.evidence || {}),
+        supportedFixes: outputDiagnostic?.supportedFixes || ['choose a safe output path and retry'],
+      },
+    });
+    return;
+  }
+  let receiptPath;
+  try {
+    ({ outputPath: receiptPath } = resolveOutputPath({
+      requestedOutput: options.receipt || compareReceiptPath(outputPath),
+      defaultOutput: compareReceiptPath(outputPath),
+      inputPaths: [basePath, headPath],
+      otherOutputPaths: [outputPath],
+    }));
+  } catch (error) {
+    const outputDiagnostic = error.archifyDiagnostics?.[0];
+    reportCompareFailure({
+      json: options.json,
+      stage: 'prepare',
+      error: error.message,
+      code: outputDiagnostic?.code || 'output/path-resolution',
+      details: {
+        ...(outputDiagnostic?.subject || {}),
+        ...(outputDiagnostic?.evidence || {}),
+        supportedFixes: outputDiagnostic?.supportedFixes || ['choose a safe receipt path and retry'],
+      },
+    });
+    return;
+  }
   let baseBuffer;
   let headBuffer;
   let base;
@@ -586,6 +628,34 @@ async function commandCompare(args) {
     };
     fs.writeFileSync(receiptCandidate, `${JSON.stringify(finalReceipt, null, 2)}\n`);
 
+    try {
+      const currentOutput = resolveOutputPath({
+        requestedOutput,
+        defaultOutput: 'architecture-delta.html',
+        inputPaths: [basePath, headPath],
+      }).outputPath;
+      resolveOutputPath({
+        requestedOutput: options.receipt || compareReceiptPath(currentOutput),
+        defaultOutput: compareReceiptPath(currentOutput),
+        inputPaths: [basePath, headPath],
+        otherOutputPaths: [currentOutput],
+      });
+    } catch (error) {
+      const outputDiagnostic = error.archifyDiagnostics?.[0];
+      reportCompareFailure({
+        json: options.json,
+        stage: 'commit',
+        error: error.message,
+        code: outputDiagnostic?.code || 'output/path-resolution',
+        details: {
+          ...(outputDiagnostic?.subject || {}),
+          ...(outputDiagnostic?.evidence || {}),
+          supportedFixes: outputDiagnostic?.supportedFixes || ['restore safe output paths and retry'],
+        },
+      });
+      return;
+    }
+
     commitComparePair({ htmlCandidate, receiptCandidate, outputPath, receiptPath, stagingDirectory });
     if (options.json) console.log(JSON.stringify(finalReceipt, null, 2));
     else {
@@ -680,6 +750,7 @@ function engineeringProfileFromArtifact(artifact) {
 }
 
 async function commandDeliver(args) {
+  const { resolveOutputPath } = await import('../renderers/shared/output-path.mjs');
   const qualityArgs = extractQualityArgs(args);
   const repoArgs = extractRepoRootArgs(qualityArgs.rest);
   const json = repoArgs.rest.includes('--json');
@@ -715,8 +786,34 @@ async function commandDeliver(args) {
 
   const authoredOutput = typeof diagram?.meta?.output === 'string' && diagram.meta.output
     ? diagram.meta.output
-    : `${type}.html`;
-  const outputPath = path.resolve(requestedOutput || authoredOutput);
+    : undefined;
+  let outputPath;
+  try {
+    ({ outputPath } = resolveOutputPath({
+      requestedOutput,
+      authoredOutput,
+      defaultOutput: `${type}.html`,
+      inputPaths: [inputPath],
+    }));
+  } catch (error) {
+    const attemptedOutput = path.resolve(requestedOutput || authoredOutput || `${type}.html`);
+    reportDeliveryFailure({
+      json,
+      stage: 'prepare',
+      type,
+      input: inputPath,
+      output: attemptedOutput,
+      error: error.message,
+      diagnostics: error.archifyDiagnostics || [diagnostic({
+        code: 'output/path-resolution',
+        message: error.message,
+        subject: { output: attemptedOutput },
+        evidence: { ...(error?.code ? { systemCode: error.code } : {}) },
+        supportedFixes: ['choose a safe output path and retry'],
+      })],
+    });
+    return;
+  }
   const outputDirectory = path.dirname(outputPath);
   try {
     fs.mkdirSync(outputDirectory, { recursive: true });
@@ -935,6 +1032,32 @@ async function commandDeliver(args) {
     };
 
     try {
+      resolveOutputPath({
+        requestedOutput,
+        authoredOutput,
+        defaultOutput: `${type}.html`,
+        inputPaths: [inputPath],
+      });
+    } catch (error) {
+      reportDeliveryFailure({
+        json,
+        stage: 'commit',
+        type,
+        input: inputPath,
+        output: outputPath,
+        error: error.message,
+        diagnostics: error.archifyDiagnostics || [diagnostic({
+          code: 'output/path-resolution',
+          message: error.message,
+          subject: { output: outputPath },
+          evidence: { ...(error?.code ? { systemCode: error.code } : {}) },
+          supportedFixes: ['restore a safe output path and retry'],
+        })],
+      });
+      return;
+    }
+
+    try {
       fs.renameSync(candidatePath, outputPath);
     } catch (error) {
       const message = `Could not commit verified delivery "${outputPath}": ${error.message}`;
@@ -1066,6 +1189,13 @@ async function commandDoctor() {
     label: 'Live preview runtime',
     ok: fs.existsSync(previewRuntime),
     missing: fs.existsSync(previewRuntime) ? 0 : 1,
+  });
+
+  const outputPathRuntime = path.join(skillRoot, 'renderers/shared/output-path.mjs');
+  checks.push({
+    label: 'Output path safety runtime',
+    ok: fs.existsSync(outputPathRuntime),
+    missing: fs.existsSync(outputPathRuntime) ? 0 : 1,
   });
 
   const scenarioGuide = path.join(skillRoot, 'recipes/scenarios.mjs');

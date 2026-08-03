@@ -23,6 +23,18 @@
     "variant": {
       "enum": ["default", "emphasis", "security", "dashed"]
     },
+    "legendMode": {
+      "enum": ["auto", "all", "hidden"]
+    },
+    "legendEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "label": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "visible": { "type": "boolean" }
+      }
+    },
     "guidedViews": {
       "type": "array",
       "maxItems": 5,
