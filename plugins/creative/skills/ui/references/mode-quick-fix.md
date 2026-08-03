@@ -7,9 +7,9 @@ Activate when the user asks for a narrow visual repair with a concrete symptom: 
 Flow:
 
 1. Read the current UI evidence: screenshot, rendered page, native view, or responsible component.
-2. Name the exact visual defect in one sentence.
-3. Make the smallest material, geometry, spacing, contrast, typography, or text-fit change that fixes that defect.
-4. Verify the real running surface or generated artifact. Check long words, localized strings, compact states, and at least one narrow viewport when applicable. Terminal output counts as a rendered surface: after changing CLI-facing text or layout, re-run the command and read the actual output, checking column alignment, block spacing, and icon consistency across the whole output rather than only the changed line.
+2. Name the exact visual defect in one sentence. Lock three fields before editing: `target` may change, `preserve` names the adjacent surface and product behavior that must stay stable, and `evidence` names the render or source that will prove the fix.
+3. Make the smallest material, geometry, spacing, contrast, typography, or text-fit change that fixes that defect. Do not redesign outside `target` to make the screenshot look coherent.
+4. Verify the real running surface or generated artifact against `target`, `preserve`, and `evidence`. When the component swaps content or state, check before/during/after and cold/warm paths; when one shared component or token is implicated, check every affected sibling rather than the reported instance. Also check long words, localized strings, compact states, and at least one narrow viewport when applicable. Terminal output counts as a rendered surface: after changing CLI-facing text or layout, re-run the command and read the actual output, checking column alignment, block spacing, and icon consistency across the whole output rather than only the changed line.
 5. If the fix touches three or more components, changes product behavior, or reveals a direction problem, stop and switch to `references/mode-screenshot-iteration.md` or the Lock the Direction First section of `SKILL.md`.
 
 **Spacing unification rule.** A spacing or sizing value tuned three times that still looks off is structural, not numeric: collapse the N independent values into one shared named token (`Spacing.s4`, `--gap-content`), with outer container padding defaulting to the inner element gap. Spacing-as-a-system details live in `references/design-reference.md`.
