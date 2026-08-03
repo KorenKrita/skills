@@ -201,13 +201,13 @@
     ]
   },
   "ocr": {
-    "sha": "5829539379ecc3c2e43c36061b73469f7a261f8d",
+    "sha": "1b193db3587e4d3f429bd8c8213479d63e3b4f21",
     "files": [
       "SKILL.md"
     ]
   },
   "nuclear-review": {
-    "sha": "b047069f4f3a73e87dd1f11f7913386d25876b91",
+    "sha": "424829e3e0f7e5a8b9181412ca04e84e026a0c02",
     "files": [
       "SKILL.md"
     ]
@@ -246,7 +246,7 @@
     ]
   },
   "read": {
-    "sha": "663f27eb136118c0a3aa78b5ce9e712b7aee7f0a",
+    "sha": "a1520c290eca77aa0301c09f954d65ec2e487662",
     "files": [
       "SKILL.md",
       "references/read-methods.md",
@@ -306,11 +306,12 @@
     ]
   },
   "ui": {
-    "sha": "663f27eb136118c0a3aa78b5ce9e712b7aee7f0a",
+    "sha": "a1520c290eca77aa0301c09f954d65ec2e487662",
     "files": [
       "SKILL.md",
       "references/design-aesthetic-quality.md",
       "references/design-data-viz.md",
+      "references/design-native-motion.md",
       "references/design-reference.md",
       "references/durable-context.md",
       "references/mode-generated-asset.md",
@@ -452,7 +453,7 @@
     ]
   },
   "archify": {
-    "sha": "7b49d0b715fd4ba48116bcdecd1ba3789a279613",
+    "sha": "2c1f8ac2ca28a26d0b68043ec80c9554e20ff0e3",
     "files": [
       "LICENSE",
       "SKILL.md",
@@ -494,6 +495,8 @@
       "renderers/shared/generated-validators.mjs",
       "renderers/shared/geometry.mjs",
       "renderers/shared/layout-report.mjs",
+      "renderers/shared/legend.mjs",
+      "renderers/shared/output-path.mjs",
       "renderers/shared/repository-evidence.mjs",
       "renderers/shared/utils.mjs",
       "renderers/shared/validator.mjs",
