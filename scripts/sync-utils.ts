@@ -7,6 +7,45 @@ export function copyFilePreservingMode(srcPath: string, destPath: string): void 
   chmodSync(destPath, statSync(srcPath).mode & 0o777)
 }
 
+/**
+ * `ownership: local` marks a Skill the repository maintains itself. Everything
+ * else is upstream-owned and therefore fetched, patched and state-tracked.
+ */
+export function isUpstreamOwned<T extends { readonly ownership?: string }>(
+  entry: T,
+): entry is Exclude<T, { readonly ownership: "local" }> {
+  return entry.ownership !== "local"
+}
+
+export function upstreamOwnedNames(
+  skills: Readonly<Record<string, { readonly ownership?: string }>>,
+): string[] {
+  return Object.entries(skills)
+    .filter(([, entry]) => isUpstreamOwned(entry))
+    .map(([name]) => name)
+}
+
+export interface SyncPlan<T> {
+  /** Skills the sync job fetches, patches and records in `.sync-state.json`. */
+  readonly sync: ReadonlyArray<readonly [string, Exclude<T, { readonly ownership: "local" }>]>
+  /** Locally owned Skills the sync job leaves untouched. */
+  readonly skipped: readonly string[]
+}
+
+export function planSync<T extends { readonly ownership?: string }>(
+  skills: Readonly<Record<string, T>>,
+): SyncPlan<T> {
+  const sync: Array<readonly [string, Exclude<T, { readonly ownership: "local" }>]> = []
+  const skipped: string[] = []
+
+  for (const [name, entry] of Object.entries(skills)) {
+    if (isUpstreamOwned(entry)) sync.push([name, entry])
+    else skipped.push(name)
+  }
+
+  return { sync, skipped }
+}
+
 export function findOrphanedStateKeys(
   stateKeys: readonly string[],
   configuredKeys: readonly string[],

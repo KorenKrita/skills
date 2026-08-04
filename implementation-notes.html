@@ -44,6 +44,24 @@
       <p><strong>附带清理：</strong>同一 <code>package.json</code> 还有 5 条对已安装 Skill 永久不可执行的脚本——发布载荷根是 <code>skills/archify</code>，<code>build:gallery</code>/<code>build:guide</code>/<code>build:start</code>/<code>build:readme-showcase</code> 引用的 <code>../scripts</code> 与 <code>../docs</code> 落在载荷之外，而 <code>render:examples</code> 默认会把 5 个已被 <code>exclude_files</code> 屏蔽的 rendered HTML 写回 <code>examples/</code>。一并通过 <code>replace_all</code> 移除；<code>bin/archify.mjs</code> 直接以路径调用 <code>scripts/render-examples.mjs</code>，不经 npm script，故 <code>demo</code>/<code>doctor</code> 不受影响。布局测试新增「archify 任何 npm script 不得包含 <code>../</code>」不变量。</p>
       <p><strong>验证：</strong><code>npx vitest run</code>（45 passed）；以 upstream 实时 <code>package.json</code> 重放全部 7 条补丁均匹配，产物为合法 JSON 且不含 <code>test/</code> 与 <code>../</code>；<code>node bin/archify.mjs doctor</code> 全项 ok，<code>validate architecture examples/web-app.architecture.json --quality showcase</code> 返回 <code>ok: true</code>（9/9 checks）。</p>
     </article>
+    <article id="base-core-seven-2026-08-04">
+      <h2>base 精简为 7 个核心 Skill</h2>
+      <p><strong>状态：</strong>user-decided</p>
+      <p><strong>日期：</strong>2026-08-04</p>
+      <p><strong>背景：</strong><code>base</code> 原本镜像 mattpocock/skills 的 22 个 active Skill，其中大部分从未使用，且相互之间存在密集的命名调用（<code>/codebase-design</code>、<code>/domain-modeling</code>、<code>/grilling</code>、<code>/improve-codebase-architecture</code>、<code>/triage</code>、<code>/wayfinder</code>）。删掉不用的 Skill 会在保留的 Skill 正文里留下指向不存在 Skill 的悬空路由。</p>
+      <p><strong>决策：</strong><code>base</code> 保留 7 个 Skill：<code>grill-me</code>、<code>handoff</code>、<code>teach</code>、<code>writing-great-skills</code>、<code>prototype</code>、<code>improve-codebase-architecture</code>、<code>diagnosing-bugs</code>；<code>plus</code> 的 8 个不变，全库共 15 个。<code>handoff</code>、<code>teach</code>、<code>writing-great-skills</code>、<code>prototype</code> 继续原样同步（<code>patches: []</code>）。</p>
+      <p><strong>实现约束：</strong>上游 <code>productivity/grill-me</code> 只是转发到 <code>/grilling</code> 的 wrapper，删除其同步条目；改为把 <code>productivity/grilling</code> 同步到目标名 <code>grill-me</code>，用两条 <code>set_frontmatter</code> 改名并重写 description，用 <code>agents/openai.yaml</code> 的 <code>target_patches</code> 同步 display name。<code>diagnosing-bugs</code> 用两条 <code>replace</code> 解除固定 <code>CONTEXT.md</code>/ADR 布局假设和 <code>/improve-codebase-architecture</code> 交接，改为当前单 agent 在修复后自行记录架构后续建议；feedback loop、tighten、回归测试和阶段时序约束全部保留。</p>
+      <p><strong>验证：</strong><code>npm test</code>（56 passed）；<code>npx tsc --noEmit</code> 无输出；以 SHA <code>2ab9580</code> 的上游 payload 重放 <code>grill-me</code> 与 <code>diagnosing-bugs</code> 的全部 patch，全部匹配且产物与提交载荷逐字节一致。</p>
+    </article>
+    <article id="local-ownership-improve-architecture-2026-08-04">
+      <h2>improve-codebase-architecture 转为本地自有 Skill</h2>
+      <p><strong>状态：</strong>user-decided</p>
+      <p><strong>日期：</strong>2026-08-04</p>
+      <p><strong>背景：</strong>上游 <code>improve-codebase-architecture</code> 把架构词汇交给 <code>/codebase-design</code>、访谈交给 <code>/grilling</code>、glossary/ADR 写入交给 <code>/domain-modeling</code>，并用 <code>subagent_type=Explore</code> 派发探索。这三个 Skill 都已从 <code>base</code> 移除，重写幅度超出声明式 patch 的合理表达范围。</p>
+      <p><strong>决策：</strong>Skill 改为本地自有，在 <code>overrides.yaml</code> 中以 <code>ownership: local</code> 声明并保留 <code>provenance</code>（上游 repo/path/ref、fork 基准 SHA <code>2ab9580</code>、fork 日期、许可证归属）。正文内联最小架构 rubric（10 个术语加 deletion test、interface is the test surface、one adapter/two adapters 三条原则），探索、HTML 候选报告、用户选择、澄清与最终建议全部由当前单 agent 完成，不再调用任何 Skill 或 subagent。已有领域/架构/决策文档存在时读取并尊重，但不假定布局、不自动写 glossary 或 ADR。<code>HTML-REPORT.md</code> 的 <code>/codebase-design</code> 词汇依赖与 ADR callout 一并改为自洽表述。详见 ADR-0005。</p>
+      <p><strong>实现约束：</strong><code>scripts/sync-utils.ts</code> 新增 <code>isUpstreamOwned</code>/<code>upstreamOwnedNames</code>/<code>planSync</code>；<code>scripts/sync.ts</code> 用 <code>planSync</code> 拆分同步集合，本地条目既不参与拉取与 <code>--force</code> 审计，也不参与 <code>.sync-state.json</code> 的孤儿清理。旧的 <code>improve-codebase-architecture</code> 同步状态 key 已删除。类型上 <code>ownership: local</code> 的条目不带 <code>source</code>，由 type guard 收窄，避免运行时读到不存在的来源。</p>
+      <p><strong>验证：</strong><code>npm test</code>（56 passed，含 <code>planSync</code> 跳过行为、本地条目不在同步状态、本地 Skill 正文无 Skill/subagent 调用、已删除 base Skill 无悬空路由四组新断言）；<code>npx tsx scripts/sync.ts</code> 的 PR 路径未运行，避免访问上游并写远端。</p>
+    </article>
   </main>
 </body>
 </html>

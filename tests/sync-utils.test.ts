@@ -8,8 +8,11 @@ import {
   findOrphanedStateKeys,
   findRemovedFiles,
   isExcludedFile,
+  isUpstreamOwned,
   planSparseCheckout,
+  planSync,
   toSparseDir,
+  upstreamOwnedNames,
 } from "../scripts/sync-utils.js"
 
 describe("sync-utils", () => {
@@ -54,6 +57,60 @@ describe("sync-utils", () => {
     } finally {
       rmSync(dir, { recursive: true, force: true })
     }
+  })
+
+  describe("ownership", () => {
+    it("treats a missing or explicit upstream ownership as upstream-owned", () => {
+      expect(isUpstreamOwned({})).toBe(true)
+      expect(isUpstreamOwned({ ownership: "upstream" })).toBe(true)
+    })
+
+    it("excludes locally owned skills from upstream sync", () => {
+      expect(isUpstreamOwned({ ownership: "local" })).toBe(false)
+    })
+
+    it("lists only upstream-owned skills for state reconciliation", () => {
+      expect(
+        upstreamOwnedNames({
+          teach: {},
+          "improve-codebase-architecture": { ownership: "local" },
+          prototype: { ownership: "upstream" },
+        }),
+      ).toEqual(["teach", "prototype"])
+    })
+
+    it("keeps a locally owned skill from being pruned as an orphaned state key", () => {
+      const skills = { teach: {}, "improve-codebase-architecture": { ownership: "local" } }
+      // Sync state only ever holds upstream-owned skills, so the local entry
+      // must not appear there and must not drag the upstream key out with it.
+      expect(findOrphanedStateKeys(["teach"], upstreamOwnedNames(skills))).toEqual([])
+      expect(findOrphanedStateKeys(["teach", "grilling"], upstreamOwnedNames(skills))).toEqual([
+        "grilling",
+      ])
+    })
+
+    describe("planSync", () => {
+      const skills: Record<string, { ownership?: string; source?: { repo: string } }> = {
+        "diagnosing-bugs": { source: { repo: "mattpocock/skills" } },
+        "improve-codebase-architecture": { ownership: "local" },
+        teach: { source: { repo: "mattpocock/skills" } },
+      }
+
+      it("skips locally owned skills and keeps every upstream one", () => {
+        const plan = planSync(skills)
+        expect(plan.sync.map(([name]) => name)).toEqual(["diagnosing-bugs", "teach"])
+        expect(plan.skipped).toEqual(["improve-codebase-architecture"])
+      })
+
+      it("hands the sync loop the full upstream config for each synced skill", () => {
+        const plan = planSync(skills)
+        expect(plan.sync[0]?.[1]).toBe(skills["diagnosing-bugs"])
+      })
+
+      it("returns an empty plan for an empty override set", () => {
+        expect(planSync({})).toEqual({ sync: [], skipped: [] })
+      })
+    })
   })
 
   it("finds sync-state entries with no matching override", () => {

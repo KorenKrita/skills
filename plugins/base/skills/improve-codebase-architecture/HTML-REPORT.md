@@ -39,7 +39,7 @@ Repo name, date, and a compact legend: solid box = module, dashed line = seam, r
 
 ## Candidate card
 
-The diagrams carry the weight. Prose is sparse, plain, and uses the glossary terms (from the `/codebase-design` skill) without ceremony.
+The diagrams carry the weight. Prose is sparse, plain, and uses the rubric terms from [SKILL.md](SKILL.md) without ceremony.
 
 Each candidate is one `<article>`:
 
@@ -50,7 +50,7 @@ Each candidate is one `<article>`:
 - **Problem** — one sentence. What hurts.
 - **Solution** — one sentence. What changes.
 - **Wins** — bullets, ≤6 words each. e.g. "Tests hit one interface", "Pricing logic stops leaking", "Delete 4 shallow wrappers".
-- **ADR callout** (if applicable) — one line in an amber-tinted box.
+- **Conflict callout** (if applicable) — one line in an amber-tinted box, when the candidate contradicts a decision the project already recorded.
 
 No paragraphs of explanation. If the diagram needs a paragraph to be understood, redraw the diagram.
 
@@ -105,7 +105,7 @@ One larger card. Candidate name, one sentence on why, anchor link to its card. T
 
 ## Tone
 
-Plain English, concise — but the architectural nouns and verbs come straight from the `/codebase-design` skill. Concision is not an excuse to drift.
+Plain English, concise — but the architectural nouns and verbs come straight from the rubric in [SKILL.md](SKILL.md). Concision is not an excuse to drift.
 
 **Use exactly:** module, interface, implementation, depth, deep, shallow, seam, adapter, leverage, locality.
 
@@ -118,6 +118,6 @@ Plain English, concise — but the architectural nouns and verbs come straight f
 - "Deepen: one interface, one place to test."
 - "Two adapters justify the seam: HTTP in prod, in-memory in tests."
 
-**Wins bullets** name the gain in glossary terms: *"locality: bugs concentrate in one module"*, *"leverage: one interface, N call sites"*, *"interface shrinks; implementation absorbs the wrappers"*. Don't write *"easier to maintain"* or *"cleaner code"* — those terms aren't in the glossary and don't earn their place.
+**Wins bullets** name the gain in rubric terms: *"locality: bugs concentrate in one module"*, *"leverage: one interface, N call sites"*, *"interface shrinks; implementation absorbs the wrappers"*. Don't write *"easier to maintain"* or *"cleaner code"* — those terms aren't in the rubric and don't earn their place.
 
-No hedging, no throat-clearing, no "it's worth noting that…". If a sentence could be a bullet, make it a bullet. If a bullet could be cut, cut it. If a term isn't in the `/codebase-design` glossary, reach for one that is before inventing a new one.
+No hedging, no throat-clearing, no "it's worth noting that…". If a sentence could be a bullet, make it a bullet. If a bullet could be cut, cut it. If a term isn't in the rubric, reach for one that is before inventing a new one.

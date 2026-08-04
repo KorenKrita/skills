@@ -12,13 +12,27 @@ import {
   findRemovedFiles,
   isExcludedFile,
   planSparseCheckout,
+  planSync,
 } from "./sync-utils.js"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 interface OverridesConfig {
-  skills: Record<string, SkillOverride>
+  skills: Record<string, SkillEntry>
 }
+
+/**
+ * A locally owned Skill lives in the repository like an upstream one, but the
+ * sync job never fetches or overwrites it. `provenance` records where the fork
+ * came from so the origin and its license stay auditable.
+ */
+interface LocalSkill {
+  ownership: "local"
+  plugin: string
+  provenance?: Record<string, string>
+}
+
+type SkillEntry = SkillOverride | LocalSkill
 
 interface ExtraMapping {
   from: string
@@ -32,6 +46,7 @@ interface TargetPatchSet {
 }
 
 interface SkillOverride {
+  ownership?: "upstream"
   source: {
     repo: string
     path: string
@@ -342,9 +357,13 @@ const program = Effect.gen(function* () {
   const syncState = readSyncState()
   let updated = false
 
+  const plan = planSync(overrides.skills)
+
+  // Locally owned Skills are deliberately absent from the upstream state, so
+  // only upstream-owned names count as configured keys when pruning orphans.
   const orphanedStateKeys = findOrphanedStateKeys(
     Object.keys(syncState),
-    Object.keys(overrides.skills),
+    plan.sync.map(([skillName]) => skillName),
   )
   for (const skillName of orphanedStateKeys) {
     console.log(`🧹 ${skillName}: 从同步状态中移除已删除的配置`)
@@ -352,7 +371,11 @@ const program = Effect.gen(function* () {
     updated = true
   }
 
-  for (const [skillName, config] of Object.entries(overrides.skills)) {
+  for (const skillName of plan.skipped) {
+    console.log(`🔒 ${skillName}: 本地自有 Skill，跳过上游同步`)
+  }
+
+  for (const [skillName, config] of plan.sync) {
     const {
       source,
       plugin,

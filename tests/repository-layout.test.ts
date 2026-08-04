@@ -2,34 +2,19 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs"
 import { join } from "node:path"
 import { describe, expect, it } from "vitest"
 import { parse as parseYaml } from "yaml"
-import { isExcludedFile } from "../scripts/sync-utils.js"
+import { isExcludedFile, isUpstreamOwned, upstreamOwnedNames } from "../scripts/sync-utils.js"
 
 const ROOT = new URL("../", import.meta.url).pathname.replace(/\/$/, "")
 const PLUGINS = ["base", "plus"] as const
 
 const EXPECTED_SKILLS = {
   base: [
-    "ask-matt",
-    "code-review",
-    "codebase-design",
     "diagnosing-bugs",
-    "domain-modeling",
     "grill-me",
-    "grill-with-docs",
-    "grilling",
     "handoff",
-    "implement",
     "improve-codebase-architecture",
     "prototype",
-    "research",
-    "resolving-merge-conflicts",
-    "setup-matt-pocock-skills",
-    "tdd",
     "teach",
-    "to-spec",
-    "to-tickets",
-    "triage",
-    "wayfinder",
     "writing-great-skills",
   ],
   plus: [
@@ -45,6 +30,44 @@ const EXPECTED_SKILLS = {
 } as const
 
 const EXPECTED_SKILL_COUNT = Object.values(EXPECTED_SKILLS).flat().length
+
+/** Skills this repository maintains itself, excluded from upstream sync. */
+const LOCAL_SKILLS = ["improve-codebase-architecture"] as const
+
+/** base Skills removed from the subscription; nothing may still route to them. */
+const REMOVED_BASE_SKILLS = [
+  "ask-matt",
+  "code-review",
+  "codebase-design",
+  "domain-modeling",
+  "grill-with-docs",
+  "grilling",
+  "implement",
+  "research",
+  "resolving-merge-conflicts",
+  "setup-matt-pocock-skills",
+  "tdd",
+  "to-spec",
+  "to-tickets",
+  "triage",
+  "wayfinder",
+] as const
+
+function readOverrides(): {
+  skills: Record<
+    string,
+    {
+      plugin: string
+      ownership?: string
+      provenance?: Record<string, string>
+      exclude_files?: string[]
+      patches?: Array<{ type: string; pattern?: string; with?: string }>
+      target_patches?: Array<{ target: string }>
+    }
+  >
+} {
+  return parseYaml(readFileSync(join(ROOT, "overrides.yaml"), "utf-8"))
+}
 
 function skillNames(plugin: string): string[] {
   return readdirSync(join(ROOT, "plugins", plugin, "skills"))
@@ -116,28 +139,49 @@ describe("repository layout", () => {
   })
 
   it("keeps sync state aligned with every upstream-managed skill", () => {
-    const overrides = parseYaml(readFileSync(join(ROOT, "overrides.yaml"), "utf-8")) as {
-      skills: Record<string, { plugin: string }>
-    }
+    const overrides = readOverrides()
     const state = JSON.parse(readFileSync(join(ROOT, ".sync-state.json"), "utf-8")) as Record<string, unknown>
-    expect(Object.keys(state).sort()).toEqual(Object.keys(overrides.skills).sort())
-    expect(Object.keys(overrides.skills)).toHaveLength(30)
+    expect(Object.keys(state).sort()).toEqual(upstreamOwnedNames(overrides.skills).sort())
+    expect(Object.keys(overrides.skills)).toHaveLength(EXPECTED_SKILL_COUNT)
     for (const [skill, config] of Object.entries(overrides.skills)) {
       expect(existsSync(join(ROOT, "plugins", config.plugin, "skills", skill)), skill).toBe(true)
     }
   })
 
-  it("does not publish files excluded by sync rules", () => {
-    const overrides = parseYaml(readFileSync(join(ROOT, "overrides.yaml"), "utf-8")) as {
-      skills: Record<
-        string,
-        {
-          plugin: string
-          exclude_files?: string[]
-          target_patches?: Array<{ target: string }>
-        }
-      >
+  it("keeps locally owned skills out of upstream sync but inside the inventory", () => {
+    const overrides = readOverrides()
+    const state = JSON.parse(readFileSync(join(ROOT, ".sync-state.json"), "utf-8")) as Record<string, unknown>
+
+    for (const skill of LOCAL_SKILLS) {
+      const entry = overrides.skills[skill]
+      expect(entry, skill).toBeDefined()
+      expect(entry?.ownership, skill).toBe("local")
+      expect(isUpstreamOwned(entry!), skill).toBe(false)
+      // No upstream source means the sync loop can never fetch or overwrite it.
+      expect("source" in entry!, skill).toBe(false)
+      expect(state[skill], skill).toBeUndefined()
+      // Provenance keeps the fork origin and its license auditable.
+      expect(entry?.provenance?.repo, skill).toBe("mattpocock/skills")
+      expect(entry?.provenance?.forked_at_sha, skill).toMatch(/^[0-9a-f]{40}$/)
+      expect(entry?.provenance?.license, skill).toContain("license")
+      expect(existsSync(join(ROOT, "plugins", entry!.plugin, "skills", skill)), skill).toBe(true)
     }
+
+    expect(upstreamOwnedNames(overrides.skills)).not.toContain(LOCAL_SKILLS[0])
+  })
+
+  it("routes to no removed base skill from any surviving runtime file", () => {
+    const runtime = textFiles(join(ROOT, "plugins", "base"))
+      .map((path) => `${path}\n${readFileSync(path, "utf-8")}`)
+      .join("\n")
+    for (const skill of REMOVED_BASE_SKILLS) {
+      expect(existsSync(join(ROOT, "plugins", "base", "skills", skill)), skill).toBe(false)
+      expect(runtime, skill).not.toContain(`/${skill}`)
+    }
+  })
+
+  it("does not publish files excluded by sync rules", () => {
+    const overrides = readOverrides()
     const state = JSON.parse(readFileSync(join(ROOT, ".sync-state.json"), "utf-8")) as Record<
       string,
       { files?: string[] }
@@ -215,12 +259,7 @@ describe("repository layout", () => {
   })
 
   it("keeps removed cross-skill routes suppressed", () => {
-    const overrides = parseYaml(readFileSync(join(ROOT, "overrides.yaml"), "utf-8")) as {
-      skills: Record<
-        string,
-        { patches?: Array<{ type: string; pattern?: string; with?: string }> }
-      >
-    }
+    const overrides = readOverrides()
     const checks = [
       { skill: "razor", path: join("plugins", "plus", "skills", "razor", "SKILL.md"), marker: "use `hai-idea`" },
     ]
@@ -234,6 +273,81 @@ describe("repository layout", () => {
         `${skill} removal patch for ${marker}`,
       ).toBe(true)
     }
+  })
+
+  it("declares the diagnosing-bugs dependency removals as replayable patches", () => {
+    const patches = readOverrides().skills["diagnosing-bugs"]?.patches ?? []
+    const skill = readFileSync(
+      join(ROOT, "plugins", "base", "skills", "diagnosing-bugs", "SKILL.md"),
+      "utf-8",
+    )
+
+    // Fixed CONTEXT.md/ADR layout and the /improve-codebase-architecture handoff
+    // are both removed declaratively, so a forced upstream replay reapplies them.
+    for (const marker of ["`CONTEXT.md`", "/improve-codebase-architecture"]) {
+      expect(skill, marker).not.toContain(marker)
+      expect(
+        patches.some((patch) => patch.type === "replace" && patch.pattern?.includes(marker)),
+        `diagnosing-bugs patch for ${marker}`,
+      ).toBe(true)
+    }
+
+    // The debugging discipline the Skill exists for must survive the patches.
+    expect(skill).toContain("Phase 1 — Build a feedback loop")
+    expect(skill).toContain("### Tighten the loop")
+    expect(skill).toContain("Phase 5 — Fix + regression test")
+    expect(skill).toContain("No red-capable command, no Phase 2.")
+  })
+
+  it("renames the upstream grilling payload to grill-me declaratively", () => {
+    const entry = readOverrides().skills["grill-me"]
+    expect((entry as { source?: { path?: string } })?.source?.path).toBe("skills/productivity/grilling")
+    expect(
+      entry?.patches?.some(
+        (patch) => patch.type === "set_frontmatter" && (patch as { field?: string }).field === "name",
+      ),
+    ).toBe(true)
+    expect(entry?.target_patches?.map(({ target }) => target)).toContain("agents/openai.yaml")
+
+    // The interview protocol is inlined; the old wrapper only forwarded to /grilling.
+    const skill = readFileSync(join(ROOT, "plugins", "base", "skills", "grill-me", "SKILL.md"), "utf-8")
+    expect(skill).toContain("Interview me relentlessly")
+    expect(skill).not.toContain("Run a `/grilling` session")
+  })
+
+  it("keeps the local architecture skill free of removed skill and subagent calls", () => {
+    const dir = join(ROOT, "plugins", "base", "skills", "improve-codebase-architecture")
+    const content = textFiles(dir).map((path) => readFileSync(path, "utf-8")).join("\n")
+
+    for (const marker of [
+      "/codebase-design",
+      "/grilling",
+      "/domain-modeling",
+      "subagent_type",
+      "`CONTEXT.md`",
+      "docs/adr/",
+    ]) {
+      expect(content, marker).not.toContain(marker)
+    }
+
+    // Self-contained rubric plus the HTML report flow must stay intact.
+    const skill = readFileSync(join(dir, "SKILL.md"), "utf-8")
+    expect(skill).toContain("## Architecture rubric")
+    expect(skill).toContain("The deletion test")
+    expect(skill).toContain("architecture-review-<timestamp>.html")
+    expect(skill).toContain("Which of these would you like to explore?")
+    const deepening = readFileSync(join(dir, "DEEPENING.md"), "utf-8")
+    for (const dependencyClass of [
+      "In-process",
+      "Local-substitutable",
+      "Remote but owned",
+      "True external",
+    ]) {
+      expect(deepening).toContain(dependencyClass)
+    }
+    expect(deepening).toContain("Testing strategy: replace, don't layer")
+    expect(skill).toContain("update the project's existing glossary or domain document immediately")
+    expect(existsSync(join(dir, "HTML-REPORT.md"))).toBe(true)
   })
 
   it("keeps only the approved plugin-level assets", () => {

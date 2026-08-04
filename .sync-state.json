@@ -1,64 +1,10 @@
 {
-  "ask-matt": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
-    "files": [
-      "SKILL.md",
-      "agents/openai.yaml"
-    ]
-  },
-  "code-review": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
-    "files": [
-      "SKILL.md",
-      "agents/openai.yaml"
-    ]
-  },
-  "codebase-design": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
-    "files": [
-      "DEEPENING.md",
-      "DESIGN-IT-TWICE.md",
-      "SKILL.md",
-      "agents/openai.yaml"
-    ]
-  },
   "diagnosing-bugs": {
     "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
     "files": [
       "SKILL.md",
       "agents/openai.yaml",
       "scripts/hitl-loop.template.sh"
-    ]
-  },
-  "domain-modeling": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
-    "files": [
-      "ADR-FORMAT.md",
-      "CONTEXT-FORMAT.md",
-      "SKILL.md",
-      "agents/openai.yaml"
-    ]
-  },
-  "grill-with-docs": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
-    "files": [
-      "SKILL.md",
-      "agents/openai.yaml"
-    ]
-  },
-  "implement": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
-    "files": [
-      "SKILL.md",
-      "agents/openai.yaml"
-    ]
-  },
-  "improve-codebase-architecture": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
-    "files": [
-      "HTML-REPORT.md",
-      "SKILL.md",
-      "agents/openai.yaml"
     ]
   },
   "prototype": {
@@ -70,79 +16,7 @@
       "agents/openai.yaml"
     ]
   },
-  "research": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
-    "files": [
-      "SKILL.md",
-      "agents/openai.yaml"
-    ]
-  },
-  "resolving-merge-conflicts": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
-    "files": [
-      "SKILL.md",
-      "agents/openai.yaml"
-    ]
-  },
-  "setup-matt-pocock-skills": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
-    "files": [
-      "SKILL.md",
-      "agents/openai.yaml",
-      "domain.md",
-      "issue-tracker-github.md",
-      "issue-tracker-gitlab.md",
-      "issue-tracker-local.md",
-      "triage-labels.md"
-    ]
-  },
-  "tdd": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
-    "files": [
-      "SKILL.md",
-      "agents/openai.yaml",
-      "mocking.md",
-      "tests.md"
-    ]
-  },
-  "to-spec": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
-    "files": [
-      "SKILL.md",
-      "agents/openai.yaml"
-    ]
-  },
-  "to-tickets": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
-    "files": [
-      "SKILL.md",
-      "agents/openai.yaml"
-    ]
-  },
-  "triage": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
-    "files": [
-      "AGENT-BRIEF.md",
-      "OUT-OF-SCOPE.md",
-      "SKILL.md",
-      "agents/openai.yaml"
-    ]
-  },
-  "wayfinder": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
-    "files": [
-      "SKILL.md",
-      "agents/openai.yaml"
-    ]
-  },
   "grill-me": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
-    "files": [
-      "SKILL.md",
-      "agents/openai.yaml"
-    ]
-  },
-  "grilling": {
     "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
     "files": [
       "SKILL.md",

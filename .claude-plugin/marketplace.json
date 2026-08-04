@@ -7,16 +7,16 @@
   "plugins": [
     {
       "name": "base",
-      "version": "0.0.3",
+      "version": "0.0.4",
       "source": "./plugins/base",
-      "description": "Matt Pocock active Skill 主体：规格、实现、测试、调试、审查与协作流程",
+      "description": "核心工程与协作流程：调试、原型、架构改进、访谈、交接、教学与 Skill 写作",
       "strict": false,
       "category": "engineering",
       "keywords": [
         "engineering",
-        "tdd",
         "debugging",
-        "code-review",
+        "architecture",
+        "prototyping",
         "workflow"
       ]
     },
