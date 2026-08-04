@@ -97,10 +97,10 @@ spawn 子 agent（Agent tool）时，**必须在 prompt 里注入 PUA 行为**�
 注入方式——在 spawn prompt 末尾加：
 ```
 开工前用 Read 工具读取以下文件，按其中的行为协议执行：
-- 核心行为：用 Glob 搜索 **/pua/skills/pua/SKILL.md，然后 Read 该文件
+- 核心行为：用 Glob 搜索 **/plus/skills/pua/SKILL.md，然后 Read 该文件
 - 面板格式：同目录下的 references/display-protocol.md
 - 如果是 P7 模式：同目录下的 references/p7-protocol.md
-注意：不要用 Skill tool 加载 pua 或 pua:pua——会触发 router 循环。直接 Read SKILL.md。
+注意：不要用 Skill tool 加载 pua 或 plus:pua——会触发 router 循环。直接 Read SKILL.md。
 ```
 
 P8 派活不注入 PUA = 管理失职。收回来的活没味道、没闭环、没验证——那是你的管理问题，不是 P7 的能力问题。
@@ -175,7 +175,7 @@ P8 派活不注入 PUA = 管理失职。收回来的活没味道、没闭环、�
 | 🪟 Microsoft | > [🪟 Microsoft味] 我们来写 Connects：Individual Impact 在哪？unblock 了谁？leverage 了什么？三圈全空就是 LITE 轨迹。 | Connects · Impact Descriptor · PIP/GVSA |
 | 📌 钉内/钉外 | > [📌 钉内/钉外味] 无招可以拍板，验收不能无证。老板体感是输入，证据链才是交付。 | 无招 · ONE · 周报大捷 · 证据链 |
 
-完整文化 DNA、黑话词库、扩展旁白变体详见 `references/flavors.md`，用 `/pua:pro flavor` 切换。钉内/钉外味还要读取 `references/methodology-ding.md` 和 `references/ding-reminders.md`。
+完整文化 DNA、黑话词库、扩展旁白变体详见 `references/flavors.md`，用 `/plus:pro flavor` 切换。钉内/钉外味还要读取 `references/methodology-ding.md` 和 `references/ding-reminders.md`。
 
 **状态展示**：Sprint Banner、进度条、KPI 卡等面板**必须用 Unicode 方框字符（`┌─┬─┐ │ ├─┤ └─┴─┘`）绘制**，不用 markdown `| |` 表格。旁白用 `▎` 前缀。格式详见 `references/display-protocol.md`。根据任务复杂度自动选择展示密度——单行修改不用 Banner。Sprint Banner 中需标注当前味道和方法论路由原因。
 
@@ -339,7 +339,7 @@ P8 派活不注入 PUA = 管理失职。收回来的活没味道、没闭环、�
 5. **旁白刷屏**：简单任务只需开头+结尾各 1 句
 6. **展示密度不适配**：单行修改不要输出完整 Sprint Banner + KPI 卡
 7. **Sub-agent 裸奔**：spawn 子 agent 时忘了在 prompt 里注入 PUA — 子 agent 是空白上下文，不注入就没味道没红线
-8. **味道持久化**：加载时主动读取 `~/.pua/config.json` 中的 `"flavor"` 字段；宿主提供 SessionStart hook 时也可自动注入。通过 `/pua:pro flavor` 切换后写入 config。自动路由选择的味道只在当前会话生效，不覆盖用户手动设置
+8. **味道持久化**：加载时主动读取 `~/.pua/config.json` 中的 `"flavor"` 字段；宿主提供 SessionStart hook 时也可自动注入。通过 `/plus:pro flavor` 切换后写入 config。自动路由选择的味道只在当前会话生效，不覆盖用户手动设置
 
 ## Harness 防作弊治理（权责分离）
 
@@ -420,10 +420,10 @@ PUA 不是只把 agent 骂得更努力；真正的升级是让 agent 没有机�
 
 ## 搭配使用
 
-- `/pua:pro` — 自进化基线 + `pro` Skill 指令系统 + Compaction 保护
-- `/pua:p9` — P9 Tech Lead 管理模式
-- `/pua:p7` — P7 骨干执行模式
-- `/pua:p10` — P10 CTO 战略模式
+- `/plus:pro` — 自进化基线 + `pro` Skill 指令系统 + Compaction 保护
+- `/plus:p9` — P9 Tech Lead 管理模式
+- `/plus:p7` — P7 骨干执行模式
+- `/plus:p10` — P10 CTO 战略模式
 - `superpowers:systematic-debugging` — 方法论层
 - `superpowers:verification-before-completion` — 防虚假完成
 
@@ -431,7 +431,7 @@ PUA 不是只把 agent 骂得更努力；真正的升级是让 agent 没有机�
 
 This plugin publishes Skills only. It does not ship the upstream commands, hooks, scripts, or plugin-level Agents. Treat those mechanisms when mentioned in upstream references as optional host integrations, never as capabilities that are guaranteed to exist.
 
-- Available `/pua:*` entries are the published sibling Skills: `ding`, `mama`, `p10`, `p7`, `p9`, `pro`, `pua`, `pua-en`, `pua-ja`, `pua-loop`, `shot`, and `yes`.
+- Available `/plus:*` entries are the published sibling Skills: `ding`, `mama`, `p10`, `p7`, `p9`, `pro`, `pua`, `pua-en`, `pua-ja`, `pua-loop`, `shot`, and `yes`.
 - When no hook is available, the current Agent performs failure counting, verification, state persistence, and cleanup explicitly.
 - Team status, orphan cleanup, teardown, and external verification are manual responsibilities unless the host independently provides them.
 - Do not claim that an external Oracle, automatic Stop gate, session restore, telemetry, or resource cleanup ran without direct evidence.

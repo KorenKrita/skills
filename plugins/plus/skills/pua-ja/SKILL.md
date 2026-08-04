@@ -338,7 +338,7 @@ PUA SkillがClaude Code Agent Teamコンテキストで実行される場合、�
 
 ### Leaderの行動規則
 
-1. **初期化**：teammate spawn時にタスク説明へ `作業開始前に Glob で **/pua/skills/pua/SKILL.md を探し、Read で読み込む` と含める
+1. **初期化**：teammate spawn時にタスク説明へ `作業開始前に Glob で **/plus/skills/pua/SKILL.md を探し、Read で読み込む` と含める
 2. **失敗カウント管理**：グローバル失敗カウンター（teammate＋タスク次元）を維持。teammate失敗レポート受信時：
    - カウント加算 → プレッシャーレベル判定（L1-L4）→ `Teammate write`で対応PUA話術＋強制アクションを送信
    - L3+時に`broadcast`で全チームへ競争プレッシャー（楽天味）

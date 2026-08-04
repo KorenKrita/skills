@@ -22,9 +22,9 @@
     },
     {
       "name": "plus",
-      "version": "0.0.11",
+      "version": "0.0.12",
       "source": "./plugins/plus",
-      "description": "决策方法、代码质量审查、读取工具、中文写作优化与架构图",
+      "description": "决策方法、代码质量审查、读取工具、中文写作优化、架构图与 PUA 高能动性治理",
       "strict": false,
       "category": "productivity",
       "keywords": [
@@ -33,20 +33,8 @@
         "review",
         "writing",
         "diagram",
-        "architecture"
-      ]
-    },
-    {
-      "name": "pua",
-      "version": "0.0.1",
-      "source": "./plugins/pua",
-      "description": "PUA 高能动性治理、分级角色、循环执行与多语言生产力 coaching Skills",
-      "strict": false,
-      "category": "productivity",
-      "keywords": [
+        "architecture",
         "pua",
-        "productivity",
-        "verification",
         "coaching",
         "agent-governance"
       ]

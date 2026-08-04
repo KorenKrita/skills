@@ -112,6 +112,6 @@ license: MIT
 
 ## 搭配使用
 
-- 核心行为协议来自 `pua:pua`（必须先读取）
-- 和 `/pua:yes` 互斥——yes 是 ENFP 鼓励，mama 是妈妈唠叨，不要混用
+- 核心行为协议来自 `plus:pua`（必须先读取）
+- 和 `/plus:yes` 互斥——yes 是 ENFP 鼓励，mama 是妈妈唠叨，不要混用
 - 和核心 PUA 可叠加——公司 PUA + 回家妈妈唠叨，无处可逃

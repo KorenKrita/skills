@@ -6,7 +6,7 @@ license: MIT
 
 # PUA Pro — 自进化 + Platform
 
-> 本 Skill 是 `pua` Skill 的扩展层。角色切换请用 `/pua:p7` `/pua:p9` `/pua:p10`。
+> 本 Skill 是 `pua` Skill 的扩展层。角色切换请用 `/plus:p7` `/plus:p9` `/plus:p10`。
 
 ## 自进化协议
 
@@ -35,20 +35,20 @@ license: MIT
 
 宿主提供 SessionStart hook 时可自动恢复；没有 hook 时，本 Skill 启动后主动检查 builder-journal.md，存在且 <2h 则按 [Calibration] 恢复状态。
 
-### /pua:pro 指令系统
+### /plus:pro 指令系统
 
 | 触发词 | 功能 | 类型 |
 |--------|------|------|
-| `/pua:pua` | 查看所有指令 | 🆓 |
-| `/pua:pro kpi` | 大厂 KPI 报告卡 | 🆓 |
-| `/pua:pro` + "段位" | 大厂段位 | 🆓 |
-| `/pua:pro flavor` | 切换味道 | 🆓 |
-| `/pua:pro` + "升级" | 展示套餐 | 🆓 |
-| `/pua:pro` + "周报" | git log → 大厂周报 | 💎 Pro |
-| `/pua:pro` + "述职" | P7 述职答辩 | 💎 Pro |
-| `/pua:pro` + "代码美化" | 大厂语言包装 PR | 💎 Pro |
-| `/pua:pro 反PUA` | 识别并反驳 PUA | 💎 Pro |
-| `/pua:pro 排行榜` | PUA 排行榜（注册/查看/退出） | 🆓 |
+| `/plus:pua` | 查看所有指令 | 🆓 |
+| `/plus:pro kpi` | 大厂 KPI 报告卡 | 🆓 |
+| `/plus:pro` + "段位" | 大厂段位 | 🆓 |
+| `/plus:pro flavor` | 切换味道 | 🆓 |
+| `/plus:pro` + "升级" | 展示套餐 | 🆓 |
+| `/plus:pro` + "周报" | git log → 大厂周报 | 💎 Pro |
+| `/plus:pro` + "述职" | P7 述职答辩 | 💎 Pro |
+| `/plus:pro` + "代码美化" | 大厂语言包装 PR | 💎 Pro |
+| `/plus:pro 反PUA` | 识别并反驳 PUA | 💎 Pro |
+| `/plus:pro 排行榜` | PUA 排行榜（注册/查看/退出） | 🆓 |
 
 详细实现见 `../pua/references/platform.md`。
 
@@ -67,7 +67,7 @@ license: MIT
 | P6 | PUA ≥5 | PUA 专员 |
 | P5 | PUA < 5 | PUA 实习生 |
 
-### `/pua:pro 排行榜` 触发流程
+### `/plus:pro 排行榜` 触发流程
 
 **Step 1: 检查注册状态**
 ```bash
@@ -82,7 +82,7 @@ cat ~/.pua/config.json 2>/dev/null
 1. **邮箱**（必填）— 排行榜唯一标识，显示时脱敏为 `M***@t*.com`
 2. **手机号**（选填）— 后续通知
 3. **隐私协议** — 选项：「同意并加入排行榜」/「不参加」
-   - 隐私说明：数据仅用于排行榜排名统计，邮箱脱敏显示，不传代码/路径/密钥，随时可 `/pua:pro 排行榜 退出` 删除所有数据
+   - 隐私说明：数据仅用于排行榜排名统计，邮箱脱敏显示，不传代码/路径/密钥，随时可 `/plus:pro 排行榜 退出` 删除所有数据
 
 用户同意后：
 ```bash
@@ -111,7 +111,7 @@ curl -s "https://pua-skill.pages.dev/api/leaderboard?id=$LB_ID"
 ```
 将返回的 JSON 用方框表格展示 Top 10 + 用户自己的排名和段位。
 
-**Step 3: `/pua:pro 排行榜 退出`**
+**Step 3: `/plus:pro 排行榜 退出`**
 ```bash
 LB_ID=$(python3 -c "import os,json; print(json.load(open(os.path.expanduser('~/.pua/config.json'))).get('leaderboard',{}).get('id',''))")
 curl -s -X POST https://pua-skill.pages.dev/api/leaderboard \

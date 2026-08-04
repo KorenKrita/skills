@@ -5,7 +5,22 @@ import { parse as parseYaml } from "yaml"
 import { isExcludedFile, isUpstreamOwned, upstreamOwnedNames } from "../scripts/sync-utils.js"
 
 const ROOT = new URL("../", import.meta.url).pathname.replace(/\/$/, "")
-const PLUGINS = ["base", "plus", "pua"] as const
+const PLUGINS = ["base", "plus"] as const
+
+const PUA_SKILLS = [
+  "ding",
+  "mama",
+  "p10",
+  "p7",
+  "p9",
+  "pro",
+  "pua",
+  "pua-en",
+  "pua-ja",
+  "pua-loop",
+  "shot",
+  "yes",
+] as const
 
 const EXPECTED_SKILLS = {
   base: [
@@ -25,20 +40,7 @@ const EXPECTED_SKILLS = {
     "nuclear-review",
     "razor",
     "read",
-  ],
-  pua: [
-    "ding",
-    "mama",
-    "p10",
-    "p7",
-    "p9",
-    "pro",
-    "pua",
-    "pua-en",
-    "pua-ja",
-    "pua-loop",
-    "shot",
-    "yes",
+    ...PUA_SKILLS,
   ],
 } as const
 
@@ -363,19 +365,19 @@ describe("repository layout", () => {
     expect(existsSync(join(dir, "HTML-REPORT.md"))).toBe(true)
   })
 
-  it("ships the complete upstream PUA Skill suite without plugin commands or hooks", () => {
+  it("ships the complete upstream PUA Skill suite inside Plus without PUA runtime assets", () => {
     const overrides = readOverrides()
     const state = JSON.parse(readFileSync(join(ROOT, ".sync-state.json"), "utf-8")) as Record<
       string,
       { sha?: string; files?: string[] }
     >
-    const puaRoot = join(ROOT, "plugins", "pua")
+    const plusRoot = join(ROOT, "plugins", "plus")
     const upstreamShas: string[] = []
 
-    for (const skill of EXPECTED_SKILLS.pua) {
+    for (const skill of PUA_SKILLS) {
       const entry = overrides.skills[skill]
-      expect(entry?.plugin, skill).toBe("pua")
-      expect(existsSync(join(puaRoot, "skills", skill, "SKILL.md")), skill).toBe(true)
+      expect(entry?.plugin, skill).toBe("plus")
+      expect(existsSync(join(plusRoot, "skills", skill, "SKILL.md")), skill).toBe(true)
       if (entry?.ownership === "local") {
         expect(skill).toBe("pua-loop")
         expect(state[skill], skill).toBeUndefined()
@@ -387,8 +389,8 @@ describe("repository layout", () => {
     }
     expect(new Set(upstreamShas).size).toBe(1)
 
-    for (const asset of ["commands", "hooks", "agents", "scripts"]) {
-      expect(existsSync(join(puaRoot, asset)), asset).toBe(false)
+    for (const asset of ["commands", "hooks", "scripts"]) {
+      expect(existsSync(join(plusRoot, asset)), asset).toBe(false)
     }
 
     for (const reference of [
@@ -400,37 +402,52 @@ describe("repository layout", () => {
       "survey.md",
       "teardown-protocol.md",
     ]) {
-      expect(existsSync(join(puaRoot, "skills", "pua", "references", reference)), reference).toBe(true)
+      expect(existsSync(join(plusRoot, "skills", "pua", "references", reference)), reference).toBe(true)
     }
   })
 
-  it("keeps every PUA Skill reference self-contained in the Skills-only plugin", () => {
-    const root = join(ROOT, "plugins", "pua", "skills")
-    const runtime = textFiles(root).map((path) => readFileSync(path, "utf-8")).join("\n")
+  it("keeps every PUA Skill reference self-contained in the Skills-only Plus suite", () => {
+    const root = join(ROOT, "plugins", "plus", "skills")
+    const runtime = PUA_SKILLS.flatMap((skill) => textFiles(join(root, skill)))
+      .map((path) => readFileSync(path, "utf-8"))
+      .join("\n")
 
     for (const stalePath of [
       "skills/ding/references/",
       "skills/pua/references/",
       "**/pua-skills/skills/pua/SKILL.md",
+      "**/pua/skills/pua/SKILL.md",
       ".claude/skills/pua/SKILL.md",
       "agents/pua-enforcer.md",
       "agents/senior-engineer-p7.md",
       "agents/tech-lead-p9.md",
       "agents/cto-p10.md",
+      "senior-engineer-p7",
+      "tech-lead-p9",
+      "cto-p10",
     ]) {
       expect(runtime, stalePath).not.toContain(stalePath)
     }
 
+    expect(runtime).toContain("**/plus/skills/pua/SKILL.md")
+    for (const staleRuntimeClaim of [
+      "v3.1 起注册 SubagentStop",
+      "pua-loop-hook.sh 的 Gate 0 保留",
+      "default=true",
+    ]) {
+      expect(runtime, staleRuntimeClaim).not.toContain(staleRuntimeClaim)
+    }
     expect(runtime).toContain("宿主提供 PreCompact/SessionStart hook 时")
     expect(runtime).toContain("没有 hook 时由当前 Agent")
     expect(runtime).toContain("## Skills-only Runtime Boundary")
 
-    const published = new Set(EXPECTED_SKILLS.pua)
-    const routedSkills = [...runtime.matchAll(/\/pua:([a-z0-9-]+)/g)].map((match) => match[1]!)
+    const published = new Set(PUA_SKILLS)
+    const routedSkills = [...runtime.matchAll(/\/plus:([a-z0-9-]+)/g)].map((match) => match[1]!)
     for (const routedSkill of routedSkills) {
-      expect(published.has(routedSkill as (typeof EXPECTED_SKILLS.pua)[number]), routedSkill).toBe(true)
+      expect(published.has(routedSkill as (typeof PUA_SKILLS)[number]), routedSkill).toBe(true)
     }
 
+    expect(runtime).not.toContain("/pua:")
     expect(runtime).not.toMatch(/\/pua(?:\s|`)/)
     expect(runtime).not.toContain("git worktree remove <worktree_path> --force")
     expect(runtime).not.toContain("git branch -D <worktree_branch>")

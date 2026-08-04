@@ -11,9 +11,9 @@ PUA v3 之前的协议只覆盖 agent 生命周期的前 4 步（Define → Spaw
 - TeamCreate 的 tmux pane 无人关闭 → 资源常驻
 - worktree 隔离的 agent 完成后留下孤儿代码副本 → 磁盘+context 浪费
 - 会话 auto-compact 后 orphan 加倍 → OOM
-- 无独立的 SubagentStop 会计层 → 无法回答"当前还有多少 agent 在场上"
+- 本 Skills-only suite 无自动 subagent 会计层 → 当前 Agent 必须显式记录并报告活跃 agent
 
-**关于 "subagent 劫持主 loop" 的澄清**：这曾是最初的假设，但查 Claude Code 官方文档后证实**不成立**——`Stop` 事件仅主会话触发，subagent 完成走独立的 `SubagentStop` 事件。hooks.json 里如果只注册 `Stop`，subagent 的生命周期结束对主会话 hook 不可见。**真正的病因是 agent 生命周期缺少会计层**，不是 hook 层劫持。v3.1 起注册 SubagentStop hook 作为 teardown accounting，配合 `/pua:pua team-status` 提供"当前在场阵容"。
+**Skills-only 约束**：本 suite 不注册 Stop/SubagentStop hook。当前 Agent 必须维护活跃 agent 清单，并在 `/plus:pua team-status` 时依据实际运行状态报告；只有宿主明确提供且有运行证据时，才能依赖自动生命周期会计。
 
 本文定义缺失的 3 步，并给出可执行的命令/信号/检查清单。
 
@@ -55,7 +55,7 @@ PUA v3 之前的协议只覆盖 agent 生命周期的前 4 步（Define → Spaw
 
 ### R2. P10 换届强制 teardown 整个 P9 团队
 
-**WHY**：P9 切换（/pua:p9 → 不同项目）时，旧 P9 管理的 P8 全部成了孤儿——没有老板会来验收它们的交付。
+**WHY**：P9 切换（/plus:p9 → 不同项目）时，旧 P9 管理的 P8 全部成了孤儿——没有老板会来验收它们的交付。
 
 **HOW**：P10 下发换届指令时必须级联：
 
@@ -98,7 +98,7 @@ TeamDelete({team_name: "<project-team>"})
 
 ```bash
 # 在 state 文件里记 agent_id 和 spawn_time
-# 巡检命令（也可用作 /pua:pua reap-orphans 后端）
+# 巡检命令（也可用作 /plus:pua reap-orphans 后端）
 jq '.agents[] | select(.spawn_time < (now - 1800)) | .id' ~/.claude/pua/active-agents.json
 ```
 
@@ -138,7 +138,7 @@ hook 层读 HOOK_INPUT.parent_session_id，若非空且尝试 TeamCreate → 拒
 
 1. **会话结束检查**（手动）：当前 Agent 在 team/loop 结束前扫描状态文件，识别并报告 stale 资源
 2. **会话启动检查**（手动）：当前 Agent 加载相关 Skill 时扫描 state 目录，发现 stale 资源后提示用户确认
-3. **用户显式**（手动）：`/pua:pua reap-orphans` 一键扫描 + 回收
+3. **用户显式**（手动）：`/plus:pua reap-orphans` 一键扫描 + 回收
 
 ---
 
@@ -148,12 +148,12 @@ PUA 的 14 个 slash 命令在本协议下的生命周期语义：
 
 | 命令 | 原语义 | 扩展后语义 | 映射操作 |
 |------|--------|-----------|---------|
-| `/pua:pua on` | 打开默认加载 | 不变 | config: always_on=true |
-| `/pua:pua off` | 关闭默认加载 | **+ 停 loop + 级联 teardown** | off → cancel-loop → teardown-all |
-| `/pua:pua-loop stop` | 停止 loop | 删除 `.pua-loop/state.md`，报告当前资源；只清理本次明确创建且获准清理的 worktree/pane |
-| `/pua:pua team-status` 🆕 | — | 列活跃 agent / PID / TTL | 读 state 目录 + jq 汇总 |
-| `/pua:pua reap-orphans` 🆕 | — | 扫 stale agent 并 TaskStop | age > 30min 批量回收 |
-| `/pua:pua teardown-all` 🆕 | — | 级联释放 P10→P9→P8→P7 | 发 TEARDOWN-CASCADE 到所有层 |
+| `/plus:pua on` | 打开默认加载 | 不变 | config: always_on=true |
+| `/plus:pua off` | 关闭默认加载 | **+ 停 loop + 级联 teardown** | off → cancel-loop → teardown-all |
+| `/plus:pua-loop stop` | 停止 loop | 删除 `.pua-loop/state.md`，报告当前资源；只清理本次明确创建且获准清理的 worktree/pane |
+| `/plus:pua team-status` 🆕 | — | 列活跃 agent / PID / TTL | 读 state 目录 + jq 汇总 |
+| `/plus:pua reap-orphans` 🆕 | — | 扫 stale agent 并 TaskStop | age > 30min 批量回收 |
+| `/plus:pua teardown-all` 🆕 | — | 级联释放 P10→P9→P8→P7 | 发 TEARDOWN-CASCADE 到所有层 |
 
 **设计原则**：
 - **幂等**：重复执行同一开关不会产生副作用（re-rm 无害、re-kill 先检查）
@@ -164,7 +164,7 @@ PUA 的 14 个 slash 命令在本协议下的生命周期语义：
 
 ## §自治 — 插件自动启动场景
 
-因为 PUA 是 `default=true` 自动加载的，不能假设用户会主动清理。所以关键是让 hook 长出 GC 能力：
+本 suite 不自动加载，也不附带 GC hook。当前 Agent 在下列生命周期节点显式执行检查；宿主另有自动化时，只在有运行证据后依赖它：
 
 | Hook 事件 | 自治行为 | 实际落地 |
 |----------|---------|---------|
@@ -174,7 +174,7 @@ PUA 的 14 个 slash 命令在本协议下的生命周期语义：
 | Subagent completion | 编排者记录完成状态并从活跃清单移除 | Skills-only 手动步骤 |
 | `PostToolUse:Task`（计划） | spawn 时记录 agent_id 到 active-agents.json | ⏳ 待实现（需 Claude Code 该事件支持） |
 
-**重要**：Claude Code 中 Stop 事件**仅**主会话触发，subagent 的 Stop 事件不会传到 Stop 钩子——所以监控 subagent 必须用独立的 SubagentStop 注册。pua-loop-hook.sh 的 Gate 0 保留作为"防御层"兜住未来调度变化，但不是必需防线。
+**重要**：本 suite 不附带 `pua-loop-hook.sh`，也不要求注册 SubagentStop。编排者必须根据实际 subagent 完成事件显式更新活跃清单；宿主提供等价 hook 时，可将其作为有证据的附加防线。
 
 ---
 
@@ -185,5 +185,5 @@ PUA 的 14 个 slash 命令在本协议下的生命周期语义：
 - ✅ `TeardownDelete` 在 skill 文档里出现次数 ≥ `TeamCreate` 的一半
 - ✅ `teardown` / `释放` / `回收` 在 p9-protocol 阶段四后出现 ≥ 3 次
 - Skills-only 发布不附带 hook；当前 Agent 必须区分主会话与 subagent 生命周期
-- `/pua:pua team-status`、`reap-orphans`、`teardown-all` 由当前 Agent 按本协议执行并报告证据
+- `/plus:pua team-status`、`reap-orphans`、`teardown-all` 由当前 Agent 按本协议执行并报告证据
 - ✅ `$HOME/.claude/pua/teardown.jsonl` 可写且有 schema

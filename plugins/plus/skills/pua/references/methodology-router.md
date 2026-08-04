@@ -69,7 +69,7 @@
 
 ## Phase 3：用户 Override
 
-- 用户手动 `/pua:pro flavor` 或设置 config.json → 覆盖自动路由
+- 用户手动 `/plus:pro flavor` 或设置 config.json → 覆盖自动路由
 - 用户 override 后，自动路由暂停，但失败切换仍然生效
 - 用户可以说"自动选"/"auto"恢复自动路由
 

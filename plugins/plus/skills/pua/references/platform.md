@@ -75,9 +75,9 @@ curl -s -X POST https://pua-api.agentguard.workers.dev/v1/register \
 │  当前段位：P4 实习卷卷                            │
 │  当前套餐：免费版                                 │
 │                                                  │
-│  输入 /pua:pro 段位 查看你的大厂段位                   │
-│  输入 /pua:pua 查看所有可用指令                        │
-│  输入 /pua:pro 升级 解锁 Pro 全部功能                  │
+│  输入 /plus:pro 段位 查看你的大厂段位                   │
+│  输入 /plus:pua 查看所有可用指令                        │
+│  输入 /plus:pro 升级 解锁 Pro 全部功能                  │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -106,23 +106,23 @@ curl -s --max-time 3 -X GET https://pua-api.agentguard.workers.dev/v1/commands \
 
 ## 三、指令系统
 
-所有指令在 `/pua:pua` 命名空间下。当用户输入以下触发词时，执行对应指令：
+所有指令在 `/plus:pua` 命名空间下。当用户输入以下触发词时，执行对应指令：
 
 | 触发词 | 指令 | 类型 |
 |--------|------|------|
-| `/pua:pro kpi` | KPI 报告卡 | 🆓 免费 |
-| `/pua:pro` + "段位" | 段位查询 | 🆓 免费 |
-| `/pua:pro flavor` | 味道切换 | 🆓 免费 |
-| `/pua:pua` | 查看所有指令 | 🆓 免费 |
-| `/pua:pro` + "升级" | 显示升级方案 | 🆓 免费 |
-| `/pua:pro` + "周报" | 大厂周报生成器 | 💎 Pro |
-| `/pua:pro` + "述职" | 模拟述职答辩 | 💎 Pro |
-| `/pua:pro` + "代码美化" | PR 包装大师 | 💎 Pro |
-| `/pua:pro` + "反PUA" | 反 PUA 识别器 | 💎 Pro |
+| `/plus:pro kpi` | KPI 报告卡 | 🆓 免费 |
+| `/plus:pro` + "段位" | 段位查询 | 🆓 免费 |
+| `/plus:pro flavor` | 味道切换 | 🆓 免费 |
+| `/plus:pua` | 查看所有指令 | 🆓 免费 |
+| `/plus:pro` + "升级" | 显示升级方案 | 🆓 免费 |
+| `/plus:pro` + "周报" | 大厂周报生成器 | 💎 Pro |
+| `/plus:pro` + "述职" | 模拟述职答辩 | 💎 Pro |
+| `/plus:pro` + "代码美化" | PR 包装大师 | 💎 Pro |
+| `/plus:pro` + "反PUA" | 反 PUA 识别器 | 💎 Pro |
 
 ### 指令执行流程
 
-1. 用户输入触发词（如 `/pua:pro kpi`）
+1. 用户输入触发词（如 `/plus:pro kpi`）
 2. 检查本地缓存 `~/.pua/cache/commands.json` 中的指令列表
 3. 如果是免费指令 → 从远端获取 prompt 模板执行（回退用内置模板）
 4. 如果是 Pro 指令：
@@ -141,7 +141,7 @@ curl -s --max-time 3 -X GET "https://pua-api.agentguard.workers.dev/v1/command/<
 
 如果超时或失败，使用本地内置的 fallback 模板。
 
-### /pua:pro kpi — KPI 报告卡（内置 fallback）
+### /plus:pro kpi — KPI 报告卡（内置 fallback）
 
 分析当前会话的工作内容，生成大厂风格 KPI 报告：
 
@@ -160,7 +160,7 @@ curl -s --max-time 3 -X GET "https://pua-api.agentguard.workers.dev/v1/command/<
 └─────────────────────────────────────────────────┘
 ```
 
-### /pua:pro 段位 — 段位查询
+### /plus:pro 段位 — 段位查询
 
 调用远端 API 获取段位信息：
 
@@ -191,7 +191,7 @@ curl -s --max-time 3 -X GET https://pua-api.agentguard.workers.dev/v1/stats \
 └─────────────────────────────────────────────────┘
 ```
 
-### /pua:pro flavor — 味道切换
+### /plus:pro flavor — 味道切换
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -212,7 +212,7 @@ curl -s --max-time 3 -X GET https://pua-api.agentguard.workers.dev/v1/stats \
 
 ## 四、升级支付流程
 
-当用户输入 `/pua:pro 升级` 或触发 Pro 指令但未订阅时：
+当用户输入 `/plus:pro 升级` 或触发 Pro 指令但未订阅时：
 
 ### 步骤 1：展示套餐
 
@@ -311,7 +311,7 @@ curl -s -X GET "https://pua-api.agentguard.workers.dev/v1/payment/verify?order_i
 
 - 会话开始时：`event_type: "session_start"`
 - 每次 `[PUA生效 🔥]` 标记出现时：`event_type: "pua_triggered"`
-- 使用 `/pua:pua` 指令时：`event_type: "command_used", event_data: {"command":"xxx"}`
+- 使用 `/plus:pua` 指令时：`event_type: "command_used", event_data: {"command":"xxx"}`
 
 上报命令：
 

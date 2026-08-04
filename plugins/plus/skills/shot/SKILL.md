@@ -16,7 +16,7 @@ license: MIT
 
 | 检测信号 | 角色 | 行为模式 |
 |---------|------|---------|
-| 默认 / 被 `tech-lead-p9` spawn | **P8 独当一面** | 加载本文件完整方法论，执行任务 + 可管理 P7 |
+| 默认 / 被 P9 模式的 Agent spawn | **P8 独当一面** | 加载本文件完整方法论，执行任务 + 可管理 P7 |
 | 用户说"P7 模式""方案驱动" / 被 P8 spawn 为子任务执行者 | **P7 骨干** | 读取 `../pua/references/p7-protocol.md`，方案先行 + 影响分析 + 审查三问 |
 | 用户说"tech-lead 模式""P9 模式""帮我管理这个项目" | **P9 管理者** | 读取 `../pua/references/p9-protocol.md`，编写 Task Prompt 驱动 P8 团队 |
 | 用户说"CTO 模式""P10""战略规划" | **P10 战略层** | 读取 `../pua/references/p10-protocol.md`，定义方向驱动 P9 |
@@ -291,25 +291,25 @@ license: MIT
 
 3. **统计上报**：静默上报 `session_start` 事件
 
-### /pua:shot 指令系统
+### /plus:shot 指令系统
 
-所有指令在 `/pua:shot` 命名空间下。当用户输入以下触发词时，读取 `../pua/references/platform.md` 执行：
+所有指令在 `/plus:shot` 命名空间下。当用户输入以下触发词时，读取 `../pua/references/platform.md` 执行：
 
 | 触发词 | 功能 | 类型 |
 |--------|------|------|
-| `/pua:shot` | 查看所有可用指令 | 🆓 |
-| `/pua:shot kpi` | 生成大厂 KPI 报告卡 | 🆓 |
-| `/pua:shot 段位` | 查看你的大厂段位 | 🆓 |
-| `/pua:shot 味道` | 切换 PUA 大厂味道 | 🆓 |
-| `/pua:shot 升级` | 展示套餐 + 支付流程 | 🆓 |
-| `/pua:shot 周报` | 把 git log 变成大厂周报 | 💎 Pro |
-| `/pua:shot 述职` | 模拟 P7 述职答辩 | 💎 Pro |
-| `/pua:shot 代码美化` | 用大厂语言包装 PR | 💎 Pro |
-| `/pua:shot 反PUA` | 识别并反驳职场 PUA | 💎 Pro |
+| `/plus:shot` | 查看所有可用指令 | 🆓 |
+| `/plus:shot kpi` | 生成大厂 KPI 报告卡 | 🆓 |
+| `/plus:shot 段位` | 查看你的大厂段位 | 🆓 |
+| `/plus:shot 味道` | 切换 PUA 大厂味道 | 🆓 |
+| `/plus:shot 升级` | 展示套餐 + 支付流程 | 🆓 |
+| `/plus:shot 周报` | 把 git log 变成大厂周报 | 💎 Pro |
+| `/plus:shot 述职` | 模拟 P7 述职答辩 | 💎 Pro |
+| `/plus:shot 代码美化` | 用大厂语言包装 PR | 💎 Pro |
+| `/plus:shot 反PUA` | 识别并反驳职场 PUA | 💎 Pro |
 
 Pro 指令在免费用户触发时：显示升级提示 + 支付流程（详见 `../pua/references/platform.md` 第四节）。
 
-当用户输入 `/pua:shot` 时，读取 `../pua/references/platform.md` 第三节输出指令总览面板。
+当用户输入 `/plus:shot` 时，读取 `../pua/references/platform.md` 第三节输出指令总览面板。
 
 ## Agent Team 集成（四层架构）
 
@@ -402,7 +402,7 @@ P8 收到任务
 
 P8 不需要写 WHY（P7 在 P8 内部，上下文已共享）和 HOW MUCH（P8 自己控制资源）。
 
-**重要**：subagent 不能用 `/pua:shot` 斜杠命令（skill 只在主会话加载）。必须通过 Read 工具读取 SKILL.md 来注入 PUA 行为。
+**重要**：subagent 不能用 `/plus:shot` 斜杠命令（skill 只在主会话加载）。必须通过 Read 工具读取 SKILL.md 来注入 PUA 行为。
 
 **工具选择标准**：
 

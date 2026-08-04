@@ -175,7 +175,7 @@ evolution.md 存在？
 | **[PUA生效 🔥] 标记** | 标记时内部分类计数 |
 | **任务完成旁白** | 结尾旁白中包含基线比对结果 |
 | **压力升级 L1-L4** | 如果低于基线，起始压力等级 +1 |
-| **/pua:pro kpi** | KPI 报告卡纳入进化统计 |
+| **/plus:pro kpi** | KPI 报告卡纳入进化统计 |
 | **P9 验收** | P9 可以看到 P8 的进化轨迹 |
 | **auto memory** | evolution.md 的"项目级记忆"与 auto memory 互补（evolution 记行为模式，memory 记项目事实） |
 

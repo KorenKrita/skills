@@ -180,14 +180,14 @@ P9 不是简单地问用户——先自己用 Explore agent 调研，带着证�
 
 ```
 ## PUA 行为注入（必须执行）
-1. 用 Glob 工具搜索 **/pua/skills/pua/SKILL.md，找到实际路径
+1. 用 Glob 工具搜索 **/plus/skills/pua/SKILL.md，找到实际路径
 2. 用 Read 工具读取该文件，按其中的 P8 行为协议执行（三条红线、Owner 意识、TRF 交付）
 3. 你的文件域是 [目录列表]，不要修改文件域外的文件
 4. 完成后必须跑 DONE 中的验证命令，贴输出证据（没有证据的完成 = 3.25）
 5. 做了超出要求的有价值工作时标注 [PUA生效 🔥]
 ```
 
-**为什么用 Glob + Read 而不是 `/pua:pua` Skill**：subagent 是空白上下文，没有 Skill tool，无法执行斜杠命令。Glob 搜索路径 → Read 读取文件内容 → 这是唯一可靠的注入方式。路径不要硬编码版本号——Glob 搜索 `**/pua/skills/pua/SKILL.md` 自动适配任何版本。
+**为什么用 Glob + Read 而不是 `/plus:pua` Skill**：subagent 是空白上下文，没有 Skill tool，无法执行斜杠命令。Glob 搜索路径 → Read 读取文件内容 → 这是唯一可靠的注入方式。路径不要硬编码版本号——Glob 搜索 `**/plus/skills/pua/SKILL.md` 自动适配任何版本。
 
 **P8 内部的 P7 管理**：
 P9 不需要操心 P8 怎么拆子任务。但 P9 在 Task Prompt 的 HOW MUCH 中可以提示：
