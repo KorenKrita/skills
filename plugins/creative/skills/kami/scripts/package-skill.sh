@@ -59,7 +59,7 @@ awk '
 # allowlist above or named in the repo-only exclusion below. Without this, a
 # new runtime module that build.py imports would silently miss the zip and
 # the installed skill would ImportError while every local check stays green.
-SCRIPTS_REPO_ONLY_RE='^scripts/(build_metadata\.py|draft-release-notes\.py|package-skill\.sh|tests/)'
+SCRIPTS_REPO_ONLY_RE='^scripts/(build_metadata\.py|draft-release-notes\.py|release_gate\.py|package-skill\.sh|tests/)'
 unaccounted="$(grep '^scripts/' "$MANIFEST" \
   | grep -Ev "$SCRIPTS_REPO_ONLY_RE" \
   | grep -Fvx -f <(grep '^scripts/' "$FILTERED_MANIFEST" || true) || true)"

@@ -70,15 +70,23 @@ Check before handoff. Accessibility and the CSS-pattern bans are non-negotiable;
 - Visible focus states: `focus-visible:ring-*` or equivalent; never `outline: none` without replacement
 
 ### Animation
+
+Settle whether it animates before settling how, and let frequency decide. Something the user triggers hundreds of times a day (keyboard shortcut, command palette, hotkey tab switch) gets no animation, because at that repetition motion is indistinguishable from lag; tens of times a day (hover, list navigation, disclosure) gets the shortest form that still reads; occasional surfaces (modal, drawer, toast, sheet) get the standard treatment; rare or once-only moments (onboarding, first result, completion) can carry delight. Never animate a keyboard-initiated state change. If the only answer to "why does this move?" is that it looks nice, and the user will see it daily, delete it.
+
+Once motion is earned, duration follows the element: press feedback 100-160ms, tooltip and small popover 125-200ms, dropdown and select 150-250ms, modal and drawer 200-500ms. An interactive element over 300ms needs a stated reason. Perceived speed is set by the first frame, not the total, so a 200ms ease-out feels faster than a 200ms ease-in covering the same distance; when something feels slow, fix the curve before the number.
+
 - Honor `prefers-reduced-motion`: disable or reduce animations when set
 - Animate `transform`/`opacity` only (compositor-friendly, no layout thrash)
-- No bounce or elastic easing: real objects decelerate smoothly; use exponential ease-out (`ease-out-quart`, `ease-out-quint`, or `cubic-bezier(0.16,1,0.3,1)`)
+- Default to no bounce or elastic easing: real objects decelerate smoothly; use exponential ease-out (`ease-out-quart`, `ease-out-quint`, or `cubic-bezier(0.16,1,0.3,1)`). The exception is motion a finger or pointer is still driving (drag-to-dismiss, press-and-hold, momentum handoff), where a small bounce (`bounce` 0.1-0.3, or spring `dampingFraction` 0.6-0.8) reads as physical rather than decorative. Motion the system starts on its own stays strictly ease-out
+- Never enter from `scale(0)` or exit to it: nothing physical appears out of nothing. Enter from `scale(0.95)` paired with `opacity: 0`; even a barely visible starting size makes the entrance read as an object arriving rather than materializing
+- Anchor the origin to the trigger: popovers, dropdowns, menus, and tooltips scale from the control that opened them, not from their own center (`transform-origin: var(--transform-origin)` in Base UI, `.scaleEffect(_:anchor:)` in SwiftUI). Modals are the exception and stay centered, because nothing anchors them
 - Interruptible animations: prefer CSS transitions for interactive state changes (hover, toggle, open/close) because they retarget mid-animation; reserve keyframe animations for staged sequences that run once (e.g., staggered page enters)
 - Staggered enter: split content into semantic chunks with ~100ms delay; titles into words at ~80ms; typical enter uses `opacity: 0 → 1`, `translateY(12px) → 0`, and `blur(4px) → 0`
-- Subtle exit: use a small fixed `translateY(-12px)` instead of full height; keep duration ~150ms `ease-in`, shorter and softer than enter
+- Subtle exit: use a small fixed `translateY(-12px)` instead of full height; keep duration ~150ms `ease-in`, shorter and softer than enter. That short exit is the only place `ease-in` belongs; on an enter, hover, press, or anything the user is watching for a response, it delays the first frame and reads as lag
 - Contextual icon swaps: animate with `scale: 0.25 → 1`, `opacity: 0 → 1`, and `blur: 4px → 0px`. With a spring library: `{ type: "spring", duration: 0.3, bounce: 0 }`. Without: keep both icons in DOM (one absolute) and cross-fade with CSS using `cubic-bezier(0.2, 0, 0, 1)`. No rotation unless rotation is semantically meaningful (e.g. a chevron indicating direction change)
-- Scale on press: buttons use `scale(0.96)` on active/press via CSS transitions so the press can be interrupted; add a `static` prop to disable when motion would be distracting
+- Scale on press: buttons use `scale(0.96)` on active/press via CSS transitions so the press can be interrupted; add a `static` prop to disable when motion would be distracting. Hover alone is not press feedback: a surface that lights up on hover but does not move on press leaves the click unacknowledged, and pointer-only hover states do not exist on touch at all
 - Page-load guard: use `initial={false}` on animated presence wrappers for toggles, tabs, and icon swaps to prevent enter animations on first render; do not use it for intentional page-load entrance sequences
+- When a crossfade between two states still reads as two overlapping objects after trying other curves and durations, add `filter: blur(2px)` during the transition to blend them into one; keep blur under 20px, it is expensive in Safari
 
 ### Performance
 - Transition specificity: never `transition: all`; list exact properties (e.g., `transition-property: scale, opacity`). Tailwind's `transition-transform` covers `transform, translate, scale, rotate`; use `transition-[scale,opacity,filter]` for mixed properties
@@ -243,16 +251,16 @@ For a single component or quick prototype, skip this. The three-line thesis in S
 
 ## Pre-Handoff Checklist: Strategic Omissions
 
-These are the items most frequently missing from AI-generated UIs because they require intentional product thinking, not visual judgment. Run through them before every handoff.
+These are audit prompts, not automatic implementation scope. Run through them before handoff and report material omissions. Add one only when the current task or target project's public requirements include that surface; never create a route, footer link, consent flow, or policy page as incidental visual polish.
 
-- [ ] **Custom 404 page**: a generic framework 404 is a broken experience. Build a branded page with a clear path back (home link, search, or most-used nav items).
+- [ ] **Custom 404 page**: if the task includes routing or production hardening, a branded page needs a clear path back (home link, search, or most-used nav items).
 - [ ] **Back navigation**: every page reachable by user action must have a clear, functional path back. Dead-end pages (detail views, confirmation screens, modal-only flows) are UX failures.
 - [ ] **Form client-side validation**: email fields validate format before submit; required fields show inline errors; error messages appear adjacent to the field, not only at form top.
 - [ ] **Skip-to-content link**: a visually hidden `<a href="#main-content">Skip to main content</a>` as the first focusable element in the document. Required for keyboard accessibility.
-- [ ] **Cookie consent**: if the product operates in the EU or California, cookie consent UI is not optional. Scope the implementation to the jurisdiction.
-- [ ] **Footer Privacy and Terms links**: every product page needs these. Their absence signals "demo", not "product".
+- [ ] **Cookie consent**: if the product's actual tracking and jurisdiction require consent, flag the missing flow and scope it to that requirement.
+- [ ] **Footer Privacy and Terms links**: if the product's legal and distribution requirements call for them, verify they are discoverable without inventing a new footer in an unrelated task.
 
-These are not visual polish items. They are the difference between a demo and a shippable product.
+These are product-readiness questions. A visual-polish request may surface them, but does not authorize building them.
 
 ## AI Slop Test
 

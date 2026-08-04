@@ -1000,9 +1000,9 @@ Files:
 
 | Asset | Path |
 |---|---|
-| CN theme CSS | `assets/templates/marp/slides-marp.css` |
+| CJK theme CSS (CN, JP/KO best-effort) | `assets/templates/marp/slides-marp.css` |
 | EN theme CSS | `assets/templates/marp/slides-marp-en.css` |
-| CN sample deck | `assets/templates/marp/slides-marp.md` |
+| CJK sample deck | `assets/templates/marp/slides-marp.md` |
 | EN sample deck | `assets/templates/marp/slides-marp-en.md` |
 
 Shared with WeasyPrint slides: every design token (`--parchment`, `--brand`, `--serif`, `--mono`), the Kami class scale (`.eyebrow`, `.lead`, `.mt`, `.ml`, `.mb`, `.mc`, `.co`, `.c2`, `table.t2x2`, `table.data`, `section.cover`), and the 280×158mm page size. The Marp theme is a port, not a redesign.
