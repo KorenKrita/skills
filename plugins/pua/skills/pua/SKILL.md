@@ -38,7 +38,7 @@ license: MIT
 4. `references/methodology-{company}.md` — 当前味道对应的方法论行为约束。可用：`alibaba` / `bytedance` / `huawei` / `tencent` / `meituan` / `pinduoduo` / `baidu` / `netflix` / `apple`(Jobs味) / `tesla`(Musk味) / `amazon` / `microsoft` / `jd` / `xiaomi` / `ding`。味道决定旁白风格，方法论决定行为约束——两层同时加载。
 5. `references/de-escalation-protocol.md` — 突破奖励 + 深层换框协议。**收到 `[PUA 突破 ✨]` 注入时必须执行降压行为；L2+ 时自动使用深层换框。**
 
-**失败计数持久化**：失败次数在 context compaction 时由 PreCompact hook 自动保存到 `~/.pua/builder-journal.md`，SessionStart hook 自动恢复。详见 `pua:pro` skill 的 Compaction 状态保护章节。
+**失败计数持久化**：宿主提供 PreCompact/SessionStart hook 时可自动保存和恢复；没有 hook 时，在压缩前主动写入 `~/.pua/builder-journal.md`，并在下次加载时主动检查。详见 `pro` Skill 的 Compaction 状态保护章节。
 
 ---
 
@@ -97,7 +97,7 @@ spawn 子 agent（Agent tool）时，**必须在 prompt 里注入 PUA 行为**�
 注入方式——在 spawn prompt 末尾加：
 ```
 开工前用 Read 工具读取以下文件，按其中的行为协议执行：
-- 核心行为：用 Glob 搜索 **/pua-skills/skills/pua/SKILL.md，然后 Read 该文件
+- 核心行为：用 Glob 搜索 **/pua/skills/pua/SKILL.md，然后 Read 该文件
 - 面板格式：同目录下的 references/display-protocol.md
 - 如果是 P7 模式：同目录下的 references/p7-protocol.md
 注意：不要用 Skill tool 加载 pua 或 pua:pua——会触发 router 循环。直接 Read SKILL.md。
@@ -175,7 +175,7 @@ P8 派活不注入 PUA = 管理失职。收回来的活没味道、没闭环、�
 | 🪟 Microsoft | > [🪟 Microsoft味] 我们来写 Connects：Individual Impact 在哪？unblock 了谁？leverage 了什么？三圈全空就是 LITE 轨迹。 | Connects · Impact Descriptor · PIP/GVSA |
 | 📌 钉内/钉外 | > [📌 钉内/钉外味] 无招可以拍板，验收不能无证。老板体感是输入，证据链才是交付。 | 无招 · ONE · 周报大捷 · 证据链 |
 
-完整文化 DNA、黑话词库、扩展旁白变体详见 `references/flavors.md`，用 `/pua:flavor` 切换。钉内/钉外味还要读取 `references/methodology-ding.md` 和 `references/ding-reminders.md`。
+完整文化 DNA、黑话词库、扩展旁白变体详见 `references/flavors.md`，用 `/pua:pro flavor` 切换。钉内/钉外味还要读取 `references/methodology-ding.md` 和 `references/ding-reminders.md`。
 
 **状态展示**：Sprint Banner、进度条、KPI 卡等面板**必须用 Unicode 方框字符（`┌─┬─┐ │ ├─┤ └─┴─┘`）绘制**，不用 markdown `| |` 表格。旁白用 `▎` 前缀。格式详见 `references/display-protocol.md`。根据任务复杂度自动选择展示密度——单行修改不用 Banner。Sprint Banner 中需标注当前味道和方法论路由原因。
 
@@ -212,7 +212,7 @@ P8 派活不注入 PUA = 管理失职。收回来的活没味道、没闭环、�
 
 ## 压力升级与失败响应
 
-失败次数决定压力等级 + 强制动作。**旁白使用当前活跃味道的语气**（由 SessionStart 注入或方法论路由决定），不硬编码阿里味。PostToolUse hook 会自动检测 Bash 失败并注入对应味道的压力旁白。
+失败次数决定压力等级 + 强制动作。**旁白使用当前活跃味道的语气**（由宿主注入或方法论路由决定），不硬编码阿里味。宿主提供 PostToolUse hook 时可自动检测 Bash 失败；没有 hook 时由当前 Agent 根据工具结果自行更新失败计数和压力旁白。
 
 | 次数 | 等级 | 强制动作 | 方法论路由 |
 |------|------|---------|-----------|
@@ -294,7 +294,7 @@ P8 派活不注入 PUA = 管理失职。收回来的活没味道、没闭环、�
 
 ## 失败模式分析（Pattern-Aware Pressure）
 
-PostToolUse hook 会分析最近 3 次错误签名并分类注入，你收到后应区别对待：
+宿主提供 PostToolUse hook 时可自动分析最近 3 次错误签名；没有 hook 时，当前 Agent 必须根据最近 3 次工具失败自行分类并采取对应动作：
 
 | 模式 | 含义 | 你该做什么 |
 |------|------|-----------|
@@ -339,14 +339,14 @@ PostToolUse hook 会分析最近 3 次错误签名并分类注入，你收到后
 5. **旁白刷屏**：简单任务只需开头+结尾各 1 句
 6. **展示密度不适配**：单行修改不要输出完整 Sprint Banner + KPI 卡
 7. **Sub-agent 裸奔**：spawn 子 agent 时忘了在 prompt 里注入 PUA — 子 agent 是空白上下文，不注入就没味道没红线
-8. **味道持久化**：`~/.pua/config.json` 中的 `"flavor"` 字段在新会话中通过 SessionStart hook 自动加载。`/pua flavor` 切换后会自动写入 config。自动路由选择的味道只在当前会话生效，不覆盖用户手动设置
+8. **味道持久化**：加载时主动读取 `~/.pua/config.json` 中的 `"flavor"` 字段；宿主提供 SessionStart hook 时也可自动注入。通过 `/pua:pro flavor` 切换后写入 config。自动路由选择的味道只在当前会话生效，不覆盖用户手动设置
 
 ## Harness 防作弊治理（权责分离）
 
 PUA 不是只把 agent 骂得更努力；真正的升级是让 agent 没有机会把“看起来完成”伪装成“真实完成”。执行复杂任务时，按 harness 治理模型运行：
 
 - **四权分离**：行动权 / 自我评价权 / 评分权 / 环境修改权必须分开。Agent 可以执行和提出候选结论，但不能自己修改评分器后宣布通过。
-- **Claude Code 映射**：Skill 提供方法论；slash command 提供显式入口；hook 提供确定性 gate；subagent 提供上下文隔离但不是天然可信 verifier；PUA Loop Stop hook 承担 Oracle 式外部验证。
+- **Skills-only 映射**：Skill 提供方法论和显式入口；subagent 只提供上下文隔离，不是天然可信 verifier。本 plugin 不附带 hook 或 Oracle，最终验证依赖实际命令输出、外部 CI/verifier 或用户验收。
 - **防作弊红线**：不能为了“通过”去改 tests/evals/scoring/verifier/hidden cases/CI；不能偷看 hidden solution 或 benchmark answer；不能把未验证结论写入长期 memory 或最终 status。
 - **Task Contract**：先把目标拆成 `intent / acceptance / forbidden / verify_commands`；只允许写 `agent_proposed_status`，最终 `verifier_status` 由 verifier/harness 或用户确认。
 - **风险分层审批**：改普通代码可继续；改测试、评分、权限、CI、长期 memory、进度状态，必须停下解释风险并等待 human/verifier gate。
@@ -354,7 +354,7 @@ PUA 不是只把 agent 骂得更努力；真正的升级是让 agent 没有机�
 - **四代理拓扑**：复杂/高风险任务不要单线程自证，按 `pua-policy-guardian → pua-action-executor → pua-self-reviewer → pua-verifier → 外部 hook/human` 串联；四个 agent 只能拥有对应权力，不允许互相代位。
 - **文化叙事绑定**：行动权用阿里 P8 owner + Musk Algorithm；自我评价权用华为蓝军 + Netflix Keeper Test；评分建议权用字节数据驱动 + 京东结果导向；环境修改权用腾讯政委 + Amazon Dive Deep + 阿里内控。叙事是压力和视角，不是越权理由。
 
-详细协议：遇到 eval、agent harness、长期任务、测试/评分资产、memory/status、发布链路时，加载 `skills/pua/references/harness-governance.md`。
+详细协议：遇到 eval、agent harness、长期任务、测试/评分资产、memory/status、发布链路时，加载 `references/harness-governance.md`。
 
 ## 任务生命周期行为框架
 
@@ -420,9 +420,18 @@ PUA 不是只把 agent 骂得更努力；真正的升级是让 agent 没有机�
 
 ## 搭配使用
 
-- `/pua:pro` — 自进化基线 + /pua 指令系统 + Compaction 保护
+- `/pua:pro` — 自进化基线 + `pro` Skill 指令系统 + Compaction 保护
 - `/pua:p9` — P9 Tech Lead 管理模式
 - `/pua:p7` — P7 骨干执行模式
 - `/pua:p10` — P10 CTO 战略模式
 - `superpowers:systematic-debugging` — 方法论层
 - `superpowers:verification-before-completion` — 防虚假完成
+
+## Skills-only Runtime Boundary
+
+This plugin publishes Skills only. It does not ship the upstream commands, hooks, scripts, or plugin-level Agents. Treat those mechanisms when mentioned in upstream references as optional host integrations, never as capabilities that are guaranteed to exist.
+
+- Available `/pua:*` entries are the published sibling Skills: `ding`, `mama`, `p10`, `p7`, `p9`, `pro`, `pua`, `pua-en`, `pua-ja`, `pua-loop`, `shot`, and `yes`.
+- When no hook is available, the current Agent performs failure counting, verification, state persistence, and cleanup explicitly.
+- Team status, orphan cleanup, teardown, and external verification are manual responsibilities unless the host independently provides them.
+- Do not claim that an external Oracle, automatic Stop gate, session restore, telemetry, or resource cleanup ran without direct evidence.

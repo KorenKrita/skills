@@ -87,9 +87,11 @@
     "sha": "3fd4e5a1cb7a40938113b66febae532ba36f350a",
     "files": [
       "SKILL.md",
+      "references/agent-team.md",
       "references/de-escalation-protocol.md",
       "references/ding-reminders.md",
       "references/display-protocol.md",
+      "references/evolution-protocol.md",
       "references/flavors.md",
       "references/harness-governance.md",
       "references/methodology-alibaba.md",
@@ -108,8 +110,12 @@
       "references/methodology-tencent.md",
       "references/methodology-tesla.md",
       "references/methodology-xiaomi.md",
+      "references/p10-protocol.md",
       "references/p7-protocol.md",
-      "references/platform.md"
+      "references/p9-protocol.md",
+      "references/platform.md",
+      "references/survey.md",
+      "references/teardown-protocol.md"
     ]
   },
   "i-have-adhd": {
@@ -187,6 +193,68 @@
       "scripts/check-render-output.mjs",
       "scripts/generate-validators.mjs",
       "scripts/render-examples.mjs"
+    ]
+  },
+  "ding": {
+    "sha": "3fd4e5a1cb7a40938113b66febae532ba36f350a",
+    "files": [
+      "SKILL.md",
+      "references/ding-reminders.md",
+      "references/methodology-ding.md"
+    ]
+  },
+  "mama": {
+    "sha": "3fd4e5a1cb7a40938113b66febae532ba36f350a",
+    "files": [
+      "SKILL.md"
+    ]
+  },
+  "p10": {
+    "sha": "3fd4e5a1cb7a40938113b66febae532ba36f350a",
+    "files": [
+      "SKILL.md"
+    ]
+  },
+  "p7": {
+    "sha": "3fd4e5a1cb7a40938113b66febae532ba36f350a",
+    "files": [
+      "SKILL.md"
+    ]
+  },
+  "p9": {
+    "sha": "3fd4e5a1cb7a40938113b66febae532ba36f350a",
+    "files": [
+      "SKILL.md"
+    ]
+  },
+  "pro": {
+    "sha": "3fd4e5a1cb7a40938113b66febae532ba36f350a",
+    "files": [
+      "SKILL.md"
+    ]
+  },
+  "pua-en": {
+    "sha": "3fd4e5a1cb7a40938113b66febae532ba36f350a",
+    "files": [
+      "SKILL.md"
+    ]
+  },
+  "pua-ja": {
+    "sha": "3fd4e5a1cb7a40938113b66febae532ba36f350a",
+    "files": [
+      "SKILL.md"
+    ]
+  },
+  "shot": {
+    "sha": "3fd4e5a1cb7a40938113b66febae532ba36f350a",
+    "files": [
+      "SKILL.md"
+    ]
+  },
+  "yes": {
+    "sha": "3fd4e5a1cb7a40938113b66febae532ba36f350a",
+    "files": [
+      "SKILL.md"
     ]
   }
 }

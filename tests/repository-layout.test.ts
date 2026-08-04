@@ -5,7 +5,7 @@ import { parse as parseYaml } from "yaml"
 import { isExcludedFile, isUpstreamOwned, upstreamOwnedNames } from "../scripts/sync-utils.js"
 
 const ROOT = new URL("../", import.meta.url).pathname.replace(/\/$/, "")
-const PLUGINS = ["base", "plus"] as const
+const PLUGINS = ["base", "plus", "pua"] as const
 
 const EXPECTED_SKILLS = {
   base: [
@@ -22,10 +22,23 @@ const EXPECTED_SKILLS = {
     "humanizer-zh",
     "i-have-adhd",
     "improve",
-    "pua",
     "nuclear-review",
     "razor",
     "read",
+  ],
+  pua: [
+    "ding",
+    "mama",
+    "p10",
+    "p7",
+    "p9",
+    "pro",
+    "pua",
+    "pua-en",
+    "pua-ja",
+    "pua-loop",
+    "shot",
+    "yes",
   ],
 } as const
 
@@ -348,6 +361,86 @@ describe("repository layout", () => {
     expect(deepening).toContain("Testing strategy: replace, don't layer")
     expect(skill).toContain("update the project's existing glossary or domain document immediately")
     expect(existsSync(join(dir, "HTML-REPORT.md"))).toBe(true)
+  })
+
+  it("ships the complete upstream PUA Skill suite without plugin commands or hooks", () => {
+    const overrides = readOverrides()
+    const state = JSON.parse(readFileSync(join(ROOT, ".sync-state.json"), "utf-8")) as Record<
+      string,
+      { sha?: string; files?: string[] }
+    >
+    const puaRoot = join(ROOT, "plugins", "pua")
+    const upstreamShas: string[] = []
+
+    for (const skill of EXPECTED_SKILLS.pua) {
+      const entry = overrides.skills[skill]
+      expect(entry?.plugin, skill).toBe("pua")
+      expect(existsSync(join(puaRoot, "skills", skill, "SKILL.md")), skill).toBe(true)
+      if (entry?.ownership === "local") {
+        expect(skill).toBe("pua-loop")
+        expect(state[skill], skill).toBeUndefined()
+        expect(entry.provenance?.forked_at_sha, skill).toMatch(/^[0-9a-f]{40}$/)
+      } else {
+        expect(state[skill]?.sha, skill).toMatch(/^[0-9a-f]{40}$/)
+        upstreamShas.push(state[skill]!.sha!)
+      }
+    }
+    expect(new Set(upstreamShas).size).toBe(1)
+
+    for (const asset of ["commands", "hooks", "agents", "scripts"]) {
+      expect(existsSync(join(puaRoot, asset)), asset).toBe(false)
+    }
+
+    for (const reference of [
+      "agent-team.md",
+      "evolution-protocol.md",
+      "p7-protocol.md",
+      "p9-protocol.md",
+      "p10-protocol.md",
+      "survey.md",
+      "teardown-protocol.md",
+    ]) {
+      expect(existsSync(join(puaRoot, "skills", "pua", "references", reference)), reference).toBe(true)
+    }
+  })
+
+  it("keeps every PUA Skill reference self-contained in the Skills-only plugin", () => {
+    const root = join(ROOT, "plugins", "pua", "skills")
+    const runtime = textFiles(root).map((path) => readFileSync(path, "utf-8")).join("\n")
+
+    for (const stalePath of [
+      "skills/ding/references/",
+      "skills/pua/references/",
+      "**/pua-skills/skills/pua/SKILL.md",
+      ".claude/skills/pua/SKILL.md",
+      "agents/pua-enforcer.md",
+      "agents/senior-engineer-p7.md",
+      "agents/tech-lead-p9.md",
+      "agents/cto-p10.md",
+    ]) {
+      expect(runtime, stalePath).not.toContain(stalePath)
+    }
+
+    expect(runtime).toContain("宿主提供 PreCompact/SessionStart hook 时")
+    expect(runtime).toContain("没有 hook 时由当前 Agent")
+    expect(runtime).toContain("## Skills-only Runtime Boundary")
+
+    const published = new Set(EXPECTED_SKILLS.pua)
+    const routedSkills = [...runtime.matchAll(/\/pua:([a-z0-9-]+)/g)].map((match) => match[1]!)
+    for (const routedSkill of routedSkills) {
+      expect(published.has(routedSkill as (typeof EXPECTED_SKILLS.pua)[number]), routedSkill).toBe(true)
+    }
+
+    expect(runtime).not.toMatch(/\/pua(?:\s|`)/)
+    expect(runtime).not.toContain("git worktree remove <worktree_path> --force")
+    expect(runtime).not.toContain("git branch -D <worktree_branch>")
+    expect(runtime).not.toContain("tmux kill-pane -t <pane_id>")
+    expect(runtime).toContain("取得用户授权")
+    const loop = readFileSync(join(root, "pua-loop", "SKILL.md"), "utf-8")
+    expect(loop).not.toContain("${CLAUDE_PLUGIN_ROOT}/scripts/")
+    expect(loop).not.toContain("Stop Hook (Oracle)")
+    expect(loop).not.toContain("<promise>LOOP_DONE</promise>")
+    expect(loop).toContain("当前 Agent 负责每轮执行验证")
   })
 
   it("keeps only the approved plugin-level assets", () => {

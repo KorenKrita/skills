@@ -10,18 +10,20 @@
 /plugin marketplace add KorenKrita/skills
 ```
 
-按需安装两个 plugin：
+按需安装三个 plugin：
 
 ```bash
 /plugin install base@korenkrita-skills
 /plugin install plus@korenkrita-skills
+/plugin install pua@korenkrita-skills
 ```
 
 常用组合：
 
 ```text
-base         核心工程与协作流程
-base + plus  全部 15 个 Skill
+base               核心工程与协作流程
+base + plus        工程主体，共 14 个 Skill
+base + plus + pua  全部 26 个 Skill
 ```
 
 ### Pi
@@ -57,13 +59,16 @@ pi install -l git:github.com/KorenKrita/skills
 | Plugin | 内容 | Skill 数量 |
 |---|---|---:|
 | **base** | 核心工程与协作流程 | 7 |
-| **plus** | 决策方法、代码质量审查、读取工具、中文写作优化与架构图 | 8 |
+| **plus** | 决策方法、代码质量审查、读取工具、中文写作优化与架构图 | 7 |
+| **pua** | PUA 高能动性治理、分级角色、循环执行与多语言 coaching | 12 |
 
 `plus` 还附带：
 
 - `agents/nuclear-review.md`：`nuclear-review` Skill 的 Claude Code subagent。
 
-Pi 只加载两个 plugin 的 `skills/`；plugin-level Agent 仅对 Claude Code 生效。
+`pua` 仅发布独立 Skills，不附带上游 commands、hooks 或 plugin-level Agents。
+
+Pi 加载三个 plugin 的 `skills/`；`plus` 的 plugin-level Agent 仅对 Claude Code 生效。
 
 ## 上游同步
 

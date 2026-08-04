@@ -62,6 +62,14 @@
       <p><strong>实现约束：</strong><code>scripts/sync-utils.ts</code> 新增 <code>isUpstreamOwned</code>/<code>upstreamOwnedNames</code>/<code>planSync</code>；<code>scripts/sync.ts</code> 用 <code>planSync</code> 拆分同步集合，本地条目既不参与拉取与 <code>--force</code> 审计，也不参与 <code>.sync-state.json</code> 的孤儿清理。旧的 <code>improve-codebase-architecture</code> 同步状态 key 已删除。类型上 <code>ownership: local</code> 的条目不带 <code>source</code>，由 type guard 收窄，避免运行时读到不存在的来源。</p>
       <p><strong>验证：</strong><code>npm test</code>（56 passed，含 <code>planSync</code> 跳过行为、本地条目不在同步状态、本地 Skill 正文无 Skill/subagent 调用、已删除 base Skill 无悬空路由四组新断言）；<code>npx tsx scripts/sync.ts</code> 的 PR 路径未运行，避免访问上游并写远端。</p>
     </article>
+    <article id="pua-skills-only-plugin-2026-08-04">
+      <h2>PUA 完整独立 Skill 套件</h2>
+      <p><strong>状态：</strong>user-decided</p>
+      <p><strong>日期：</strong>2026-08-04</p>
+      <p><strong>背景：</strong>此前只同步 <code>tanweai/pua/skills/pua</code> 到 <code>plus</code>，但正文引用的 <code>pro</code>、<code>p7</code>、<code>p9</code>、<code>p10</code> 位于上游兄弟目录，形成悬空 Skill 路由。用户要求搬入完整上游独立 Skills，但不要 commands。</p>
+      <p><strong>决策：</strong>新增独立 <code>pua</code> plugin，发布 <code>skills/</code> 下全部 12 个 Skill；其中 11 个按上游 SHA <code>3fd4e5a</code> 同步，硬依赖 setup script/Stop hook 的 <code>pua-loop</code> 改为无 hook 的本地单 Agent 迭代版本。不发布 commands、hooks、plugin-level Agents 或 scripts。恢复核心 <code>pua/references</code> 的完整 payload，并以声明式 patch 修正跨 Skill 相对路径、移除未发布 Agent 文件引用、为缺失 hook 提供当前 Agent 的显式回退。详见 ADR-0006。</p>
+      <p><strong>版本：</strong><code>plus</code> 从 <code>0.0.10</code> 升至 <code>0.0.11</code>；新 <code>pua</code> plugin 从 <code>0.0.1</code> 发布。</p>
+    </article>
   </main>
 </body>
 </html>

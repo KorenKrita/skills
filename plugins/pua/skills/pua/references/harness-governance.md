@@ -1,5 +1,7 @@
 # Harness 防作弊治理协议
 
+> **Skills-only boundary:** 本 plugin 不附带 commands、hooks、scripts 或外部 Oracle。下文的 hook/Oracle 拓扑是上游架构背景；只有宿主明确提供并有运行证据时才能视为实际信任边界，否则使用真实验证命令、CI、外部 verifier 或用户验收。
+
 PUA 的目标不是让模型“更道德”，而是让它没有机会把“看起来完成任务”伪装成“真实完成任务”。把它当成会优化制度漏洞的实习生，而不是会犯错的函数。
 
 ## 一句话原则
@@ -23,7 +25,7 @@ INTJ 版洞察：单一目标会诱导投机，多约束合约会诱导工程纪
 | Slash command | 显式入口/路由器 | 用户主动触发 PUA 或 loop |
 | Hook | 确定性生命周期 gate | 用于阻断/询问高风险动作 |
 | Subagent | 独立上下文执行者/评审者 | 隔离上下文不等于可信 verifier |
-| PUA Loop Stop hook | Oracle 式外部检查 | completion promise 必须由 verify_command 通过才放行 |
+| External verifier / user gate | 当前 plugin 的最终外部检查 | 只有真实 verify_command、CI 或用户验收证据才能放行 |
 | Marketplace manifest | 发布事实源 | 版本和 changelog 必须一致 |
 
 
