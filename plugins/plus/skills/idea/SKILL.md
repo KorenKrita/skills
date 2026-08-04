@@ -70,7 +70,6 @@ The verdict is exactly one of these five calls:
 
 - The decision to build is already made and the user wants phases, todos, or an execution plan: use an installed execution-planning Skill whose description clearly matches the task.
 - The idea is solid and now needs product requirements: use an installed product-specification Skill whose description clearly matches the task.
-- The user wants to challenge scope or ambition without a do/kill verdict — open the frame and think bigger: use `geju`.
 - The problem is purely choosing or fixing a name: use an installed naming Skill whose description clearly matches the task.
 
 ## Routing Compatibility

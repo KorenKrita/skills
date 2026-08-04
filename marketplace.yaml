@@ -15,22 +15,22 @@ plugins:
       - code-review
       - workflow
   plus:
-    version: 0.0.7
-    description: 工程审计、决策方法、研究工具与 Claude Code 自动续跑
+    version: 0.0.8
+    description: 文档审计、决策方法、代码质量审查与读取工具
     category: productivity
     keywords:
       - audit
       - decision
-      - research
-      - goal
+      - docs
+      - reading
       - review
   creative:
-    version: 0.0.16
-    description: UI/Web 设计、中文写作优化、文档排版与小黑插画
+    version: 0.0.17
+    description: UI 设计、中文写作优化与架构图
     category: design
     keywords:
       - ui
-      - web
+      - design
       - writing
-      - document
-      - illustration
+      - diagram
+      - architecture

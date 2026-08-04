@@ -7,8 +7,8 @@
 | **skill** | 一个 `SKILL.md` 加可选 scripts、references、assets、Skill metadata 的最小能力单元 |
 | **plugin** | Claude Code 的安装单元；本仓库固定为 `base`、`plus`、`creative` 三个 |
 | **base** | Matt Pocock active 22 个 Skill 的 canonical mirror |
-| **plus** | 工程审计、决策方法和通用工具，共 13 个 Skill；附带 Claude Code Agent 与 Hook |
-| **creative** | UI/Web、中文写作优化、文档排版和插画，共 7 个 Skill |
+| **plus** | 工程审计、决策方法和通用工具，共 9 个 Skill；附带 Claude Code Agent |
+| **creative** | UI 设计、中文写作优化和架构图，共 3 个 Skill |
 | **marketplace** | `.claude-plugin/marketplace.json` 定义的三个 plugin 聚合入口 |
 
 ## Sync System
@@ -26,7 +26,7 @@
 | Term | Definition |
 |---|---|
 | **upstream skill** | 在 `overrides.yaml` 中声明并由 CI 跟随外部仓库更新的 Skill |
-| **local skill** | 仓库内独立维护且不进入 overrides 的 Skill；当前为 `fan-out` |
+| **local skill** | 仓库内独立维护且不进入 overrides 的 Skill |
 | **skill payload** | Skill 运行所需的 SKILL、scripts、references、assets 和 metadata |
 | **plugin asset** | Claude Code 专用的 plugin-level Agent、Hook 或其他资源 |
 

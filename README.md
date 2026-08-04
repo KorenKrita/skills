@@ -22,9 +22,9 @@
 
 ```text
 base                  Matt Pocock active 主体
-base + plus           编码、审计、决策和研究
-base + creative       编码、网页、文档和插画
-base + plus + creative  全部 42 个 Skill
+base + plus           编码、审计、决策和读取
+base + creative       编码、界面、写作和架构图
+base + plus + creative  全部 34 个 Skill
 ```
 
 ### Pi
@@ -60,15 +60,14 @@ pi install -l git:github.com/KorenKrita/skills
 | Plugin | 内容 | Skill 数量 |
 |---|---|---:|
 | **base** | Matt Pocock active 工程与生产力主体 | 22 |
-| **plus** | 工程审计、决策方法、读取与目标工具 | 13 |
-| **creative** | UI/Web、中文写作优化、排版与插画 | 7 |
+| **plus** | 工程审计、决策方法与读取工具 | 9 |
+| **creative** | UI 设计、中文写作优化与架构图 | 3 |
 
 `plus` 还附带：
 
 - `agents/nuclear-review.md`：`nuclear-review` Skill 的 Claude Code subagent。
-- `hooks/double-shot-latte/*`：独立 Claude Code Stop hook，最多继续三次。
 
-Pi 只加载三个 plugin 的 `skills/`；plugin-level Agent 与 Hook 仅对 Claude Code 生效。
+Pi 只加载三个 plugin 的 `skills/`；plugin-level Agent 仅对 Claude Code 生效。
 
 ## 上游同步
 
@@ -80,17 +79,10 @@ Pi 只加载三个 plugin 的 `skills/`；plugin-level Agent 与 Hook 仅对 Cla
 - [tw93/Waza](https://github.com/tw93/Waza)
 - [hylarucoder/hai-stack](https://github.com/hylarucoder/hai-stack)
 - [shadcn/improve](https://github.com/shadcn/improve)
-- [alibaba/open-code-review](https://github.com/alibaba/open-code-review)
 - [cursor/plugins](https://github.com/cursor/plugins)
-- [KAOPU-XiaoPu/web-design](https://github.com/KAOPU-XiaoPu/web-design)
 - [op7418/Humanizer-zh](https://github.com/op7418/Humanizer-zh)
 - [tanweai/pua](https://github.com/tanweai/pua)
-- [joeseesun/qiaomu-goal-meta-skill](https://github.com/joeseesun/qiaomu-goal-meta-skill)
 - [tt-a1i/archify](https://github.com/tt-a1i/archify)
-- [tw93/kami](https://github.com/tw93/kami)
-- [helloianneo/ian-xiaohei-illustrations](https://github.com/helloianneo/ian-xiaohei-illustrations)
-- [helloianneo/ian-xiaohei-scenes](https://github.com/helloianneo/ian-xiaohei-scenes)
-- [obra/double-shot-latte](https://github.com/obra/double-shot-latte)
 
 ## 许可证
 

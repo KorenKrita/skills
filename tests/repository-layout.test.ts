@@ -35,27 +35,18 @@ const EXPECTED_SKILLS = {
   plus: [
     "docs-vs-code",
     "docs-vs-docs",
-    "fan-out",
-    "geju",
-    "goal-gen",
-    "goudi",
     "i-have-adhd",
     "idea",
     "improve",
     "pua",
     "nuclear-review",
-    "ocr",
     "razor",
     "read",
   ],
   creative: [
     "archify",
     "humanizer-zh",
-    "xiaohei",
-    "kami",
     "ui",
-    "web",
-    "xiaohei2",
   ],
 } as const
 
@@ -134,7 +125,7 @@ describe("repository layout", () => {
     }
     const state = JSON.parse(readFileSync(join(ROOT, ".sync-state.json"), "utf-8")) as Record<string, unknown>
     expect(Object.keys(state).sort()).toEqual(Object.keys(overrides.skills).sort())
-    expect(Object.keys(overrides.skills)).toHaveLength(42)
+    expect(Object.keys(overrides.skills)).toHaveLength(34)
     for (const [skill, config] of Object.entries(overrides.skills)) {
       expect(existsSync(join(ROOT, "plugins", config.plugin, "skills", skill)), skill).toBe(true)
     }
@@ -217,23 +208,8 @@ describe("repository layout", () => {
     expect(runtime).toContain('subagent_type: "nuclear-review"')
   })
 
-  it("keeps both Xiaohei skills on their local runtime names", () => {
-    const xiaohei = join(ROOT, "plugins", "creative", "skills", "xiaohei")
-    const xiaohei2 = join(ROOT, "plugins", "creative", "skills", "xiaohei2")
-    expect(frontmatterName(join(xiaohei, "SKILL.md"))).toBe("xiaohei")
-    expect(frontmatterName(join(xiaohei2, "SKILL.md"))).toBe("xiaohei2")
-
-    const runtime = [...textFiles(xiaohei), ...textFiles(xiaohei2)]
-      .map((path) => readFileSync(path, "utf-8"))
-      .join("\n")
-    expect(runtime).not.toContain("$ian-xiaohei-illustrations")
-    expect(runtime).not.toContain("$ian-xiaohei-scenes")
-    expect(runtime).toContain("$xiaohei")
-    expect(runtime).toContain("$xiaohei2")
-  })
-
   it("removes unavailable hai skill references from the selected subset", () => {
-    const selected = ["docs-vs-code", "docs-vs-docs", "geju", "goudi", "idea", "razor"]
+    const selected = ["docs-vs-code", "docs-vs-docs", "idea", "razor"]
     const content = selected
       .flatMap((skill) => textFiles(join(ROOT, "plugins", "plus", "skills", skill)))
       .map((path) => readFileSync(path, "utf-8"))
@@ -242,25 +218,34 @@ describe("repository layout", () => {
     expect(content).not.toContain("SKILL.zh_CN.md")
   })
 
+  it("keeps removed cross-skill routes suppressed", () => {
+    const overrides = parseYaml(readFileSync(join(ROOT, "overrides.yaml"), "utf-8")) as {
+      skills: Record<
+        string,
+        { patches?: Array<{ type: string; pattern?: string; with?: string }> }
+      >
+    }
+    const checks = [
+      { skill: "idea", path: join("plugins", "plus", "skills", "idea", "SKILL.md"), marker: "use `geju`" },
+      { skill: "ui", path: join("plugins", "creative", "skills", "ui", "SKILL.md"), marker: "tw93/Kami" },
+    ]
+
+    for (const { skill, path, marker } of checks) {
+      expect(readFileSync(join(ROOT, path), "utf-8"), path).not.toContain(marker)
+      expect(
+        overrides.skills[skill]?.patches?.some(
+          (patch) => patch.type === "replace" && patch.pattern?.includes(marker) && patch.with === "",
+        ),
+        `${skill} removal patch for ${marker}`,
+      ).toBe(true)
+    }
+  })
+
   it("keeps only the approved plugin-level assets", () => {
-    expect(existsSync(join(ROOT, "plugins", "plus", "hooks", "hooks.json"))).toBe(true)
-    expect(existsSync(join(ROOT, "plugins", "plus", "hooks", "ponytail.md"))).toBe(false)
+    expect(existsSync(join(ROOT, "plugins", "plus", "hooks"))).toBe(false)
     expect(existsSync(join(ROOT, "plugins", "plus", "agents", "nuclear-review.md"))).toBe(true)
     expect(existsSync(join(ROOT, "plugins", "base", "rules"))).toBe(false)
     expect(existsSync(join(ROOT, "plugins", "plus", "rules"))).toBe(false)
     expect(existsSync(join(ROOT, "plugins", "creative", "rules"))).toBe(false)
-  })
-
-  it("ships one complete Kami payload without a nested duplicate", () => {
-    const kami = join(ROOT, "plugins", "creative", "skills", "kami")
-    expect(existsSync(join(kami, "SKILL.md"))).toBe(true)
-    expect(existsSync(join(kami, "CHEATSHEET.md"))).toBe(true)
-    expect(existsSync(join(kami, "scripts", "build.py"))).toBe(true)
-    expect(existsSync(join(kami, "references", "design.md"))).toBe(true)
-    expect(existsSync(join(kami, "assets", "templates"))).toBe(true)
-    expect(textFiles(kami).filter((path) => path.endsWith("SKILL.md"))).toHaveLength(1)
-    expect(readFileSync(join(kami, "scripts", "package-skill.sh"), "utf-8")).not.toContain(
-      "mcp_server.py",
-    )
   })
 })

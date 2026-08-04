@@ -1,6 +1,8 @@
 # ADR-0004: 同步可独立运行的 packaged Skill payload
 
-## Status: Accepted
+## Status: Amended
+
+> 2026-08-04：Kami 已从订阅仓库移除，其同步规则与 packaged payload 一并删除。下述 packaged payload 选择原则继续有效；Kami 路径仅作为历史案例。
 
 ## Context
 
@@ -17,16 +19,15 @@ Kami 是主要案例：上游仓库约 76MB，同时提供约 1.2MB 的 `plugins
 - 没有独立 payload、内部资源无法拆分的上游能力，需要单独评估后再引入；
 - Marketplace 不使用外部 plugin reference。
 
-Kami 同步路径固定为：
+Kami 曾按以下路径应用该原则，直至 2026-08-04 移除：
 
 ```text
 tw93/kami/plugins/kami/skills/kami
 → plugins/creative/skills/kami
 ```
-
 ## Consequences
 
-- Pi 递归扫描只发现一份 Kami。
-- Kami 的运行脚本、模板、参考和按需字体下载保持完整。
-- 仓库不再携带上游网站、showcase、字体全集和发布产物。
+- 采用 packaged payload 的上游能力只发布预期的 Skill 副本。
+- payload 保留运行所需的脚本、模板、参考和资源。
+- 仓库不携带上游网站、showcase、字体全集和发布产物。
 - 上游 payload 路径或引用发生变化时，同步 patch 和文件清单会显式失败或产生差异。

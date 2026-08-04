@@ -168,12 +168,6 @@ skills:
     plugin: plus
     patches: []
 
-  ocr:
-    source: { repo: alibaba/open-code-review, path: plugins/open-code-review/skills/open-code-review, ref: main }
-    plugin: plus
-    patches:
-      - { type: set_frontmatter, field: name, value: ocr }
-
   nuclear-review:
     source: { repo: cursor/plugins, path: cursor-team-kit/skills/thermo-nuclear-code-quality-review, ref: main }
     plugin: plus
@@ -195,48 +189,6 @@ skills:
           - { type: replace_all, pattern: "Thermo-Nuclear Code Quality Review", with: "Nuclear Review" }
           - { type: replace_all, pattern: "cursor-team-kit plugin", with: "plus plugin" }
 
-  geju:
-    source: { repo: hylarucoder/hai-stack, path: skills/geju, ref: main }
-    plugin: plus
-    patches:
-      - type: replace
-        pattern: "For Chinese readers, see `SKILL.zh_CN.md`. The English `SKILL.md` is the execution source of truth.\n\n"
-        with: ""
-      - { type: replace_all, pattern: hai-idea, with: idea }
-      - type: replace_all
-        pattern: "`hai-architecture`"
-        with: "an installed architecture Skill whose description clearly matches the task"
-      - type: replace_all
-        pattern: "`hai-prd`"
-        with: "an installed product-specification Skill whose description clearly matches the task"
-      - type: append_content
-        text: |
-          ## Routing Compatibility
-
-          Invoke another Skill only when an installed Skill's description clearly matches the next subtask. Otherwise, complete the subtask directly with this workflow. Never require an uninstalled Skill.
-    exclude_files:
-      - SKILL.zh_CN.md
-
-  goudi:
-    source: { repo: hylarucoder/hai-stack, path: skills/goudi, ref: main }
-    plugin: plus
-    patches:
-      - type: replace
-        pattern: "For Chinese readers, see `SKILL.zh_CN.md`. The English `SKILL.md` is the execution source of truth.\n\n"
-        with: ""
-      - { type: replace_all, pattern: hai-idea, with: idea }
-      - { type: replace_all, pattern: hai-tdd, with: tdd }
-      - type: replace_all
-        pattern: "`hai-goal`"
-        with: "an installed execution-planning Skill whose description clearly matches the task"
-      - type: append_content
-        text: |
-          ## Routing Compatibility
-
-          Invoke another Skill only when an installed Skill's description clearly matches the next subtask. Otherwise, complete the subtask directly with this workflow. Never require an uninstalled Skill.
-    exclude_files:
-      - SKILL.zh_CN.md
-
   idea:
     source: { repo: hylarucoder/hai-stack, path: skills/hai-idea, ref: main }
     plugin: plus
@@ -254,6 +206,9 @@ skills:
       - type: replace_all
         pattern: "`hai-naming`"
         with: "an installed naming Skill whose description clearly matches the task"
+      - type: replace
+        pattern: "- The user wants to challenge scope or ambition without a do/kill verdict — open the frame and think bigger: use `geju`.\n"
+        with: ""
       - type: append_content
         text: |
           ## Routing Compatibility
@@ -324,27 +279,10 @@ skills:
       - references/evolution-protocol.md
       - references/survey.md
 
-  goal-gen:
-    source: { repo: joeseesun/qiaomu-goal-meta-skill, path: ., ref: main }
-    plugin: plus
-    patches:
-      - { type: set_frontmatter, field: name, value: goal-gen }
-    target_patches:
-      - target: agents/interface.yaml
-        patches:
-          - { type: replace_all, pattern: "$qiaomu-goal-meta-skill", with: "$goal-gen" }
-    exclude_files:
-      - .gitignore
-      - README.md
-      - manifest.json
-
   i-have-adhd:
     source: { repo: ayghri/i-have-adhd, path: skills/i-have-adhd, ref: main }
     plugin: plus
     patches: []
-
-  # Local Skill: plugins/plus/skills/fan-out
-  # Independent hook: plugins/plus/hooks (obra/double-shot-latte)
 
   # ─── creative: design, writing, and visual output ──────────────────────────
 
@@ -353,25 +291,11 @@ skills:
     plugin: creative
     patches:
       - { type: set_frontmatter, field: name, value: ui }
+      - type: replace
+        pattern: "**Document & print typography → Kami.** When the deliverable is a shippable document rather than a product UI surface (report, slide deck, resume, long-form or print-oriented page, paged PDF), do not hand-roll an over-designed document layout here. Suggest the user run it through Kami (`tw93/Kami`), a document design system with a fixed constraint language and templates, and let Kami draft the detailed plan. Screen 排版 (app surfaces, components, web pages) stays in this skill.\n\n"
+        with: ""
     exclude_files:
       - scripts/check-update.sh
-
-  web:
-    source: { repo: KAOPU-XiaoPu/web-design, path: ., ref: main }
-    plugin: creative
-    patches:
-      - { type: set_frontmatter, field: name, value: web }
-      - type: replace
-        pattern: "# Web Design\n"
-        with: "# Web Design\n\n用户可以在 https://getdesign.md/ 挑选喜欢的 design，或者按照下述流程设计自己的 design。\n"
-      - type: append_content
-        text: |
-          ## Worked Example
-
-          Before drafting `DESIGN.md`, consult `docs/DESIGN.md` and its accompanying implementation as a worked example of specification structure and implementation fidelity. Treat it as a quality reference, not a visual template to copy.
-    exclude_files:
-      - .gitignore
-      - README.md
 
   humanizer-zh:
     source: { repo: op7418/Humanizer-zh, path: ., ref: main }
@@ -425,44 +349,3 @@ skills:
       - examples/web-app-rendered.html
       - examples/workflow-agent-tool-call-rendered.html
       - test/
-
-  kami:
-    source: { repo: tw93/kami, path: plugins/kami/skills/kami, ref: main }
-    plugin: creative
-    patches:
-      - type: replace
-        pattern: "**Update check (non-blocking).** At the start of a task, run `bash scripts/check-update.sh`. It does a read-only version check at most once per day and prints one line when a newer kami is available; relay that line to the user, then continue. It sends no data, and fails silently when offline, sandboxed, or without `curl`. Never let it block the work.\n\n"
-        with: ""
-    target_patches:
-      - target: scripts/package-skill.sh
-        patches:
-          - { type: replace_all, pattern: "  \"scripts/mcp_server.py\"\n", with: "" }
-          - { type: replace_all, pattern: "|mcp_server", with: "" }
-    exclude_files:
-      - scripts/draft-release-notes.py
-      - scripts/mcp_server.py
-      - scripts/tests/test_build.py
-
-  xiaohei:
-    source: { repo: helloianneo/ian-xiaohei-illustrations, path: ian-xiaohei-illustrations, ref: main }
-    plugin: creative
-    patches:
-      - { type: set_frontmatter, field: name, value: xiaohei }
-    target_patches:
-      - target: agents/openai.yaml
-        patches:
-          - { type: replace_all, pattern: "$ian-xiaohei-illustrations", with: "$xiaohei" }
-
-  xiaohei2:
-    source: { repo: helloianneo/ian-xiaohei-scenes, path: ian-xiaohei-scenes, ref: main }
-    plugin: creative
-    patches:
-      - { type: set_frontmatter, field: name, value: xiaohei2 }
-      - { type: replace_all, pattern: "$ian-xiaohei-illustrations", with: "$xiaohei" }
-    target_patches:
-      - target: agents/openai.yaml
-        patches:
-          - { type: replace_all, pattern: "$ian-xiaohei-scenes", with: "$xiaohei2" }
-    exclude_files:
-      - .gitignore
-      - README.md
