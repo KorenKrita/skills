@@ -22,7 +22,7 @@
     },
     {
       "name": "plus",
-      "version": "0.0.8",
+      "version": "0.0.9",
       "source": "./plugins/plus",
       "description": "文档审计、决策方法、代码质量审查与读取工具",
       "strict": false,
@@ -37,13 +37,12 @@
     },
     {
       "name": "creative",
-      "version": "0.0.17",
+      "version": "0.0.18",
       "source": "./plugins/creative",
-      "description": "UI 设计、中文写作优化与架构图",
+      "description": "中文写作优化与架构图",
       "strict": false,
       "category": "design",
       "keywords": [
-        "ui",
         "design",
         "writing",
         "diagram",

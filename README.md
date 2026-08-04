@@ -23,8 +23,8 @@
 ```text
 base                  Matt Pocock active 主体
 base + plus           编码、审计、决策和读取
-base + creative       编码、界面、写作和架构图
-base + plus + creative  全部 34 个 Skill
+base + creative       编码、写作和架构图
+base + plus + creative  全部 32 个 Skill
 ```
 
 ### Pi
@@ -60,8 +60,8 @@ pi install -l git:github.com/KorenKrita/skills
 | Plugin | 内容 | Skill 数量 |
 |---|---|---:|
 | **base** | Matt Pocock active 工程与生产力主体 | 22 |
-| **plus** | 工程审计、决策方法与读取工具 | 9 |
-| **creative** | UI 设计、中文写作优化与架构图 | 3 |
+| **plus** | 工程审计、决策方法与读取工具 | 8 |
+| **creative** | 中文写作优化与架构图 | 2 |
 
 `plus` 还附带：
 

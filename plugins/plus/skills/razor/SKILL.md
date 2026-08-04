@@ -129,7 +129,6 @@ machine, service boundary, or architecture flow.
 
 - The target is a requirement document or product scope — use an installed product-specification Skill whose description clearly matches the task.
 - The target is module boundaries, dependency direction, or abstraction depth — use an installed architecture Skill whose description clearly matches the task.
-- The question is whether the whole idea is worth doing at all — use `idea`.
 - The user wants the cuts turned into an execution plan — use an installed execution-planning Skill whose description clearly matches the task.
 
 ## Common Mistakes

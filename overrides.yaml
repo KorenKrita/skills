@@ -189,38 +189,6 @@ skills:
           - { type: replace_all, pattern: "Thermo-Nuclear Code Quality Review", with: "Nuclear Review" }
           - { type: replace_all, pattern: "cursor-team-kit plugin", with: "plus plugin" }
 
-  idea:
-    source: { repo: hylarucoder/hai-stack, path: skills/hai-idea, ref: main }
-    plugin: plus
-    patches:
-      - { type: set_frontmatter, field: name, value: idea }
-      - type: replace
-        pattern: "For Chinese readers, see `SKILL.zh_CN.md`. The English `SKILL.md` is the execution source of truth.\n\n"
-        with: ""
-      - type: replace_all
-        pattern: "`hai-goal`"
-        with: "an installed execution-planning Skill whose description clearly matches the task"
-      - type: replace_all
-        pattern: "`hai-prd`"
-        with: "an installed product-specification Skill whose description clearly matches the task"
-      - type: replace_all
-        pattern: "`hai-naming`"
-        with: "an installed naming Skill whose description clearly matches the task"
-      - type: replace
-        pattern: "- The user wants to challenge scope or ambition without a do/kill verdict — open the frame and think bigger: use `geju`.\n"
-        with: ""
-      - type: append_content
-        text: |
-          ## Routing Compatibility
-
-          Invoke another Skill only when an installed Skill's description clearly matches the next subtask. Otherwise, complete the subtask directly with this workflow. Never require an uninstalled Skill.
-    target_patches:
-      - target: agents/openai.yaml
-        patches:
-          - { type: replace_all, pattern: "$hai-idea", with: "$idea" }
-    exclude_files:
-      - SKILL.zh_CN.md
-
   razor:
     source: { repo: hylarucoder/hai-stack, path: skills/hai-razor, ref: main }
     plugin: plus
@@ -230,7 +198,9 @@ skills:
         pattern: "For Chinese readers, see `SKILL.zh_CN.md`. The English `SKILL.md` is the execution source of truth.\n\n"
         with: ""
       - { type: replace_all, pattern: hai-razor, with: razor }
-      - { type: replace_all, pattern: hai-idea, with: idea }
+      - type: replace
+        pattern: "- The question is whether the whole idea is worth doing at all — use `hai-idea`.\n"
+        with: ""
       - type: replace_all
         pattern: "`hai-prd`"
         with: "an installed product-specification Skill whose description clearly matches the task"
@@ -285,17 +255,6 @@ skills:
     patches: []
 
   # ─── creative: design, writing, and visual output ──────────────────────────
-
-  ui:
-    source: { repo: tw93/Waza, path: skills/ui, ref: main }
-    plugin: creative
-    patches:
-      - { type: set_frontmatter, field: name, value: ui }
-      - type: replace
-        pattern: "**Document & print typography → Kami.** When the deliverable is a shippable document rather than a product UI surface (report, slide deck, resume, long-form or print-oriented page, paged PDF), do not hand-roll an over-designed document layout here. Suggest the user run it through Kami (`tw93/Kami`), a document design system with a fixed constraint language and templates, and let Kami draft the detailed plan. Screen 排版 (app surfaces, components, web pages) stays in this skill.\n\n"
-        with: ""
-    exclude_files:
-      - scripts/check-update.sh
 
   humanizer-zh:
     source: { repo: op7418/Humanizer-zh, path: ., ref: main }

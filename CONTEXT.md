@@ -7,8 +7,8 @@
 | **skill** | 一个 `SKILL.md` 加可选 scripts、references、assets、Skill metadata 的最小能力单元 |
 | **plugin** | Claude Code 的安装单元；本仓库固定为 `base`、`plus`、`creative` 三个 |
 | **base** | Matt Pocock active 22 个 Skill 的 canonical mirror |
-| **plus** | 工程审计、决策方法和通用工具，共 9 个 Skill；附带 Claude Code Agent |
-| **creative** | UI 设计、中文写作优化和架构图，共 3 个 Skill |
+| **plus** | 工程审计、决策方法和通用工具，共 8 个 Skill；附带 Claude Code Agent |
+| **creative** | 中文写作优化和架构图，共 2 个 Skill |
 | **marketplace** | `.claude-plugin/marketplace.json` 定义的三个 plugin 聚合入口 |
 
 ## Sync System

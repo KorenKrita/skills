@@ -206,14 +206,6 @@
       "SKILL.md"
     ]
   },
-  "idea": {
-    "sha": "f9af2306f5bced6a199dc6ba155ea3cd318ee570",
-    "files": [
-      "SKILL.md",
-      "agents/openai.yaml",
-      "references/output-template.md"
-    ]
-  },
   "razor": {
     "sha": "f9af2306f5bced6a199dc6ba155ea3cd318ee570",
     "files": [
@@ -268,20 +260,6 @@
       "SKILL.md",
       "agents/gemini.toml",
       "agents/openai.yaml"
-    ]
-  },
-  "ui": {
-    "sha": "a1520c290eca77aa0301c09f954d65ec2e487662",
-    "files": [
-      "SKILL.md",
-      "references/design-aesthetic-quality.md",
-      "references/design-data-viz.md",
-      "references/design-native-motion.md",
-      "references/design-reference.md",
-      "references/durable-context.md",
-      "references/mode-generated-asset.md",
-      "references/mode-quick-fix.md",
-      "references/mode-screenshot-iteration.md"
     ]
   },
   "humanizer-zh": {

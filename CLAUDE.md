@@ -6,9 +6,9 @@
 
 ```text
 plugins/base/skills/<skill>/SKILL.md      Matt Pocock active 主体（22）
-plugins/plus/skills/<skill>/SKILL.md      工程、思考与工具增强（9）
+plugins/plus/skills/<skill>/SKILL.md      工程、思考与工具增强（8）
 plugins/plus/agents/*.md                  plus 的 Claude Code subagents
-plugins/creative/skills/<skill>/SKILL.md  设计、写作与视觉能力（3）
+plugins/creative/skills/<skill>/SKILL.md  写作与架构图能力（2）
 overrides.yaml                            上游来源、改名、排除和 patch
 marketplace.yaml                          三个 plugin 的 Marketplace 元数据
 .claude-plugin/marketplace.json           生成产物

@@ -36,7 +36,6 @@ const EXPECTED_SKILLS = {
     "docs-vs-code",
     "docs-vs-docs",
     "i-have-adhd",
-    "idea",
     "improve",
     "pua",
     "nuclear-review",
@@ -46,7 +45,6 @@ const EXPECTED_SKILLS = {
   creative: [
     "archify",
     "humanizer-zh",
-    "ui",
   ],
 } as const
 
@@ -125,7 +123,7 @@ describe("repository layout", () => {
     }
     const state = JSON.parse(readFileSync(join(ROOT, ".sync-state.json"), "utf-8")) as Record<string, unknown>
     expect(Object.keys(state).sort()).toEqual(Object.keys(overrides.skills).sort())
-    expect(Object.keys(overrides.skills)).toHaveLength(34)
+    expect(Object.keys(overrides.skills)).toHaveLength(32)
     for (const [skill, config] of Object.entries(overrides.skills)) {
       expect(existsSync(join(ROOT, "plugins", config.plugin, "skills", skill)), skill).toBe(true)
     }
@@ -209,7 +207,7 @@ describe("repository layout", () => {
   })
 
   it("removes unavailable hai skill references from the selected subset", () => {
-    const selected = ["docs-vs-code", "docs-vs-docs", "idea", "razor"]
+    const selected = ["docs-vs-code", "docs-vs-docs", "razor"]
     const content = selected
       .flatMap((skill) => textFiles(join(ROOT, "plugins", "plus", "skills", skill)))
       .map((path) => readFileSync(path, "utf-8"))
@@ -226,8 +224,7 @@ describe("repository layout", () => {
       >
     }
     const checks = [
-      { skill: "idea", path: join("plugins", "plus", "skills", "idea", "SKILL.md"), marker: "use `geju`" },
-      { skill: "ui", path: join("plugins", "creative", "skills", "ui", "SKILL.md"), marker: "tw93/Kami" },
+      { skill: "razor", path: join("plugins", "plus", "skills", "razor", "SKILL.md"), marker: "use `hai-idea`" },
     ]
 
     for (const { skill, path, marker } of checks) {
