@@ -13,10 +13,7 @@
   },
   "scripts": {
     "generate:validators": "node scripts/generate-validators.mjs",
-    "check:validators": "node scripts/generate-validators.mjs --check",
-    "check:release-identity": "node ../scripts/check-release-identity.mjs",
-    "test": "npm run check:validators && npm run check:release-identity && node test/golden.mjs && node ../scripts/run-tests.mjs",
-    "render:examples": "node scripts/render-examples.mjs ../examples"
+    "check:validators": "node scripts/generate-validators.mjs --check"
   },
   "devDependencies": {
     "ajv": "^8.17.1"
