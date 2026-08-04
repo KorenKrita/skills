@@ -35,6 +35,7 @@ Usage:
     python3 scripts/build.py --check-fonts path/to/doc.pdf           # which family actually drew the CJK text
     python3 scripts/build.py --check-style path/to/filled.html       # template rules against a produced document
     python3 scripts/build.py --check-docs                            # lint the CSS snippets the reference docs teach from
+    python3 scripts/build.py --doctor                                # installed render/check/font capabilities
 """
 from __future__ import annotations
 
@@ -58,7 +59,7 @@ from lint import (
     check_style,
     scan_file,
 )
-from optional_deps import MissingDepError
+from optional_deps import MissingDepError, run_doctor
 from render import build_slides, render_pdf
 from shared import (
     DIAGRAMS,
@@ -206,6 +207,10 @@ def main(argv: list[str]) -> int:
             return _error_unexpected(args[1])
         target = args[1] if len(args) > 1 else None
         return verify_all(target)
+    if args[0] == "--doctor":
+        if len(args) > 1:
+            return _error_unexpected(args[1])
+        return run_doctor()
     # Path-taking check subcommands share one guard + dispatch table.
     path_checks = {
         "--check-orphans": check_orphans,
