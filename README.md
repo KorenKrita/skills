@@ -10,21 +10,18 @@
 /plugin marketplace add KorenKrita/skills
 ```
 
-按需安装三个 plugin：
+按需安装两个 plugin：
 
 ```bash
 /plugin install base@korenkrita-skills
 /plugin install plus@korenkrita-skills
-/plugin install creative@korenkrita-skills
 ```
 
 常用组合：
 
 ```text
-base                  Matt Pocock active 主体
-base + plus           编码、审计、决策和读取
-base + creative       编码、写作和架构图
-base + plus + creative  全部 32 个 Skill
+base         Matt Pocock active 主体
+base + plus  全部 30 个 Skill
 ```
 
 ### Pi
@@ -60,14 +57,13 @@ pi install -l git:github.com/KorenKrita/skills
 | Plugin | 内容 | Skill 数量 |
 |---|---|---:|
 | **base** | Matt Pocock active 工程与生产力主体 | 22 |
-| **plus** | 工程审计、决策方法与读取工具 | 8 |
-| **creative** | 中文写作优化与架构图 | 2 |
+| **plus** | 决策方法、代码质量审查、读取工具、中文写作优化与架构图 | 8 |
 
 `plus` 还附带：
 
 - `agents/nuclear-review.md`：`nuclear-review` Skill 的 Claude Code subagent。
 
-Pi 只加载三个 plugin 的 `skills/`；plugin-level Agent 仅对 Claude Code 生效。
+Pi 只加载两个 plugin 的 `skills/`；plugin-level Agent 仅对 Claude Code 生效。
 
 ## 上游同步
 

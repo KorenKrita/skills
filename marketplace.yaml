@@ -15,21 +15,13 @@ plugins:
       - code-review
       - workflow
   plus:
-    version: 0.0.9
-    description: 文档审计、决策方法、代码质量审查与读取工具
+    version: 0.0.10
+    description: 决策方法、代码质量审查、读取工具、中文写作优化与架构图
     category: productivity
     keywords:
-      - audit
       - decision
-      - docs
       - reading
       - review
-  creative:
-    version: 0.0.18
-    description: 中文写作优化与架构图
-    category: design
-    keywords:
-      - design
       - writing
       - diagram
       - architecture

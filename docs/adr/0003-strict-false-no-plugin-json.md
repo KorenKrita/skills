@@ -4,7 +4,7 @@
 
 ## Context
 
-三个本地 plugin 目录（base、plus、creative）是否需要自己的 `.claude-plugin/plugin.json`。
+本地 plugin 目录是否需要自己的 `.claude-plugin/plugin.json`。决策时的本地 plugin 为 base、plus、creative（historical；creative 已于 2026-08-04 移除）。
 
 备选方案：
 - A) 每个 plugin 目录有 plugin.json——标准结构，strict:true
@@ -18,4 +18,4 @@
 
 - 减少维护文件数量
 - plugin 元数据集中管理在 marketplace.yaml → CI 生成 marketplace.json
-- 当前 Marketplace 只发布 base、plus、creative 三个本地 plugin
+- 当前 Marketplace 只发布 base、plus 两个本地 plugin

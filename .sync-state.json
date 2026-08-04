@@ -175,22 +175,6 @@
       "agents/openai.yaml"
     ]
   },
-  "docs-vs-code": {
-    "sha": "f9af2306f5bced6a199dc6ba155ea3cd318ee570",
-    "files": [
-      "SKILL.md",
-      "references/checklist.md",
-      "references/output-template.md"
-    ]
-  },
-  "docs-vs-docs": {
-    "sha": "f9af2306f5bced6a199dc6ba155ea3cd318ee570",
-    "files": [
-      "SKILL.md",
-      "agents/openai.yaml",
-      "references/output-template.md"
-    ]
-  },
   "improve": {
     "sha": "03369ee6d7cafbfcecc4346539b05b3dc0a603bb",
     "files": [

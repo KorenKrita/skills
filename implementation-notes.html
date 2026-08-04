@@ -31,7 +31,7 @@
       <p><strong>日期：</strong>2026-07-26</p>
       <p><strong>背景：</strong>tw93/Waza 上游已删除 read/ui 的 “Update check (non-blocking).” 段落，但 <code>overrides.yaml</code> 仍配置对应 <code>replace</code> 补丁。补丁匹配失败使每日同步持续产出 <code>[补丁失败]</code> 草稿 PR（#148/#150/#151），真实内容更新被挡在草稿态无人合并。</p>
       <p><strong>决策：</strong>删除 read/ui 两处已失效的 <code>replace</code> 补丁，保留 <code>exclude_files: scripts/check-update.sh</code>（上游若恢复该脚本仍需屏蔽）。kami 的同类补丁保留，因为其上游 <code>scripts/check-update.sh</code> 与 SKILL.md 段落仍存在。重新执行 <code>npx tsx scripts/sync.ts --force</code> 生成非草稿 PR #153/#154。</p>
-      <p><strong>实现约束：</strong>同步脚本按 upstream SHA 命名分支，被取代的旧 SHA PR（#147/#148）需人工关闭；关闭 PR 后 <code>--force</code> 重跑才会重建分支。重跑生成的 PR 基于旧 main，若期间 main 已递增同一 plugin 版本，需 rebase 后手工把版本号继续 +0.0.1 并重新 <code>build:marketplace</code>（本次 creative 0.0.11 → 0.0.12）。</p>
+      <p><strong>实现约束：</strong>同步脚本按 upstream SHA 命名分支，被取代的旧 SHA PR（#147/#148）需人工关闭；关闭 PR 后 <code>--force</code> 重跑才会重建分支。重跑生成的 PR 基于旧 main，若期间 main 已递增同一 plugin 版本，需 rebase 后手工把版本号继续 +0.0.1 并重新 <code>build:marketplace</code>（本次 creative 0.0.11 → 0.0.12；creative plugin 已于 2026-08-04 移除，historical）。</p>
       <p><strong>验证：</strong><code>npm test</code>（45 passed）；合并后分支 SKILL.md 中 “update check” 匹配数为 0；PR #153/#154/#155 均以 MERGEABLE/CLEAN 合并。</p>
     </article>
     <article id="archify-2-12-patch-drift-2026-07-28">

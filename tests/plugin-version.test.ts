@@ -33,6 +33,6 @@ describe("plugin-version", () => {
 
   it("rejects invalid or missing versions", () => {
     expect(() => incrementPatchVersion("v1")).toThrow("SemVer")
-    expect(() => bumpPluginVersion(MARKETPLACE, "creative")).toThrow("不存在 plugin")
+    expect(() => bumpPluginVersion(MARKETPLACE, "absent")).toThrow("不存在 plugin")
   })
 })

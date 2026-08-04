@@ -111,57 +111,7 @@ skills:
     plugin: base
     patches: []
 
-  # ─── plus: engineering, thinking, and tools ────────────────────────────────
-
-  docs-vs-code:
-    source: { repo: hylarucoder/hai-stack, path: skills/hai-audit-docs-against-code, ref: main }
-    plugin: plus
-    patches:
-      - { type: set_frontmatter, field: name, value: docs-vs-code }
-      - type: replace
-        pattern: "For Chinese readers, see `SKILL.zh_CN.md`. The English `SKILL.md` is the execution source of truth.\n\n"
-        with: ""
-      - { type: replace_all, pattern: hai-audit-docs-internally, with: docs-vs-docs }
-      - type: replace_all
-        pattern: "`entity-model-auditor`"
-        with: "an installed data-model auditing Skill whose description clearly matches the task"
-      - type: replace_all
-        pattern: "`hai-rewrite-doc`"
-        with: "an installed document-rewriting Skill whose description clearly matches the task"
-      - type: append_content
-        text: |
-          ## Routing Compatibility
-
-          Invoke another Skill only when an installed Skill's description clearly matches the next subtask. Otherwise, complete the subtask directly with this workflow. Never require an uninstalled Skill.
-    exclude_files:
-      - SKILL.zh_CN.md
-
-  docs-vs-docs:
-    source: { repo: hylarucoder/hai-stack, path: skills/hai-audit-docs-internally, ref: main }
-    plugin: plus
-    patches:
-      - { type: set_frontmatter, field: name, value: docs-vs-docs }
-      - type: replace
-        pattern: "For Chinese readers, see `SKILL.zh_CN.md`. The English `SKILL.md` is the execution source of truth.\n\n"
-        with: ""
-      - { type: replace_all, pattern: hai-audit-docs-against-code, with: docs-vs-code }
-      - type: replace_all
-        pattern: "`hai-prd`"
-        with: "an installed product-specification Skill whose description clearly matches the task"
-      - type: replace_all
-        pattern: "`hai-rewrite-doc`"
-        with: "an installed document-rewriting Skill whose description clearly matches the task"
-      - type: append_content
-        text: |
-          ## Routing Compatibility
-
-          Invoke another Skill only when an installed Skill's description clearly matches the next subtask. Otherwise, complete the subtask directly with this workflow. Never require an uninstalled Skill.
-    target_patches:
-      - target: agents/openai.yaml
-        patches:
-          - { type: replace_all, pattern: "$hai-audit-docs-internally", with: "$docs-vs-docs" }
-    exclude_files:
-      - SKILL.zh_CN.md
+  # ─── plus: engineering, thinking, tools, and writing ───────────────────────
 
   improve:
     source: { repo: shadcn/improve, path: skills/improve, ref: main }
@@ -254,11 +204,9 @@ skills:
     plugin: plus
     patches: []
 
-  # ─── creative: design, writing, and visual output ──────────────────────────
-
   humanizer-zh:
     source: { repo: op7418/Humanizer-zh, path: ., ref: main }
-    plugin: creative
+    plugin: plus
     patches: []
     exclude_files:
       - .gitignore
@@ -266,7 +214,7 @@ skills:
 
   archify:
     source: { repo: tt-a1i/archify, path: archify, ref: main }
-    plugin: creative
+    plugin: plus
     patches:
       - type: set_frontmatter
         field: description

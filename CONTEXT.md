@@ -5,11 +5,10 @@
 | Term | Definition |
 |---|---|
 | **skill** | 一个 `SKILL.md` 加可选 scripts、references、assets、Skill metadata 的最小能力单元 |
-| **plugin** | Claude Code 的安装单元；本仓库固定为 `base`、`plus`、`creative` 三个 |
+| **plugin** | Claude Code 的安装单元；本仓库固定为 `base`、`plus` 两个 |
 | **base** | Matt Pocock active 22 个 Skill 的 canonical mirror |
-| **plus** | 工程审计、决策方法和通用工具，共 8 个 Skill；附带 Claude Code Agent |
-| **creative** | 中文写作优化和架构图，共 2 个 Skill |
-| **marketplace** | `.claude-plugin/marketplace.json` 定义的三个 plugin 聚合入口 |
+| **plus** | 决策方法、代码质量审查、通用工具、中文写作优化和架构图，共 8 个 Skill；附带 Claude Code Agent |
+| **marketplace** | `.claude-plugin/marketplace.json` 定义的两个 plugin 聚合入口 |
 
 ## Sync System
 
@@ -32,7 +31,7 @@
 
 ## Naming Conventions
 
-- Plugin：`base`、`plus`、`creative`。
+- Plugin：`base`、`plus`。
 - Skill 目录名 = Skill 调用名 = frontmatter `name`。
 - 外部 Skill 改名由 overrides key + `set_frontmatter` + 相关 metadata patch 共同完成。
 - `nuclear-review` 的 plugin-level Agent 与 Skill 使用同一个最终名称。

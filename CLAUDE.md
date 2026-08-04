@@ -1,16 +1,15 @@
 # KorenKrita Skills
 
-个人 Skill 订阅仓库，通过一个 Marketplace 分发三个 Claude Code plugin，并作为一个 Pi Package 加载全部 Skill。
+个人 Skill 订阅仓库，通过一个 Marketplace 分发两个 Claude Code plugin，并作为一个 Pi Package 加载全部 Skill。
 
 ## 项目结构
 
 ```text
 plugins/base/skills/<skill>/SKILL.md      Matt Pocock active 主体（22）
-plugins/plus/skills/<skill>/SKILL.md      工程、思考与工具增强（8）
+plugins/plus/skills/<skill>/SKILL.md      工程、思考、工具与写作增强（8）
 plugins/plus/agents/*.md                  plus 的 Claude Code subagents
-plugins/creative/skills/<skill>/SKILL.md  写作与架构图能力（2）
 overrides.yaml                            上游来源、改名、排除和 patch
-marketplace.yaml                          三个 plugin 的 Marketplace 元数据
+marketplace.yaml                          两个 plugin 的 Marketplace 元数据
 .claude-plugin/marketplace.json           生成产物
 .sync-state.json                          上游 SHA 与文件清单
 ```
@@ -35,6 +34,7 @@ npm run sync
 - `.sync-state.json` 由同步流程维护；结构迁移时必须与 overrides key 和上游文件清单一起迁移。
 - `base` 保持 Matt active 22 的 canonical name 和内部引用。
 - `plus/agents` 仅对 Claude Code 生效；Pi 只加载 `plugins/*/skills`；仓库不再附带 plugin-level hooks。
+- 仓库只发布 `base` 和 `plus` 两个 plugin。
 
 ## Agent skills
 

@@ -5,7 +5,7 @@ import { parse as parseYaml } from "yaml"
 import { isExcludedFile } from "../scripts/sync-utils.js"
 
 const ROOT = new URL("../", import.meta.url).pathname.replace(/\/$/, "")
-const PLUGINS = ["base", "plus", "creative"] as const
+const PLUGINS = ["base", "plus"] as const
 
 const EXPECTED_SKILLS = {
   base: [
@@ -33,18 +33,14 @@ const EXPECTED_SKILLS = {
     "writing-great-skills",
   ],
   plus: [
-    "docs-vs-code",
-    "docs-vs-docs",
+    "archify",
+    "humanizer-zh",
     "i-have-adhd",
     "improve",
     "pua",
     "nuclear-review",
     "razor",
     "read",
-  ],
-  creative: [
-    "archify",
-    "humanizer-zh",
   ],
 } as const
 
@@ -76,7 +72,7 @@ function relativeFiles(dir: string, prefix = ""): string[] {
 }
 
 describe("repository layout", () => {
-  it("publishes exactly base, plus, and creative", () => {
+  it("publishes exactly base and plus", () => {
     const actual = readdirSync(join(ROOT, "plugins"))
       .filter((name) => statSync(join(ROOT, "plugins", name)).isDirectory())
       .sort()
@@ -91,6 +87,9 @@ describe("repository layout", () => {
       readFileSync(join(ROOT, ".claude-plugin", "marketplace.json"), "utf-8"),
     ) as { plugins: Array<{ name: string; version?: string }> }
 
+    expect(Object.keys(config.plugins).sort()).toEqual([...PLUGINS].sort())
+    expect(generated.plugins.map(({ name }) => name).sort()).toEqual([...PLUGINS].sort())
+
     for (const plugin of PLUGINS) {
       const version = config.plugins[plugin]?.version
       expect(version, plugin).toMatch(/^\d+\.\d+\.\d+$/)
@@ -102,7 +101,6 @@ describe("repository layout", () => {
     const allNames = PLUGINS.flatMap((plugin) => skillNames(plugin))
     expect(skillNames("base")).toEqual([...EXPECTED_SKILLS.base].sort())
     expect(skillNames("plus")).toEqual([...EXPECTED_SKILLS.plus].sort())
-    expect(skillNames("creative")).toEqual([...EXPECTED_SKILLS.creative].sort())
     expect(allNames).toHaveLength(EXPECTED_SKILL_COUNT)
     expect(new Set(allNames).size).toBe(EXPECTED_SKILL_COUNT)
   })
@@ -123,7 +121,7 @@ describe("repository layout", () => {
     }
     const state = JSON.parse(readFileSync(join(ROOT, ".sync-state.json"), "utf-8")) as Record<string, unknown>
     expect(Object.keys(state).sort()).toEqual(Object.keys(overrides.skills).sort())
-    expect(Object.keys(overrides.skills)).toHaveLength(32)
+    expect(Object.keys(overrides.skills)).toHaveLength(30)
     for (const [skill, config] of Object.entries(overrides.skills)) {
       expect(existsSync(join(ROOT, "plugins", config.plugin, "skills", skill)), skill).toBe(true)
     }
@@ -168,7 +166,7 @@ describe("repository layout", () => {
 
   it("does not expose commands for excluded Archify tests", () => {
     const manifest = JSON.parse(
-      readFileSync(join(ROOT, "plugins", "creative", "skills", "archify", "package.json"), "utf-8"),
+      readFileSync(join(ROOT, "plugins", "plus", "skills", "archify", "package.json"), "utf-8"),
     ) as { scripts?: Record<string, string> }
     const archifyScripts = Object.values(manifest.scripts ?? {})
     expect(archifyScripts.join("\n")).not.toContain("test/")
@@ -178,12 +176,12 @@ describe("repository layout", () => {
       expect(script, script).not.toContain("../")
     }
     const schemaReadme = readFileSync(
-      join(ROOT, "plugins", "creative", "skills", "archify", "schemas", "README.md"),
+      join(ROOT, "plugins", "plus", "skills", "archify", "schemas", "README.md"),
       "utf-8",
     )
     expect(schemaReadme).not.toContain("`npm test`")
     expect(schemaReadme).toContain("`npm run check:validators`")
-    const archifyDocs = textFiles(join(ROOT, "plugins", "creative", "skills", "archify"))
+    const archifyDocs = textFiles(join(ROOT, "plugins", "plus", "skills", "archify"))
       .filter((path) => path.endsWith(".md"))
     for (const path of archifyDocs) {
       const doc = readFileSync(path, "utf-8")
@@ -207,7 +205,7 @@ describe("repository layout", () => {
   })
 
   it("removes unavailable hai skill references from the selected subset", () => {
-    const selected = ["docs-vs-code", "docs-vs-docs", "razor"]
+    const selected = ["razor"]
     const content = selected
       .flatMap((skill) => textFiles(join(ROOT, "plugins", "plus", "skills", skill)))
       .map((path) => readFileSync(path, "utf-8"))
@@ -243,6 +241,5 @@ describe("repository layout", () => {
     expect(existsSync(join(ROOT, "plugins", "plus", "agents", "nuclear-review.md"))).toBe(true)
     expect(existsSync(join(ROOT, "plugins", "base", "rules"))).toBe(false)
     expect(existsSync(join(ROOT, "plugins", "plus", "rules"))).toBe(false)
-    expect(existsSync(join(ROOT, "plugins", "creative", "rules"))).toBe(false)
   })
 })

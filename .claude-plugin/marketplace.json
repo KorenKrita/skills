@@ -22,28 +22,15 @@
     },
     {
       "name": "plus",
-      "version": "0.0.9",
+      "version": "0.0.10",
       "source": "./plugins/plus",
-      "description": "文档审计、决策方法、代码质量审查与读取工具",
+      "description": "决策方法、代码质量审查、读取工具、中文写作优化与架构图",
       "strict": false,
       "category": "productivity",
       "keywords": [
-        "audit",
         "decision",
-        "docs",
         "reading",
-        "review"
-      ]
-    },
-    {
-      "name": "creative",
-      "version": "0.0.18",
-      "source": "./plugins/creative",
-      "description": "中文写作优化与架构图",
-      "strict": false,
-      "category": "design",
-      "keywords": [
-        "design",
+        "review",
         "writing",
         "diagram",
         "architecture"

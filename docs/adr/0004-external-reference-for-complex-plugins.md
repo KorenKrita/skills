@@ -19,7 +19,7 @@ Kami 是主要案例：上游仓库约 76MB，同时提供约 1.2MB 的 `plugins
 - 没有独立 payload、内部资源无法拆分的上游能力，需要单独评估后再引入；
 - Marketplace 不使用外部 plugin reference。
 
-Kami 曾按以下路径应用该原则，直至 2026-08-04 移除：
+Kami 曾按以下 historical 路径应用该原则，直至 2026-08-04 移除；其中的 creative plugin 已一并不再存在：
 
 ```text
 tw93/kami/plugins/kami/skills/kami
