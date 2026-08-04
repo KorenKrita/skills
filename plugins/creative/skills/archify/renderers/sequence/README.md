@@ -45,6 +45,14 @@ The schema lives at:
 archify/schemas/sequence.schema.json
 ```
 
+## Legend
+
+The default visual legend derives kinds from `messages[].variant` (omitting
+`variant` means `default`). Supported `meta.legend.entries` keys, in stable
+order, are `emphasis`, `return`, `security`, `dashed`, and `default`. These are
+visual message keys, not Semantic Lens controls; label/visibility overrides do
+not create edge facts.
+
 ## Layout budget
 
 | Constant | Value |

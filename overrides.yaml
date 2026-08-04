@@ -395,7 +395,10 @@ skills:
             pattern: "    \"test:webm\": \"node test/webm-artifact.smoke.mjs\",\n"
             with: ""
           - type: replace_all
-            pattern: "    \"test\": \"npm run check:validators && node test/golden.mjs && node ../scripts/run-tests.mjs\",\n"
+            pattern: "    \"test\": \"npm run check:validators && npm run check:release-identity && node test/golden.mjs && node ../scripts/run-tests.mjs\",\n"
+            with: ""
+          - type: replace_all
+            pattern: "    \"check:release-identity\": \"node ../scripts/check-release-identity.mjs\",\n"
             with: ""
           - type: replace_all
             pattern: "    \"build:gallery\": \"node ../scripts/build-gallery.mjs ../docs\",\n"

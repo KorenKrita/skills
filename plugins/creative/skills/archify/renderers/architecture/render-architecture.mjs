@@ -4,6 +4,7 @@ import { esc, renderDefinitions, renderSemanticSigil, textUnits } from '../share
 import { animateAttr, focusEdgeAttrs, focusNodeAttrs, focusNodeTitle, loadDiagram, writeDiagram, svgAccessibleText, svgRootAttrs } from '../shared/cli.mjs';
 import { componentBox, boundaryBox, connectionPath } from '../shared/layout-report.mjs';
 import { throwDiagnosticProblems } from '../shared/diagnostics.mjs';
+import { legendFootprint, relationshipLegendObstacles, resolveLegend, renderLegend as renderResolvedLegend } from '../shared/legend.mjs';
 import { gridLayout, resolveComponentPos, validateGridPlacement } from './grid.mjs';
 import {
   asArray,
@@ -60,6 +61,16 @@ const layout = {
   legendH: 28,
 };
 
+const LEGEND_CATALOG = [
+  ['frontend', 'Frontend'],
+  ['backend', 'Backend'],
+  ['database', 'Database'],
+  ['cloud', 'Cloud'],
+  ['security', 'Security'],
+  ['messagebus', 'Message bus'],
+  ['external', 'External'],
+].map(([kind, label]) => ({ kind, label }));
+
 // ---- Measure components from free coordinates --------------------------------
 function measureComponent(c) {
   const [x, y] = resolveComponentPos(c, grid);
@@ -111,7 +122,13 @@ function componentContext(component) {
   return scopes.length ? scopes.join(' › ') : 'Architecture component';
 }
 
-// ---- Auto viewBox: fit all geometry + a legend row --------------------------
+const architectureLegendEntries = resolveLegend(
+  arch.meta?.legend,
+  LEGEND_CATALOG,
+  new Set([...components.values()].map((component) => component.type)),
+);
+
+// ---- Auto viewBox: fit all geometry + the measured resolved legend ----------
 function autoViewBox() {
   let maxX = 0;
   let maxY = 0;
@@ -123,9 +140,20 @@ function autoViewBox() {
     maxX = Math.max(maxX, b.x + b.width);
     maxY = Math.max(maxY, b.y + b.height);
   }
+
+  let width = Math.ceil(maxX + layout.margin);
+  let footprint = legendFootprint(architectureLegendEntries, {
+    width: Math.max(1, width - layout.margin * 2),
+  });
+  if (footprint.minWidth > width - layout.margin * 2) {
+    width = Math.ceil(footprint.minWidth + layout.margin * 2);
+    footprint = legendFootprint(architectureLegendEntries, {
+      width: width - layout.margin * 2,
+    });
+  }
   return [
-    Math.ceil(maxX + layout.margin),
-    Math.ceil(maxY + layout.margin + layout.legendH),
+    width,
+    Math.ceil(maxY + layout.margin + layout.legendH + footprint.extraHeight),
   ];
 }
 
@@ -603,30 +631,35 @@ function renderComponent(c) {
         </g>`;
 }
 
-// Auto legend: one swatch per component type actually used, left to right.
-const TYPE_LABELS = {
-  frontend: 'Frontend', backend: 'Backend', database: 'Database', cloud: 'Cloud',
-  security: 'Security', messagebus: 'Message bus', external: 'External',
-};
 function renderLegend() {
-  const used = [];
-  const seen = new Set();
-  for (const c of components.values()) {
-    if (!seen.has(c.type)) { seen.add(c.type); used.push(c.type); }
-  }
-  const y = legendY();
-  let x = layout.margin;
-  const parts = ['        <g data-legend-bridge>',
-    `          <text x="${x}" y="${y - 13}" class="t-primary" font-size="9" font-weight="600">Legend</text>`];
-  for (const type of used) {
-    parts.push(`          <g data-legend-kind="${esc(type)}">`);
-    parts.push(`            <rect x="${x}" y="${y - 8}" width="14" height="9" rx="2" class="${componentFill[type] || 'c-external'}" stroke-width="1"/>`);
-    parts.push(`            <text x="${x + 20}" y="${y}" class="t-muted" font-size="8">${TYPE_LABELS[type] || type}</text>`);
-    parts.push('          </g>');
-    x += 30 + (textUnits(TYPE_LABELS[type] || type) * 5 + 34);
-  }
-  parts.push('        </g>');
-  return parts.join('\n');
+  const entries = architectureLegendEntries;
+  const relationshipObstacles = relationshipLegendObstacles(arch.connections, {
+    pointsFor: (connection) => pathFor(connection).points,
+    labelRectFor: (connection) => {
+      if (!connection.label) return null;
+      const [x, y] = labelPoint(connection, pathFor(connection).points);
+      const width = Math.max(30, textUnits(connection.label) * 4.8 + 10);
+      return { x: x - width / 2, y: y - 10, width, height: 14 };
+    },
+  });
+  const contentBottom = Math.max(
+    0,
+    ...[...components.values()].map((component) => component.y + component.height),
+    ...boundaries.map((boundary) => boundary.y + boundary.height),
+  );
+  return renderResolvedLegend({
+    entries,
+    layout: {
+      x: layout.margin,
+      baselineY: legendY(),
+      width: viewBox[0] - layout.margin * 2,
+      minTitleY: contentBottom + 8,
+      obstacles: relationshipObstacles,
+      unfit: arch.meta?.legend === undefined ? 'hide' : 'error',
+      diagramType: 'architecture',
+    },
+    renderSwatch: (entry) => `<rect x="${entry.x}" y="${entry.baseline - 8}" width="14" height="9" rx="2" class="${componentFill[entry.kind] || 'c-external'}" stroke-width="1"/>`,
+  });
 }
 
 function renderSvg() {

@@ -46,6 +46,14 @@ The schema lives at:
 archify/schemas/lifecycle.schema.json
 ```
 
+## Legend
+
+The default legend derives kinds from `states[].type`. Supported
+`meta.legend.entries` keys, in stable order, are `start`, `active`, `waiting`,
+`decision`, `success`, `failure`, `neutral`, and `external`. Labels and
+visibility may be overridden through the shared legend contract; only kinds
+backed by rendered states receive Semantic Legend controls.
+
 ## Layout budget
 
 | Band | Lane id | Top y | Column centers | Default state |
@@ -56,11 +64,11 @@ archify/schemas/lifecycle.schema.json
 
 | Constant | Value |
 |----------|-------|
-| viewBox | default `[980, 660]`; schema minimum `[420, 360]` |
-| State area | x within `[32, width − 32]`; y within `[64, legend y − 24]` |
+| viewBox | default `[980, 660]`; schema minimum `[420, 566]` |
+| State area | x within `[32, width − 32]`; state bottom at or above `height − 122` |
 | State spacing | ≥10px between any two states — checked across lanes, because all event lanes share one band; separate same-band states with `col` or `yOffset` |
 | Transition length | ≥32px between endpoints |
-| Legend row | y = height − 98 |
+| Legend row | final baseline y = height − 36; extra measured rows wrap upward |
 
 The primary lifecycle rail runs along the phase band and extends to the
 furthest occupied phase column. Route presets for transitions: `straight`,

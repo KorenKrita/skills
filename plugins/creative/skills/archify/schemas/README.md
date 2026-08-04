@@ -29,6 +29,54 @@ It may also include up to five guided `views`. Each view has a unique `id`, a
 reader-facing `label`, a non-empty `focus` list of existing semantic node IDs,
 and an optional short `note`.
 
+### Legend presentation contract
+
+Every `meta` object accepts the same optional legend shape without changing
+`schema_version: 1`:
+
+```json
+"legend": {
+  "mode": "auto",
+  "entries": {
+    "security": { "label": "restricted data", "visible": true }
+  }
+}
+```
+
+`mode` is `auto` (the default), `all`, or `hidden`. `auto` includes only kinds
+present in typed IR; `all` includes the renderer's full stable catalog;
+`hidden` removes the complete legend and takes precedence over entry overrides.
+Architecture documents that omit an explicit `viewBox` size that automatic
+viewBox from the same measured resolved legend footprint used for final SVG
+layout. Across all renderers, legacy documents that omit `meta.legend` use a
+compatibility-safe implicit `auto`: if the resolved legend cannot fit an
+explicit authored viewBox without overlap, Archify omits the complete legend
+instead of turning a previously valid schema-v1 document into a hard failure.
+Once an author adds `meta.legend` (including explicit `mode: "auto"`), the
+layout is intentional and unfit labels or bands fail with a path-prefixed
+diagnostic. An entry may set a non-empty, bounded `label`, boolean `visible`,
+or both.
+`visible: false` removes a resolved entry and `visible: true` forces a supported
+but unused kind into the visual legend. Unknown kinds and properties fail
+strict validation.
+
+Supported keys are renderer-owned:
+
+| Renderer | `meta.legend.entries` keys |
+|---|---|
+| Architecture | `frontend`, `backend`, `database`, `cloud`, `security`, `messagebus`, `external` |
+| Workflow | `frontend`, `backend`, `security`, `messagebus`, `database`, `cloud`, `external` |
+| Sequence | `emphasis`, `return`, `security`, `dashed`, `default` |
+| Dataflow | `emphasis`, `security`, `dashed`, `database`, `default` |
+| Lifecycle | `start`, `active`, `waiting`, `decision`, `success`, `failure`, `neutral`, `external` |
+
+Labels are presentation only: they do not rename the stable kind, change
+nodes/relationships, or create Semantic Lens edge facts. Sequence message and
+Dataflow flow-variant entries are visual keys. Component/state entries backed
+by exact compiled node facts receive the interactive Semantic Legend bridge;
+this includes Dataflow `database` when a real `nodes[].type: "database"` fact
+exists.
+
 Every relationship collection (`connections`, `edges`, `messages`, `flows`, and
 `transitions`) accepts an optional author-controlled `id` using the shared ID
 pattern. The renderer keeps its source-order runtime key separately, while the
@@ -57,6 +105,8 @@ The five diagram schemas reference `common.schema.json#/$defs/...`:
   `messagebus`, `external`
 - `variant` — `default`, `emphasis`, `security`, `dashed` (sequence messages
   extend this list locally with `return`)
+- `legendMode` and `legendEntry` — the shared strict mode and label/visibility
+  override shapes used by each renderer-owned key map
 - `guidedViews` — the bounded, read-only reader paths accepted by `meta.views`
 - `cards` — the summary-card blocks rendered below the SVG
 

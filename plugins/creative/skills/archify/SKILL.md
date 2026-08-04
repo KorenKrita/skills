@@ -3,7 +3,7 @@ name: archify
 description: Create professional architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with SVG, pan/zoom, search, semantic relationship inspection, presentation mode, dark/light themes, optional motion, and PNG/JPEG/WebP/SVG/WebM export. Accepts plain-language descriptions or Mermaid flowchart, sequenceDiagram, and stateDiagram input, then lays diagrams out in Archify style. Use when the user asks for system or cloud architecture, infrastructure and network topology, security boundaries, technical or approval workflows, runbooks, CI/CD flows, API call sequences, request lifecycles, data pipelines, ETL/ELT, PII boundaries, data lineage, state machines, lifecycle/status transitions, or conversion/beautification of Mermaid diagrams.
 license: MIT
 metadata:
-  version: "2.12"
+  version: "2.13"
   author: tt-a1i
   based_on: Cocoon-AI/architecture-diagram-generator (MIT, v1.0)
 ---
@@ -61,6 +61,7 @@ Read Mermaid for topology and meaning, then author fresh Archify JSON; do not me
 ## Authoring invariants
 
 - One obvious main path; side branches leave the nearest main-path node. Remove low-value edges before adding routing controls.
+- Omit `meta.legend` for the truthful `auto` default. When needed, use only `mode: auto|all|hidden` and renderer-supported `entries.<kind>.label|visible`; labels never change semantics.
 - Component types are `frontend`, `backend`, `database`, `cloud`, `security`, `messagebus`, and `external`; variants are `default`, `emphasis`, `security`, and `dashed`.
 - Spacing means clear gap, not center distance. For a relationship label, clear gap must exceed its measured mask width; otherwise omit the label or move it deliberately.
 - Automatic routes own their endpoint sides. A side is a direction contract: the first and final segment must leave/enter perpendicular to that side.

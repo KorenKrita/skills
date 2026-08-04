@@ -42,6 +42,18 @@ The schema lives at:
 archify/schemas/dataflow.schema.json
 ```
 
+## Legend
+
+The default visual legend derives kinds from `flows[].variant` (omitting
+`variant` means `default`) and adds `database` only when a database node exists.
+Supported `meta.legend.entries` keys, in stable order, are `emphasis`,
+`security`, `dashed`, `database`, and `default`. Flow variants remain
+visual-only because Archify has no compiled edge-kind facts in this slice. A
+present `database` entry is different: it comes from exact
+`nodes[].type: "database"` facts, so it publishes the normal Semantic Legend
+count, accessible name, and keyboard interaction. Forcing `database` visible
+without a database node keeps it visual-only.
+
 ## Layout budget
 
 | Constant | Value |

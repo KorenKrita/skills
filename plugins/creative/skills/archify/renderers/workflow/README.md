@@ -56,6 +56,14 @@ The schema lives at:
 archify/schemas/workflow.schema.json
 ```
 
+## Legend
+
+The default legend derives component kinds from `nodes[].type`. Supported
+`meta.legend.entries` keys, in stable order, are `frontend`, `backend`,
+`security`, `messagebus`, `database`, `cloud`, and `external`. Labels and
+visibility may be overridden through the shared legend contract; only kinds
+backed by rendered nodes receive Semantic Legend controls.
+
 ## Layout budget
 
 | Constant | Value |

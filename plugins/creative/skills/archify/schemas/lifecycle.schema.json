@@ -59,6 +59,27 @@
         "views": {
           "$ref": "common.schema.json#/$defs/guidedViews"
         },
+        "legend": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "mode": { "$ref": "common.schema.json#/$defs/legendMode" },
+            "entries": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "start": { "$ref": "common.schema.json#/$defs/legendEntry" },
+                "active": { "$ref": "common.schema.json#/$defs/legendEntry" },
+                "waiting": { "$ref": "common.schema.json#/$defs/legendEntry" },
+                "decision": { "$ref": "common.schema.json#/$defs/legendEntry" },
+                "success": { "$ref": "common.schema.json#/$defs/legendEntry" },
+                "failure": { "$ref": "common.schema.json#/$defs/legendEntry" },
+                "neutral": { "$ref": "common.schema.json#/$defs/legendEntry" },
+                "external": { "$ref": "common.schema.json#/$defs/legendEntry" }
+              }
+            }
+          }
+        },
         "viewBox": {
           "type": "array",
           "prefixItems": [

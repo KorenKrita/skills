@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { esc, renderDefinitions, renderSemanticSigil, textUnits } from '../shared/utils.mjs';
 import { animateAttr, focusEdgeAttrs, focusNodeAttrs, focusNodeTitle, loadDiagram, writeDiagram, svgAccessibleText, svgRootAttrs } from '../shared/cli.mjs';
 import { throwDiagnosticProblems } from '../shared/diagnostics.mjs';
+import { resolveLegend, renderLegend as renderResolvedLegend } from '../shared/legend.mjs';
 import { componentFill, arrowClassMap, rectsOverlap, cleanFlowProblems, cleanCrossingProblems, cleanAmbiguousCorridorProblems, cleanBorderRunProblems, cleanRouteRhythmProblems, cleanLabelRouteClearanceProblems, routePointsValue, asArray, isFinitePoint } from '../shared/geometry.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -348,17 +349,29 @@ ${messageLabel(message, start, end)}${note}
         </g>`;
 }
 
+const LEGEND_CATALOG = [
+  { kind: 'emphasis', label: 'request', className: 'a-emphasis', marker: 'arrowhead-emphasis', strokeWidth: 1.8 },
+  { kind: 'return', label: 'return', className: 'a-default', marker: 'arrowhead', dash: '3,5' },
+  { kind: 'security', label: 'security', className: 'a-security', marker: 'arrowhead-security' },
+  { kind: 'dashed', label: 'async trace', className: 'a-dashed', marker: 'arrowhead-dashed' },
+  { kind: 'default', label: 'default message', className: 'a-default', marker: 'arrowhead' },
+].map((entry) => ({ ...entry, interactive: false, swatchWidth: 34, swatchGap: 9 }));
+
 function renderLegend() {
-  const y = layout.legendY;
-  return `        <text x="150" y="${y - 20}" class="t-primary" font-size="10" font-weight="600">Legend</text>
-        <path d="M 150 ${y} L 184 ${y}" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
-        <text x="193" y="${y + 3}" class="t-muted" font-size="8">request</text>
-        <path d="M 270 ${y} L 304 ${y}" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#arrowhead)"/>
-        <text x="313" y="${y + 3}" class="t-muted" font-size="8">return</text>
-        <path d="M 385 ${y} L 419 ${y}" class="a-security" stroke-width="1.4" marker-end="url(#arrowhead-security)"/>
-        <text x="428" y="${y + 3}" class="t-muted" font-size="8">security</text>
-        <path d="M 530 ${y} L 564 ${y}" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
-        <text x="573" y="${y + 3}" class="t-muted" font-size="8">async trace</text>`;
+  const presentKinds = new Set(asArray(sequence.messages).map((message) => message.variant || 'default'));
+  const entries = resolveLegend(sequence.meta?.legend, LEGEND_CATALOG, presentKinds);
+  return renderResolvedLegend({
+    entries,
+    layout: {
+      x: 40,
+      baselineY: layout.legendY,
+      width: viewBox[0] - 80,
+      minTitleY: layout.legendY - 30,
+      unfit: sequence.meta?.legend === undefined ? 'hide' : 'error',
+      diagramType: 'sequence',
+    },
+    renderSwatch: (entry) => `<path d="M ${entry.x} ${entry.baseline - 3} L ${entry.x + 34} ${entry.baseline - 3}" class="${entry.className}" stroke-width="${entry.strokeWidth || 1.4}"${entry.dash ? ` stroke-dasharray="${entry.dash}"` : ''} marker-end="url(#${entry.marker})"/>`,
+  });
 }
 
 function renderSvg() {
