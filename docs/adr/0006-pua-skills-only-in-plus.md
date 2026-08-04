@@ -1,6 +1,6 @@
 # ADR-0006: PUA Skills-only suite 保留在 plus
 
-## Status: Amended
+## Status: Superseded by ADR-0007
 
 ## Context
 

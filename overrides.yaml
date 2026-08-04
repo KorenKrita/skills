@@ -141,290 +141,85 @@ skills:
     exclude_files:
       - scripts/check-update.sh
 
-  # ─── pua: standalone upstream Skills only ───────────────────────────────────
-
-  ding:
-    source: { repo: tanweai/pua, path: skills/ding, ref: main }
-    plugin: plus
-    patches:
-      - { type: replace_all, pattern: "skills/ding/references/", with: "references/" }
-      - { type: replace_all, pattern: "skills/pua/references/", with: "../pua/references/" }
-
-  mama:
-    source: { repo: tanweai/pua, path: skills/mama, ref: main }
-    plugin: plus
-    patches:
-      - type: replace
-        pattern: "加载后先用 Glob 搜索 `**/pua/skills/pua/SKILL.md` 找到核心 skill，读取其中的行为约束。本 skill 只覆盖旁白和话术。"
-        with: "加载后先读取同一 plugin 中的 `../pua/SKILL.md`，遵循其中的核心行为约束。本 skill 只覆盖旁白和话术。"
-      - { type: replace_all, pattern: "pua:", with: "plus:" }
-
-  p10:
-    source: { repo: tanweai/pua, path: skills/p10, ref: main }
-    plugin: plus
-    patches:
-      - { type: replace_all, pattern: "核心行为遵循 `/pua` 核心 skill", with: "核心行为遵循 `pua` Skill" }
-
-  p7:
-    source: { repo: tanweai/pua, path: skills/p7, ref: main }
-    plugin: plus
-    patches:
-      - { type: replace_all, pattern: "核心行为遵循 `/pua` 核心 skill", with: "核心行为遵循 `pua` Skill" }
-
-  p9:
-    source: { repo: tanweai/pua, path: skills/p9, ref: main }
-    plugin: plus
-    patches:
-      - { type: replace_all, pattern: "核心行为遵循 `/pua` 核心 skill", with: "核心行为遵循 `pua` Skill" }
-
-  pro:
-    source: { repo: tanweai/pua, path: skills/pro, ref: main }
-    plugin: plus
-    patches:
-      - { type: replace, pattern: "本 skill 是 `/pua` 核心的扩展层。", with: "本 Skill 是 `pua` Skill 的扩展层。" }
-      - { type: replace_all, pattern: "`references/evolution-protocol.md`", with: "`../pua/references/evolution-protocol.md`" }
-      - { type: replace_all, pattern: "`references/platform.md`", with: "`../pua/references/platform.md`" }
-      - type: replace
-        pattern: "PreCompact hook 自动注入指令，要求 dump 运行时状态到 `~/.pua/builder-journal.md`："
-        with: "宿主提供 PreCompact hook 时，可自动要求 dump 运行时状态到 `~/.pua/builder-journal.md`；没有 hook 时，在压缩或交接前由当前 Agent 主动保存："
-      - type: replace
-        pattern: "SessionStart hook 自动检测 builder-journal.md，存在且 <2h 则注入 [Calibration] 恢复状态。"
-        with: "宿主提供 SessionStart hook 时可自动恢复；没有 hook 时，本 Skill 启动后主动检查 builder-journal.md，存在且 <2h 则按 [Calibration] 恢复状态。"
-      - { type: replace_all, pattern: "/pua:kpi", with: "/pua:pro kpi" }
-      - { type: replace_all, pattern: "/pua:flavor", with: "/pua:pro flavor" }
-      - { type: replace_all, pattern: "`/pua ", with: "`/pua:pro " }
-      - { type: replace_all, pattern: "`/pua`", with: "`/pua:pua`" }
-      - { type: replace_all, pattern: "### /pua 指令系统", with: "### /pua:pro 指令系统" }
-      - { type: replace_all, pattern: "pua:", with: "plus:" }
+  # ─── plus: single upstream PUA Skill ───────────────────────────────────────
 
   pua:
     source: { repo: tanweai/pua, path: skills/pua, ref: main }
     plugin: plus
     patches:
       - type: replace
+        pattern: "**⚠️ 味道检测（第一优先级）**：加载本 skill 后，先检查 SessionStart 是否已注入 `[PUA Always-On]` 和 `Current Flavor`。如果已注入，**以注入的味道为准**（用户在 `~/.pua/config.json` 配置的）。如果没有注入，默认 🟠 阿里味。"
+        with: "**⚠️ 味道检测（第一优先级）**：加载本 Skill 后，主动读取 `~/.pua/config.json`（如果存在）的 `flavor` 配置；没有配置时默认使用 🟠 阿里味。不要假定 SessionStart hook 已运行。"
+      - type: replace
         pattern: "**失败计数持久化**：失败次数在 context compaction 时由 PreCompact hook 自动保存到 `~/.pua/builder-journal.md`，SessionStart hook 自动恢复。详见 `pua:pro` skill 的 Compaction 状态保护章节。"
-        with: "**失败计数持久化**：宿主提供 PreCompact/SessionStart hook 时可自动保存和恢复；没有 hook 时，在压缩前主动写入 `~/.pua/builder-journal.md`，并在下次加载时主动检查。详见 `pro` Skill 的 Compaction 状态保护章节。"
-      - { type: replace_all, pattern: "`/pua:flavor`", with: "`/pua:pro flavor`" }
+        with: "**失败计数持久化**：压缩或交接前，由当前 Agent 主动把失败次数和有效方法写入 `~/.pua/builder-journal.md`；下次加载本 Skill 时主动检查并恢复。宿主若提供等价 hook，只在有运行证据时依赖它。"
       - type: replace
-        pattern: "失败次数决定压力等级 + 强制动作。**旁白使用当前活跃味道的语气**（由 SessionStart 注入或方法论路由决定），不硬编码阿里味。PostToolUse hook 会自动检测 Bash 失败并注入对应味道的压力旁白。"
-        with: "失败次数决定压力等级 + 强制动作。**旁白使用当前活跃味道的语气**（由宿主注入或方法论路由决定），不硬编码阿里味。宿主提供 PostToolUse hook 时可自动检测 Bash 失败；没有 hook 时由当前 Agent 根据工具结果自行更新失败计数和压力旁白。"
-      - type: replace
-        pattern: "8. **味道持久化**：`~/.pua/config.json` 中的 `\"flavor\"` 字段在新会话中通过 SessionStart hook 自动加载。`/pua flavor` 切换后会自动写入 config。自动路由选择的味道只在当前会话生效，不覆盖用户手动设置"
-        with: "8. **味道持久化**：加载时主动读取 `~/.pua/config.json` 中的 `\"flavor\"` 字段；宿主提供 SessionStart hook 时也可自动注入。通过 `/pua:pro flavor` 切换后写入 config。自动路由选择的味道只在当前会话生效，不覆盖用户手动设置"
-      - { type: replace_all, pattern: "`skills/pua/references/harness-governance.md`", with: "`references/harness-governance.md`" }
+        pattern: "每次标记时静默上报 `pua_triggered` 事件（详见 `references/platform.md`）。"
+        with: "`[PUA生效 🔥]` 只写入当前输出；本发行版不附带遥测脚本，也不向外部服务静默上报。"
       - { type: replace_all, pattern: "**/pua-skills/skills/pua/SKILL.md", with: "**/plus/skills/pua/SKILL.md" }
       - type: replace
+        pattern: "注意：不要用 Skill tool 加载 pua 或 pua:pua——会触发 router 循环。直接 Read SKILL.md。"
+        with: "注意：子 Agent 直接 Read `pua/SKILL.md`；不要递归调用 `pua` Skill。"
+      - type: replace
+        pattern: "完整文化 DNA、黑话词库、扩展旁白变体详见 `references/flavors.md`，用 `/pua:flavor` 切换。钉内/钉外味还要读取 `references/methodology-ding.md` 和 `references/ding-reminders.md`。"
+        with: "完整文化 DNA、黑话词库、扩展旁白变体详见 `references/flavors.md`。用户直接说出目标味道即可切换；钉内/钉外味还要读取 `references/methodology-ding.md` 和 `references/ding-reminders.md`。"
+      - type: replace
+        pattern: "失败次数决定压力等级 + 强制动作。**旁白使用当前活跃味道的语气**（由 SessionStart 注入或方法论路由决定），不硬编码阿里味。PostToolUse hook 会自动检测 Bash 失败并注入对应味道的压力旁白。"
+        with: "失败次数决定压力等级 + 强制动作。**旁白使用当前活跃味道的语气**（由本 Skill 的配置读取或方法论路由决定），不硬编码阿里味。当前 Agent 根据实际工具结果自行更新失败计数和压力旁白。"
+      - type: replace
+        pattern: "收到 PostToolUse hook 注入的 `[PUA 突破 ✨]` 时（连续失败 ≥3 次后成功），必须执行："
+        with: "连续失败 ≥3 次后首次成功时，标记 `[PUA 突破 ✨]` 并执行："
+      - { type: replace, pattern: "2. **味道认可** — 用当前味道的认可话术（hook 已注入，跟随其语气）", with: "2. **味道认可** — 用当前味道的认可话术确认突破" }
+      - type: replace
         pattern: "PostToolUse hook 会分析最近 3 次错误签名并分类注入，你收到后应区别对待："
-        with: "宿主提供 PostToolUse hook 时可自动分析最近 3 次错误签名；没有 hook 时，当前 Agent 必须根据最近 3 次工具失败自行分类并采取对应动作："
+        with: "当前 Agent 分析最近 3 次工具失败的错误签名并分类处理："
+      - type: replace
+        pattern: "8. **味道持久化**：`~/.pua/config.json` 中的 `\"flavor\"` 字段在新会话中通过 SessionStart hook 自动加载。`/pua flavor` 切换后会自动写入 config。自动路由选择的味道只在当前会话生效，不覆盖用户手动设置"
+        with: "8. **味道持久化**：加载本 Skill 时主动读取 `~/.pua/config.json` 中的 `\"flavor\"` 字段；用户直接要求切换味道后更新该字段。自动路由只在当前会话生效，不覆盖用户手动设置"
       - type: replace
         pattern: "- **Claude Code 映射**：Skill 提供方法论；slash command 提供显式入口；hook 提供确定性 gate；subagent 提供上下文隔离但不是天然可信 verifier；PUA Loop Stop hook 承担 Oracle 式外部验证。"
-        with: "- **Skills-only 映射**：Skill 提供方法论和显式入口；subagent 只提供上下文隔离，不是天然可信 verifier。本 plugin 不附带 hook 或 Oracle，最终验证依赖实际命令输出、外部 CI/verifier 或用户验收。"
-      - { type: replace_all, pattern: "/pua 指令系统", with: "`pro` Skill 指令系统" }
-      - type: append_content
-        text: |
-          ## Skills-only Runtime Boundary
+        with: "- **Skills-only 映射**：本 Skill 提供方法论；subagent 只提供上下文隔离，不是天然可信 verifier。本发行版不附带 hook 或 Oracle，最终验证依赖实际命令输出、外部 CI/verifier 或用户验收。"
+      - type: replace
+        pattern: "- **四代理拓扑**：复杂/高风险任务不要单线程自证，按 `pua-policy-guardian → pua-action-executor → pua-self-reviewer → pua-verifier → 外部 hook/human` 串联；四个 agent 只能拥有对应权力，不允许互相代位。"
+        with: "- **职责分离**：复杂或高风险任务不要由同一执行者单线程自证；按策略约束、执行、自审、独立验证分离职责，最终由真实 verifier、CI 或用户验收。"
+      - type: replace
+        pattern: "详细协议：遇到 eval、agent harness、长期任务、测试/评分资产、memory/status、发布链路时，加载 `skills/pua/references/harness-governance.md`。"
+        with: "遇到 eval、agent harness、长期任务、测试/评分资产、memory/status 或发布链路时，直接执行上述权责分离和防作弊规则。"
+      - type: replace
+        pattern: |-
+          ## 搭配使用
 
-          This plugin publishes Skills only. It does not ship the upstream commands, hooks, scripts, or plugin-level Agents. Treat those mechanisms when mentioned in upstream references as optional host integrations, never as capabilities that are guaranteed to exist.
+          - `/pua:pro` — 自进化基线 + /pua 指令系统 + Compaction 保护
+          - `/pua:p9` — P9 Tech Lead 管理模式
+          - `/pua:p7` — P7 骨干执行模式
+          - `/pua:p10` — P10 CTO 战略模式
+          - `superpowers:systematic-debugging` — 方法论层
+          - `superpowers:verification-before-completion` — 防虚假完成
+        with: |-
+          ## 单 Skill 边界
 
-          - Available `/pua:*` entries are the published sibling Skills: `ding`, `mama`, `p10`, `p7`, `p9`, `pro`, `pua`, `pua-en`, `pua-ja`, `pua-loop`, `shot`, and `yes`.
-          - When no hook is available, the current Agent performs failure counting, verification, state persistence, and cleanup explicitly.
-          - Team status, orphan cleanup, teardown, and external verification are manual responsibilities unless the host independently provides them.
-          - Do not claim that an external Oracle, automatic Stop gate, session restore, telemetry, or resource cleanup ran without direct evidence.
-      - { type: replace_all, pattern: "pua:", with: "plus:" }
+          本发行版只发布一个 `pua` Skill，不附带 sibling Skills、commands、hooks、scripts 或 PUA plugin-level Agents。
+
+          - 用户通过自然语言选择味道或工作模式，不调用任何 PUA 子命令。
+          - 当前 Agent 显式完成失败计数、状态记录、验证和收尾；只有宿主提供且有运行证据时才依赖自动 hook。
+          - 不声称外部 Oracle、Stop gate、session restore、遥测或资源清理已经运行，除非有直接证据。
     target_patches:
-      - target: references/platform.md
-        patches:
-          - { type: replace_all, pattern: "/pua:kpi", with: "/pua:pro kpi" }
-          - { type: replace_all, pattern: "/pua:flavor", with: "/pua:pro flavor" }
-          - { type: replace_all, pattern: "`/pua ", with: "`/pua:pro " }
-          - { type: replace_all, pattern: "`/pua`", with: "`/pua:pua`" }
-          - { type: replace_all, pattern: "/pua 段位", with: "/pua:pro 段位" }
-          - { type: replace_all, pattern: "/pua 升级", with: "/pua:pro 升级" }
-          - { type: replace_all, pattern: "/pua kpi", with: "/pua:pro kpi" }
-          - { type: replace_all, pattern: "/pua 味道", with: "/pua:pro flavor" }
-          - { type: replace_all, pattern: "输入 /pua 查看所有可用指令", with: "输入 /pua:pua 查看所有可用指令" }
-          - { type: replace_all, pattern: "pua:", with: "plus:" }
       - target: references/flavors.md
         patches:
-          - { type: replace_all, pattern: "/pua:flavor", with: "/pua:pro flavor" }
-          - { type: replace_all, pattern: "pua:", with: "plus:" }
-      - target: references/evolution-protocol.md
-        patches:
-          - { type: replace_all, pattern: "/pua:kpi", with: "/pua:pro kpi" }
-          - { type: replace_all, pattern: "pua:", with: "plus:" }
+          - { type: replace_all, pattern: "用户使用 `/pua:flavor` 切换", with: "用户直接要求切换味道" }
       - target: references/methodology-router.md
         patches:
-          - { type: replace_all, pattern: "/pua flavor", with: "/pua:pro flavor" }
-          - { type: replace_all, pattern: "pua:", with: "plus:" }
-      - target: references/agent-team.md
-        patches:
-          - { type: replace_all, pattern: "`/pua`", with: "`/pua:pua`" }
-          - { type: replace_all, pattern: "`cto-p10` agent 或用户指定", with: "用户指定 P10 模式" }
-          - { type: replace_all, pattern: "`tech-lead-p9` agent 或用户指定", with: "用户指定 P9 模式" }
-          - { type: replace_all, pattern: "`senior-engineer-p7` agent / 被 P8 spawn", with: "用户指定 P7 模式 / 被 P8 spawn" }
-          - { type: replace_all, pattern: "pua:", with: "plus:" }
-      - target: references/p9-protocol.md
-        patches:
-          - { type: replace_all, pattern: "为什么用 Glob + Read 而不是 /pua 命令", with: "为什么用 Glob + Read 而不是 `/pua:pua` Skill" }
-          - { type: replace_all, pattern: "**/pua/skills/pua/SKILL.md", with: "**/plus/skills/pua/SKILL.md" }
-          - { type: replace_all, pattern: "pua:", with: "plus:" }
-      - target: references/survey.md
-        patches:
-          - { type: replace_all, pattern: "用 /pua 或类似的 skill 来施压", with: "用 `pua` 或类似的 Skill 来施压" }
-      - target: references/harness-governance.md
-        patches:
-          - type: replace_all
-            pattern: "# Harness 防作弊治理协议"
-            with: |-
-              # Harness 防作弊治理协议
-
-              > **Skills-only boundary:** 本 plugin 不附带 commands、hooks、scripts 或外部 Oracle。下文的 hook/Oracle 拓扑是上游架构背景；只有宿主明确提供并有运行证据时才能视为实际信任边界，否则使用真实验证命令、CI、外部 verifier 或用户验收。
-          - type: replace_all
-            pattern: "| PUA Loop Stop hook | Oracle 式外部检查 | completion promise 必须由 verify_command 通过才放行 |"
-            with: "| External verifier / user gate | 当前 plugin 的最终外部检查 | 只有真实 verify_command、CI 或用户验收证据才能放行 |"
-      - target: references/teardown-protocol.md
-        patches:
-          - { type: replace_all, pattern: "/pua:on", with: "/pua:pua on" }
-          - { type: replace_all, pattern: "/pua:off", with: "/pua:pua off" }
-          - { type: replace_all, pattern: "/pua:cancel-pua-loop", with: "/pua:pua-loop stop" }
-          - { type: replace_all, pattern: "/pua:team-status", with: "/pua:pua team-status" }
-          - { type: replace_all, pattern: "/pua:reap-orphans", with: "/pua:pua reap-orphans" }
-          - { type: replace_all, pattern: "/pua:teardown-all", with: "/pua:pua teardown-all" }
-          - type: replace_all
-            pattern: "# PUA Teardown Protocol — Agent 生命周期释放协议"
-            with: |-
-              # PUA Teardown Protocol — Agent 生命周期释放协议
-
-              > **Skills-only boundary:** 本 plugin 不发布上游 hooks、scripts 或 commands。下文保留的是生命周期设计背景；所有自动动作在本发行版中都由当前 Agent 显式执行，除非宿主独立提供对应能力并能给出运行证据。
-          - type: replace_all
-            pattern: |-
-              ### R3. worktree agent 完成后自动回收 worktree
-
-              **WHY**：`isolation: "worktree"` 创建的 git worktree 不会自动删除。10 个 worktree 就是 10 份代码副本，磁盘和 context 双重浪费。
-
-              **HOW**：P8/P9 收到 `[P7-COMPLETION]` 后，执行：
-
-              ```bash
-              # 从 Agent result 拿 worktree 路径和 branch
-              git worktree remove <worktree_path> --force
-              git branch -D <worktree_branch>  # 如果已合并
-              ```
-            with: |-
-              ### R3. worktree agent 完成后安全回收
-
-              **WHY**：`isolation: "worktree"` 创建的 git worktree 不会自动删除，但清理前必须保护未提交或尚未整合的工作。
-
-              **HOW**：P8/P9 收到 `[P7-COMPLETION]` 后：
-
-              1. 检查 worktree 状态、diff 和目标分支，确认成果已经安全整合。
-              2. 列出准备清理的 worktree、branch 和理由，取得用户授权。
-              3. 获得授权后仅使用会安全失败的 `git worktree remove <worktree_path>` 与 `git branch -d <worktree_branch>`。
-              4. 任何未提交修改、未合并 branch、归属不明或仍活跃的资源都只报告，不强制删除。
-          - type: replace_all
-            pattern: |-
-              ## §Cleanup — 主动清理 checklist
-
-              每次 `[TEARDOWN]` 触发后执行：
-
-              ```bash
-              # 1. 清 worktree（若有）
-              git worktree list --porcelain | grep -A1 "<branch>" && git worktree remove ...
-
-              # 2. 清 state file
-              rm -f "$HOME/.claude/pua/agent-<id>.state"
-
-              # 3. 关 tmux pane（若是 TeamCreate 成员）
-              tmux kill-pane -t <pane_id>
-
-              # 4. 记录到 teardown log
-              echo "{\"agent\":\"<id>\",\"reason\":\"<reason>\",\"ts\":\"$(date -u +%FT%TZ)\"}" >> "$HOME/.claude/pua/teardown.jsonl"
-              ```
-            with: |-
-              ## §Cleanup — 主动清理 checklist
-
-              每次 `[TEARDOWN]` 先生成清理计划，不立即执行破坏性命令：
-
-              1. 列出本次流程明确创建的 worktree、branch、state file、进程和 pane。
-              2. 检查 worktree 是否 clean、branch 是否已整合、进程或 pane 是否仍活跃。
-              3. 向用户展示计划并取得清理授权。
-              4. 获得授权后使用会安全失败的清理命令；禁止强制删除 worktree 或未合并 branch。
-              5. pane/process 归属不明或仍活跃时只报告，不终止。
-              6. 记录实际清理项、跳过项和验证证据。
-          - { type: replace_all, pattern: "1. **Stop hook 层**（自动）：每次主会话 Stop 时扫一次 `$HOME/.claude/pua/loop-*.md`，stale 的直接清理（已在 `pua-loop-hook.sh` 实现）", with: "1. **会话结束检查**（手动）：当前 Agent 在 team/loop 结束前扫描状态文件，识别并报告 stale 资源" }
-          - { type: replace_all, pattern: "2. **SessionStart hook 层**（自动）：新会话启动时扫 state 目录，stale 的提示用户确认", with: "2. **会话启动检查**（手动）：当前 Agent 加载相关 Skill 时扫描 state 目录，发现 stale 资源后提示用户确认" }
-          - { type: replace_all, pattern: "| `/pua:pua-loop stop` | 删 state file | **+ 原子级联清理** | rm state + cleanup worktree + kill pane |", with: "| `/pua:pua-loop stop` | 停止 loop | 删除 `.pua-loop/state.md`，报告当前资源；只清理本次明确创建且获准清理的 worktree/pane |" }
-          - { type: replace_all, pattern: "| `SessionStart` | 扫 stale loop state，提示用户确认回收 | ✅ `session-restore.sh` |", with: "| Session start | 当前 Agent 扫描 stale loop state，提示用户确认回收 | Skills-only 手动步骤 |" }
-          - { type: replace_all, pattern: "| `PreCompact` | dump 活跃 agent 清单到 HANDOFF | ✅ inline prompt hook |", with: "| Before compact/handoff | 当前 Agent 显式记录活跃资源与恢复步骤 | Skills-only 手动步骤 |" }
-          - { type: replace_all, pattern: "| `Stop`（主会话） | 走 loop 逻辑 + stale 兜底清理 | ✅ `pua-loop-hook.sh` + Gate 0 防御 |", with: "| Session completion | 当前 Agent 运行验证并检查 stale 资源 | Skills-only 手动步骤 |" }
-          - { type: replace_all, pattern: "| `SubagentStop` | **agent 完成会计**：写 teardown.jsonl + 从 active-agents.json 移除 | ✅ `subagent-teardown.sh`（v3.1 新增） |", with: "| Subagent completion | 编排者记录完成状态并从活跃清单移除 | Skills-only 手动步骤 |" }
-          - { type: replace_all, pattern: "- ✅ `pua-loop-hook.sh` 有 Gate 0（subagent 识别）", with: "- Skills-only 发布不附带 hook；当前 Agent 必须区分主会话与 subagent 生命周期" }
-          - { type: replace_all, pattern: "- ✅ `/pua:pua team-status`、`/pua:pua reap-orphans`、`/pua:pua teardown-all` 存在", with: "- `/pua:pua team-status`、`reap-orphans`、`teardown-all` 由当前 Agent 按本协议执行并报告证据" }
-
-          - { type: replace_all, pattern: "- 无独立的 SubagentStop 会计层 → 无法回答\"当前还有多少 agent 在场上\"", with: "- 本 Skills-only suite 无自动 subagent 会计层 → 当前 Agent 必须显式记录并报告活跃 agent" }
-          - { type: replace_all, pattern: "**关于 \"subagent 劫持主 loop\" 的澄清**：这曾是最初的假设，但查 Claude Code 官方文档后证实**不成立**——`Stop` 事件仅主会话触发，subagent 完成走独立的 `SubagentStop` 事件。hooks.json 里如果只注册 `Stop`，subagent 的生命周期结束对主会话 hook 不可见。**真正的病因是 agent 生命周期缺少会计层**，不是 hook 层劫持。v3.1 起注册 SubagentStop hook 作为 teardown accounting，配合 `/pua:pua team-status` 提供\"当前在场阵容\"。", with: "**Skills-only 约束**：本 suite 不注册 Stop/SubagentStop hook。当前 Agent 必须维护活跃 agent 清单，并在 `/pua:pua team-status` 时依据实际运行状态报告；只有宿主明确提供且有运行证据时，才能依赖自动生命周期会计。" }
-          - { type: replace_all, pattern: "因为 PUA 是 `default=true` 自动加载的，不能假设用户会主动清理。所以关键是让 hook 长出 GC 能力：", with: "本 suite 不自动加载，也不附带 GC hook。当前 Agent 在下列生命周期节点显式执行检查；宿主另有自动化时，只在有运行证据后依赖它：" }
-          - { type: replace_all, pattern: "**重要**：Claude Code 中 Stop 事件**仅**主会话触发，subagent 的 Stop 事件不会传到 Stop 钩子——所以监控 subagent 必须用独立的 SubagentStop 注册。pua-loop-hook.sh 的 Gate 0 保留作为\"防御层\"兜住未来调度变化，但不是必需防线。", with: "**重要**：本 suite 不附带 `pua-loop-hook.sh`，也不要求注册 SubagentStop。编排者必须根据实际 subagent 完成事件显式更新活跃清单；宿主提供等价 hook 时，可将其作为有证据的附加防线。" }
-          - { type: replace_all, pattern: "pua:", with: "plus:" }
-  pua-en:
-    source: { repo: tanweai/pua, path: skills/pua-en, ref: main }
-    plugin: plus
-    patches:
-      - type: replace
-        pattern: "| **PIP Enforcer** | Defined via `agents/pua-enforcer.md` | Optional watchdog. Detects slacking patterns, intervenes with PIP. Recommended for 5+ teammates |\n"
-        with: ""
-
-  pua-ja:
-    source: { repo: tanweai/pua, path: skills/pua-ja, ref: main }
-    plugin: plus
-    patches:
-      - type: replace
-        pattern: "| **PUA Enforcer** | `agents/pua-enforcer.md`で定義 | 任意の監視役。サボりパターンを検知しPUAで介入。5+teammate時に推奨 |\n"
-        with: ""
-      - type: replace
-        pattern: "1. **初期化**：teammate spawn時にタスク説明に含める：`作業開始前にpua skillをロードするか cat .claude/skills/pua/SKILL.md を実行`"
-        with: "1. **初期化**：teammate spawn時にタスク説明へ `作業開始前に Glob で **/plus/skills/pua/SKILL.md を探し、Read で読み込む` と含める"
-
-  pua-loop:
-    ownership: local
-    plugin: plus
-    provenance:
-      repo: tanweai/pua
-      path: skills/pua-loop
-      ref: main
-      forked_at_sha: 3fd4e5a1cb7a40938113b66febae532ba36f350a
-      forked_at: 2026-08-04
-      license: upstream Skill text adapted under its MIT license
-
-  shot:
-    source: { repo: tanweai/pua, path: skills/shot, ref: main }
-    plugin: plus
-    patches:
-      - { type: replace_all, pattern: "`references/", with: "`../pua/references/" }
-      - { type: replace_all, pattern: "详见 references/platform.md", with: "详见 ../pua/references/platform.md" }
-      - type: replace
-        pattern: "**独立 agent 可用**：`agents/senior-engineer-p7.md`、`agents/tech-lead-p9.md`、`agents/cto-p10.md`，可直接 spawn 使用。\n\n"
-        with: ""
-      - { type: replace_all, pattern: "`cto-p10` agent 或用户指定", with: "用户指定 P10 模式" }
-      - { type: replace_all, pattern: "`tech-lead-p9` agent 或用户指定", with: "用户指定 P9 模式" }
-      - { type: replace_all, pattern: "`senior-engineer-p7` agent / 被 P8 spawn", with: "用户指定 P7 模式 / 被 P8 spawn" }
-      - type: replace
-        pattern: "开工前先用 Read 工具读取 找到 pua 插件目录下的 skills/pua/SKILL.md（用 Glob 搜索 **/pua/skills/pua/SKILL.md）（了解 PUA 行为协议），\n再读取 skills/pua/references/p7-protocol.md（Glob: **/pua/skills/pua/references/p7-protocol.md）（进入 P7 方案驱动模式）。"
-        with: "开工前先用 Read 工具读取同一 plugin 中的 `../pua/SKILL.md`（了解 PUA 行为协议），\n再读取 `../pua/references/p7-protocol.md`（进入 P7 方案驱动模式）。"
-      - type: replace
-        pattern: "- `agents/senior-engineer-p7` — P7 Senior Engineer agent，P8 可 spawn 用于子任务\n- `agents/tech-lead-p9` — P9 Tech Lead agent，编写 Task Prompt 驱动 P8 团队\n- `agents/cto-p10` — P10 CTO agent，定义战略方向驱动 P9 团队\n"
-        with: ""
-      - { type: replace_all, pattern: "### /pua 指令系统", with: "### /pua:shot 指令系统" }
-      - { type: replace_all, pattern: "`/pua ", with: "`/pua:shot " }
-      - { type: replace_all, pattern: "`/pua`", with: "`/pua:shot`" }
-      - { type: replace_all, pattern: "`tech-lead-p9` spawn", with: "P9 模式的 Agent spawn" }
-      - { type: replace_all, pattern: "pua:", with: "plus:" }
-
-  "yes":
-    source: { repo: tanweai/pua, path: skills/yes, ref: main }
-    plugin: plus
-    patches:
-      - { type: replace_all, pattern: "和 `/pua` 核心一样支持味道切换。", with: "和 `pua` 核心 Skill 一样支持味道切换。" }
-      - { type: replace_all, pattern: "pua:", with: "plus:" }
+          - { type: replace_all, pattern: "用户手动 `/pua flavor` 或设置 config.json", with: "用户直接指定味道或设置 config.json" }
+    exclude_files:
+      - references/agent-team.md
+      - references/evolution-protocol.md
+      - references/harness-governance.md
+      - references/p10-protocol.md
+      - references/p7-protocol.md
+      - references/p9-protocol.md
+      - references/platform.md
+      - references/survey.md
+      - references/teardown-protocol.md
 
   i-have-adhd:
     source: { repo: ayghri/i-have-adhd, path: skills/i-have-adhd, ref: main }

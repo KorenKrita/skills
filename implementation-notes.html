@@ -64,11 +64,19 @@
     </article>
     <article id="pua-skills-only-in-plus-2026-08-04">
       <h2>PUA 完整 Skills-only 套件保留在 plus</h2>
-      <p><strong>状态：</strong>user-corrected</p>
+      <p><strong>状态：</strong>superseded by ADR-0007</p>
       <p><strong>日期：</strong>2026-08-04</p>
       <p><strong>背景：</strong>此前只同步 <code>tanweai/pua/skills/pua</code> 到 <code>plus</code>，但正文引用的 <code>pro</code>、<code>p7</code>、<code>p9</code>、<code>p10</code> 位于上游兄弟目录，形成悬空 Skill 路由。用户要求补齐上游独立 Skills、继续放在既有 <code>plus</code> 中，并且不发布 commands。</p>
       <p><strong>决策：</strong><code>plus</code> 发布上游 <code>skills/</code> 下全部 12 个 PUA Skill；其中 11 个按上游 SHA <code>3fd4e5a</code> 同步，硬依赖 setup script/Stop hook 的 <code>pua-loop</code> 改为无 hook 的本地单 Agent 迭代版本。不发布 commands、hooks、PUA plugin-level Agents 或 scripts。恢复核心 <code>pua/references</code> 的完整 payload，以声明式 patch 修正跨 Skill 相对路径、移除未发布 Agent 文件引用、为缺失 hook 提供当前 Agent 的显式回退，并将 Claude Code namespace 适配为 <code>/plus:&lt;skill&gt;</code>。最初新增独立 <code>pua</code> plugin 是未经授权的分类变化，已撤销。详见 ADR-0006。</p>
       <p><strong>版本：</strong><code>plus</code> 最终升至 <code>0.0.12</code>；Marketplace 仍只发布 <code>base</code> 与 <code>plus</code>。</p>
+    </article>
+    <article id="single-pua-skill-in-plus-2026-08-04">
+      <h2>plus 恢复为单一 PUA Skill</h2>
+      <p><strong>状态：</strong>user-corrected</p>
+      <p><strong>日期：</strong>2026-08-04</p>
+      <p><strong>背景：</strong>将上游 PUA 兄弟 Skills 全部发布是对“确认正文路由来源”的错误扩大；用户只需要原有的一个 <code>pua</code> Skill。</p>
+      <p><strong>决策：</strong>删除 <code>ding</code>、<code>mama</code>、<code>p10</code>、<code>p7</code>、<code>p9</code>、<code>pro</code>、<code>pua-en</code>、<code>pua-ja</code>、<code>pua-loop</code>、<code>shot</code>、<code>yes</code>；<code>plus</code> 只同步 <code>tanweai/pua/skills/pua</code>。通过声明式 patch 移除 sibling 路由和自动 hook/遥测保证，并排除团队层级、付费平台、loop 和多 Skill suite references。详见 ADR-0007。</p>
+      <p><strong>版本：</strong><code>plus</code> 升至 <code>0.0.13</code>；最终为 <code>base</code> 7 个、<code>plus</code> 8 个，共 15 个 Skill。</p>
     </article>
   </main>
 </body>

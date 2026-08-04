@@ -6,7 +6,7 @@
 
 ```text
 plugins/base/skills/<skill>/SKILL.md      核心工程与协作流程（7）
-plugins/plus/skills/<skill>/SKILL.md      工程、思考、工具、写作与 PUA Skills（19）
+plugins/plus/skills/<skill>/SKILL.md      工程、思考、工具、写作与单一 PUA Skill（8）
 plugins/plus/agents/*.md                  plus 的 Claude Code subagents
 overrides.yaml                            Skill 归属：上游来源、改名、排除、patch，本地自有声明
 marketplace.yaml                          两个 plugin 的 Marketplace 元数据
@@ -28,14 +28,14 @@ npm run sync
 - 所有修改必须遵守根目录 `AGENTS.md` 的 plugin 版本递增规则。
 - 上游 Skill 的修改通过 `overrides.yaml` 声明，不直接维护漂移副本。
 - 本地自有 Skill 在 `overrides.yaml` 中用 `ownership: local` 声明并记录 fork provenance；同步流程跳过它们，inventory、布局和 Marketplace 校验照常生效。
-- 当前本地自有 Skill 是 `base/improve-codebase-architecture` 与 `plus/pua-loop`。
+- 当前唯一的本地自有 Skill 是 `base/improve-codebase-architecture`。
 - Skill 目录名必须等于 `SKILL.md` frontmatter 的 `name`。
 - 同一个 Skill name 在整个仓库只出现一次，避免 Pi 递归发现 collision。
 - `.claude-plugin/marketplace.json` 由 `marketplace.yaml` 生成。
 - `.sync-state.json` 由同步流程维护，只覆盖上游 Skill；结构迁移时必须与上游 overrides key 和上游文件清单一起迁移。
-- `base` 固定 7 个 Skill、`plus` 固定 19 个；Skill 正文不得调用仓库不再发布的 Skill。
+- `base` 固定 7 个 Skill、`plus` 固定 8 个；Skill 正文不得调用仓库不再发布的 Skill。
 - `plus/agents` 仅对 Claude Code 生效；Pi 只加载 `plugins/*/skills`。
-- `plus` 中的 PUA suite 只同步上游独立 Skills，不发布上游 commands、hooks、plugin-level Agents 或 scripts。
+- `plus` 只发布一个上游 `pua` Skill，不发布其兄弟 Skills、commands、hooks、PUA plugin-level Agents 或 scripts。
 - 仓库只发布 `base` 和 `plus` 两个 plugin。
 
 ## Agent skills

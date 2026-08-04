@@ -21,7 +21,7 @@
 
 ```text
 base               核心工程与协作流程
-base + plus  全部 26 个 Skill
+base + plus  全部 15 个 Skill
 ```
 
 ### Pi
@@ -57,13 +57,13 @@ pi install -l git:github.com/KorenKrita/skills
 | Plugin | 内容 | Skill 数量 |
 |---|---|---:|
 | **base** | 核心工程与协作流程 | 7 |
-| **plus** | 决策方法、代码质量审查、读取工具、中文写作优化、架构图与 PUA suite | 19 |
+| **plus** | 决策方法、代码质量审查、读取工具、中文写作优化、架构图与单一 PUA Skill | 8 |
 
 `plus` 还附带：
 
 - `agents/nuclear-review.md`：`nuclear-review` Skill 的 Claude Code subagent。
 
-`plus` 中的 PUA suite 仅发布独立 Skills，不附带上游 commands、hooks 或 plugin-level Agents。
+`plus` 只发布一个 `pua` Skill；不附带上游 PUA commands、hooks、scripts、兄弟 Skills 或 plugin-level Agents。
 
 Pi 加载两个 plugin 的 `skills/`；`plus` 的 plugin-level Agent 仅对 Claude Code 生效。
 
