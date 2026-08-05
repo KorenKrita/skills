@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "base",
-      "version": "0.0.5",
+      "version": "0.0.6",
       "source": "./plugins/base",
       "description": "核心工程与协作流程：调试、原型、架构改进、访谈、交接、教学与 Skill 写作",
       "strict": false,

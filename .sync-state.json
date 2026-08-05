@@ -41,10 +41,10 @@
       "agents/openai.yaml"
     ]
   },
-  "writing-great-skills": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
+  "writing-for-agents": {
+    "sha": "0986ebaf5d29e812162702b2633a2942c30200d2",
     "files": [
-      "GLOSSARY.md",
+      "SKILL-MECHANICS.md",
       "SKILL.md",
       "agents/openai.yaml"
     ]

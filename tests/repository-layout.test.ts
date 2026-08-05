@@ -29,7 +29,7 @@ const EXPECTED_SKILLS = {
     "improve-codebase-architecture",
     "prototype",
     "teach",
-    "writing-great-skills",
+    "writing-for-agents",
   ],
   plus: [
     "archify",
@@ -328,6 +328,19 @@ describe("repository layout", () => {
     const skill = readFileSync(join(ROOT, "plugins", "base", "skills", "grill-me", "SKILL.md"), "utf-8")
     expect(skill).toContain("Interview the user relentlessly")
     expect(skill).not.toContain("Run a `/grilling` session")
+  })
+
+  it("keeps writing-for-agents metadata and sync patches aligned with its new identity", () => {
+    const entry = readOverrides().skills["writing-for-agents"]
+    const metadata = readFileSync(
+      join(ROOT, "plugins", "base", "skills", "writing-for-agents", "agents", "openai.yaml"),
+      "utf-8",
+    )
+
+    expect(metadata).toContain('display_name: "Writing for Agents"')
+    expect(metadata).toContain('short_description: "Write predictable agent-facing docs"')
+    expect(metadata).not.toContain("Writing Great Skills")
+    expect(entry?.target_patches?.map(({ target }) => target)).toContain("agents/openai.yaml")
   })
 
   it("keeps the local architecture skill free of removed skill and subagent calls", () => {

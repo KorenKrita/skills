@@ -43,10 +43,15 @@ skills:
     plugin: base
     patches: []
 
-  writing-great-skills:
-    source: { repo: mattpocock/skills, path: skills/productivity/writing-great-skills, ref: main }
+  writing-for-agents:
+    source: { repo: mattpocock/skills, path: skills/productivity/writing-for-agents, ref: main }
     plugin: base
     patches: []
+    target_patches:
+      - target: agents/openai.yaml
+        patches:
+          - { type: replace_all, pattern: "Writing Great Skills", with: "Writing for Agents" }
+          - { type: replace_all, pattern: "Principles for predictable skills", with: "Write predictable agent-facing docs" }
 
   # ─── base: locally owned Skills ───────────────────────────────────────────
 
