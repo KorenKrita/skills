@@ -29,6 +29,7 @@ const EXPECTED_SKILLS = {
     "improve-codebase-architecture",
     "prototype",
     "teach",
+    "to-questionnaire",
     "writing-for-agents",
     "wizard",
   ],

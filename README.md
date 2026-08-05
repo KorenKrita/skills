@@ -21,7 +21,7 @@
 
 ```text
 base               核心工程与协作流程
-base + plus  全部 17 个 Skill
+base + plus  全部 18 个 Skill
 ```
 
 ### Pi
@@ -56,7 +56,7 @@ pi install -l git:github.com/KorenKrita/skills
 
 | Plugin | 内容 | Skill 数量 |
 |---|---|---:|
-| **base** | 核心工程与协作流程 | 8 |
+| **base** | 核心工程与协作流程 | 9 |
 | **plus** | 决策方法、代码质量审查、读取工具、中文写作优化、架构图、白话重述与单一 PUA Skill | 9 |
 
 `plus` 还附带：

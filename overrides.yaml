@@ -38,6 +38,11 @@ skills:
     plugin: base
     patches: []
 
+  to-questionnaire:
+    source: { repo: mattpocock/skills, path: skills/productivity/to-questionnaire, ref: main }
+    plugin: base
+    patches: []
+
   wizard:
     source: { repo: mattpocock/skills, path: skills/engineering/wizard, ref: main }
     plugin: base
