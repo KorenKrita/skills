@@ -326,7 +326,7 @@ describe("repository layout", () => {
 
     // The interview protocol is inlined; the old wrapper only forwarded to /grilling.
     const skill = readFileSync(join(ROOT, "plugins", "base", "skills", "grill-me", "SKILL.md"), "utf-8")
-    expect(skill).toContain("Interview me relentlessly")
+    expect(skill).toContain("Interview the user relentlessly")
     expect(skill).not.toContain("Run a `/grilling` session")
   })
 
