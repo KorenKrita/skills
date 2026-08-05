@@ -38,6 +38,11 @@ skills:
     plugin: base
     patches: []
 
+  wizard:
+    source: { repo: mattpocock/skills, path: skills/engineering/wizard, ref: main }
+    plugin: base
+    patches: []
+
   teach:
     source: { repo: mattpocock/skills, path: skills/productivity/teach, ref: main }
     plugin: base

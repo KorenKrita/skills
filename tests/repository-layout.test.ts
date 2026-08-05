@@ -30,6 +30,7 @@ const EXPECTED_SKILLS = {
     "prototype",
     "teach",
     "writing-for-agents",
+    "wizard",
   ],
   plus: [
     "archify",
