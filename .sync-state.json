@@ -1,6 +1,6 @@
 {
   "diagnosing-bugs": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
+    "sha": "2ffb184ffbb752faa664c0b204f3c9241b1428e9",
     "files": [
       "SKILL.md",
       "agents/openai.yaml",
@@ -8,7 +8,7 @@
     ]
   },
   "prototype": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
+    "sha": "2ffb184ffbb752faa664c0b204f3c9241b1428e9",
     "files": [
       "LOGIC.md",
       "SKILL.md",
@@ -17,21 +17,21 @@
     ]
   },
   "grill-me": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
+    "sha": "2ffb184ffbb752faa664c0b204f3c9241b1428e9",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "handoff": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
+    "sha": "2ffb184ffbb752faa664c0b204f3c9241b1428e9",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "teach": {
-    "sha": "2ab958093e83e0ec752e6c1c5932da465bf23e0c",
+    "sha": "2ffb184ffbb752faa664c0b204f3c9241b1428e9",
     "files": [
       "GLOSSARY-FORMAT.md",
       "LEARNING-RECORD-FORMAT.md",
@@ -125,7 +125,7 @@
     ]
   },
   "archify": {
-    "sha": "19213e107f47733132e8958dd78f3a7fb8c6e225",
+    "sha": "ed9e91f6f9caae036b6ec95f7e00d09b8af961a4",
     "files": [
       "LICENSE",
       "SKILL.md",
@@ -170,6 +170,7 @@
       "renderers/shared/legend.mjs",
       "renderers/shared/output-path.mjs",
       "renderers/shared/repository-evidence.mjs",
+      "renderers/shared/text-fit.mjs",
       "renderers/shared/utils.mjs",
       "renderers/shared/validator.mjs",
       "renderers/workflow/README.md",
