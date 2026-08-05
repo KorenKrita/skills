@@ -59,7 +59,7 @@
     ]
   },
   "nuclear-review": {
-    "sha": "fa16d695b35ccf4ea179d976e5aaee0834a25b0b",
+    "sha": "8185ad9fbb903efc7d1cf152a9be9777e516cfbc",
     "files": [
       "SKILL.md"
     ]
@@ -110,7 +110,7 @@
     ]
   },
   "i-have-adhd": {
-    "sha": "d05af1e4ac2259846e81686d14180d46d84acc2d",
+    "sha": "0047e0d323af880d4a32acbcc8bf58b3ca3bb280",
     "files": [
       "SKILL.md",
       "agents/gemini.toml",
@@ -125,7 +125,7 @@
     ]
   },
   "archify": {
-    "sha": "2c1f8ac2ca28a26d0b68043ec80c9554e20ff0e3",
+    "sha": "19213e107f47733132e8958dd78f3a7fb8c6e225",
     "files": [
       "LICENSE",
       "SKILL.md",
