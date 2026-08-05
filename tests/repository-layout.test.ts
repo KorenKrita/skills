@@ -47,7 +47,7 @@ const EXPECTED_SKILLS = {
 const EXPECTED_SKILL_COUNT = Object.values(EXPECTED_SKILLS).flat().length
 
 /** Skills this repository maintains itself, excluded from upstream sync. */
-const LOCAL_SKILLS = ["improve-codebase-architecture"] as const
+const LOCAL_SKILLS = ["bro", "improve-codebase-architecture"] as const
 
 /** base Skills removed from the subscription; nothing may still route to them. */
 const REMOVED_BASE_SKILLS = [
@@ -182,7 +182,8 @@ describe("repository layout", () => {
       expect(existsSync(join(ROOT, "plugins", entry!.plugin, "skills", skill)), skill).toBe(true)
     }
 
-    expect(upstreamOwnedNames(overrides.skills)).not.toContain(LOCAL_SKILLS[0])
+    const upstreamNames = upstreamOwnedNames(overrides.skills)
+    for (const skill of LOCAL_SKILLS) expect(upstreamNames).not.toContain(skill)
   })
 
   it("routes to no removed base skill from any surviving runtime file", () => {
@@ -341,6 +342,21 @@ describe("repository layout", () => {
     expect(metadata).toContain('short_description: "Write predictable agent-facing docs"')
     expect(metadata).not.toContain("Writing Great Skills")
     expect(entry?.target_patches?.map(({ target }) => target)).toContain("agents/openai.yaml")
+  })
+
+  it("keeps bro as the local context-aware re-pitch Skill", () => {
+    const entry = readOverrides().skills.bro
+    const skill = readFileSync(join(ROOT, "plugins", "plus", "skills", "bro", "SKILL.md"), "utf-8")
+
+    expect(entry?.ownership).toBe("local")
+    expect(entry?.provenance?.path).toBe("skills/productivity/wait-what")
+    expect(entry?.provenance?.original_repo).toBe("dmmulroy/.dotfiles")
+    expect(entry?.provenance?.original_path).toBe("home/.agents/skills/bro")
+    expect(entry?.provenance?.original_sha).toBe("c2322c6534f586b146ae0e8d9296019396aa32c0")
+    expect(entry?.provenance?.original_license).toContain("no license declared")
+    expect(skill).toContain("Re-pitch your last message")
+    expect(skill).toContain("ASD-STE100 Simplified Technical English")
+    expect(skill).toContain("`CONTEXT.md` when that file exists")
   })
 
   it("keeps the local architecture skill free of removed skill and subagent calls", () => {
