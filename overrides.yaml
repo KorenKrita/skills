@@ -67,6 +67,11 @@ skills:
 
   # ─── plus: engineering, thinking, tools, and writing ───────────────────────
 
+  bro:
+    source: { repo: dmmulroy/.dotfiles, path: home/.agents/skills/bro, ref: main }
+    plugin: plus
+    patches: []
+
   improve:
     source: { repo: shadcn/improve, path: skills/improve, ref: main }
     plugin: plus

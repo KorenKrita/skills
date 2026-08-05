@@ -33,6 +33,7 @@ const EXPECTED_SKILLS = {
   ],
   plus: [
     "archify",
+    "bro",
     "humanizer-zh",
     "i-have-adhd",
     "improve",

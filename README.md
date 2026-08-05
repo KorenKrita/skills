@@ -21,7 +21,7 @@
 
 ```text
 base               核心工程与协作流程
-base + plus  全部 15 个 Skill
+base + plus  全部 16 个 Skill
 ```
 
 ### Pi
@@ -57,7 +57,7 @@ pi install -l git:github.com/KorenKrita/skills
 | Plugin | 内容 | Skill 数量 |
 |---|---|---:|
 | **base** | 核心工程与协作流程 | 7 |
-| **plus** | 决策方法、代码质量审查、读取工具、中文写作优化、架构图与单一 PUA Skill | 8 |
+| **plus** | 决策方法、代码质量审查、读取工具、中文写作优化、架构图、白话重述与单一 PUA Skill | 9 |
 
 `plus` 还附带：
 
@@ -83,6 +83,7 @@ Pi 加载两个 plugin 的 `skills/`；`plus` 的 plugin-level Agent 仅对 Clau
 - [op7418/Humanizer-zh](https://github.com/op7418/Humanizer-zh)
 - [tanweai/pua](https://github.com/tanweai/pua)
 - [tt-a1i/archify](https://github.com/tt-a1i/archify)
+- [dmmulroy/.dotfiles](https://github.com/dmmulroy/.dotfiles)
 
 ## 许可证
 

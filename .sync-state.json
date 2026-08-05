@@ -185,5 +185,11 @@
       "scripts/generate-validators.mjs",
       "scripts/render-examples.mjs"
     ]
+  },
+  "bro": {
+    "sha": "c2322c6534f586b146ae0e8d9296019396aa32c0",
+    "files": [
+      "SKILL.md"
+    ]
   }
 }
