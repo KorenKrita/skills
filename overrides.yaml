@@ -60,8 +60,7 @@ skills:
     target_patches:
       - target: agents/openai.yaml
         patches:
-          - { type: replace_all, pattern: "Writing Great Skills", with: "Writing for Agents" }
-          - { type: replace_all, pattern: "Principles for predictable skills", with: "Write predictable agent-facing docs" }
+          - { type: replace_all, pattern: "Write documents agents consume", with: "Write predictable agent-facing docs" }
 
   # ─── base: locally owned Skills ───────────────────────────────────────────
 
