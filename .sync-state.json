@@ -1,6 +1,6 @@
 {
   "diagnosing-bugs": {
-    "sha": "0986ebaf5d29e812162702b2633a2942c30200d2",
+    "sha": "8b36d4fb2635b3c21998dcd8144439c9e5ba7302",
     "files": [
       "SKILL.md",
       "agents/openai.yaml",
@@ -8,7 +8,7 @@
     ]
   },
   "prototype": {
-    "sha": "0986ebaf5d29e812162702b2633a2942c30200d2",
+    "sha": "8b36d4fb2635b3c21998dcd8144439c9e5ba7302",
     "files": [
       "LOGIC.md",
       "SKILL.md",
@@ -17,28 +17,28 @@
     ]
   },
   "grill-me": {
-    "sha": "0986ebaf5d29e812162702b2633a2942c30200d2",
+    "sha": "8b36d4fb2635b3c21998dcd8144439c9e5ba7302",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "handoff": {
-    "sha": "0986ebaf5d29e812162702b2633a2942c30200d2",
+    "sha": "8b36d4fb2635b3c21998dcd8144439c9e5ba7302",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "to-questionnaire": {
-    "sha": "0986ebaf5d29e812162702b2633a2942c30200d2",
+    "sha": "8b36d4fb2635b3c21998dcd8144439c9e5ba7302",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "wizard": {
-    "sha": "0986ebaf5d29e812162702b2633a2942c30200d2",
+    "sha": "8b36d4fb2635b3c21998dcd8144439c9e5ba7302",
     "files": [
       "SKILL.md",
       "agents/openai.yaml",
@@ -46,7 +46,7 @@
     ]
   },
   "teach": {
-    "sha": "0986ebaf5d29e812162702b2633a2942c30200d2",
+    "sha": "8b36d4fb2635b3c21998dcd8144439c9e5ba7302",
     "files": [
       "GLOSSARY-FORMAT.md",
       "LEARNING-RECORD-FORMAT.md",
@@ -57,7 +57,7 @@
     ]
   },
   "writing-for-agents": {
-    "sha": "0986ebaf5d29e812162702b2633a2942c30200d2",
+    "sha": "8b36d4fb2635b3c21998dcd8144439c9e5ba7302",
     "files": [
       "SKILL-MECHANICS.md",
       "SKILL.md",
@@ -125,7 +125,7 @@
     ]
   },
   "i-have-adhd": {
-    "sha": "0047e0d323af880d4a32acbcc8bf58b3ca3bb280",
+    "sha": "b837bf132b9d05765c5deed5b30935f562abba86",
     "files": [
       "SKILL.md",
       "agents/gemini.toml",
@@ -140,7 +140,7 @@
     ]
   },
   "archify": {
-    "sha": "ed9e91f6f9caae036b6ec95f7e00d09b8af961a4",
+    "sha": "5875dc81b5c77c7004d7c1d297dda470fce97f50",
     "files": [
       "LICENSE",
       "SKILL.md",
