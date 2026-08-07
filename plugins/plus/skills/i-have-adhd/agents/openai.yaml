@@ -4,4 +4,4 @@ interface:
   default_prompt: "Use $i-have-adhd to make this response action-first and easy to execute."
 
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false
