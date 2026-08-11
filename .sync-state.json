@@ -74,7 +74,7 @@
     ]
   },
   "nuclear-review": {
-    "sha": "9490cc1cf95d5de2e4941196cdac00dd861812a4",
+    "sha": "6f7e183aa9f48805c38746705fe6a17d42cafb94",
     "files": [
       "SKILL.md"
     ]
@@ -125,7 +125,7 @@
     ]
   },
   "i-have-adhd": {
-    "sha": "30a743050db79a357111a7fa1f6b41ebc310af02",
+    "sha": "2ed064090711586e0c97a2fbbf15465fe8f1808b",
     "files": [
       "SKILL.md",
       "agents/gemini.toml",
