@@ -23,7 +23,6 @@ Lifecycle JSON files must set:
   "diagram_type": "lifecycle",
   "meta": {
     "title": "Agent Run Lifecycle",
-    "subtitle": "Lifecycle phases, interruptions, recovery, and terminal exits",
     "viewBox": [980, 660]
   },
   "lanes": [],

@@ -31,9 +31,50 @@ its typed topology. Adding `meta.legend` makes the presentation intentional and
 strict: if its resolved labels cannot fit the authored viewBox, shorten or hide
 them, or widen the viewBox using the emitted diagnostic.
 
+## Language consistency
+
+Default all reader-facing authored copy to the language of the user's request,
+or to the conversation's dominant language when the request itself is
+language-neutral. Apply that choice to titles, subtitles, node and relationship
+copy, boundaries, lanes, groups, guided views, legend labels, and cards. Use
+another language or bilingual copy only when the user asks for it.
+
+Keep exact product names, code identifiers, commands, protocols, API paths, and
+environment names intact. Those terms may remain English inside localized copy,
+but surrounding explanatory prose must still use the selected language. For a
+non-English diagram, localize visible semantic legend labels through
+`meta.legend.entries`; renderer-owned viewer controls remain separate from
+authored copy and are not a reason to mix languages in the specification.
+
+## Visual preset default
+
+Omit `meta.visual_preset` by default. The renderer then opens the diagram in
+`classic` for both light and dark color modes. Color mode and visual preset are
+independent viewer state: switching Light / Dark must preserve the current
+preset. Author `signal-flow`, `blueprint`, or `editorial` only when the user
+explicitly requests that visual style.
+
+## Engineering profile default
+
+Omit `meta.engineering_profile` for an ordinary system architecture. Region,
+cluster, and security boundary wording do not by themselves enable an
+engineering profile. Enable `deployment-ownership` only when the user
+explicitly asks for a production deployment topology, ownership handoff, or
+fail-closed deployment review and the source facts are known. Once enabled,
+do not remove the engineering profile merely to pass validation; repair the
+authored facts or report the diagnostics truthfully.
+
+## Title hierarchy
+
+Use one concise title and let the diagram carry the explanation. Omit
+`meta.subtitle` by default, and never use it to restate the title, nodes, edges,
+or cards. Include one short supporting line only when the user explicitly asks
+for a subtitle; an omitted or blank subtitle must not leave an empty visual row
+in the generated viewer.
+
 ## Executable geometry rules
 
-- Node anchors are side midpoints. `left`/`right` change the horizontal endpoint; `top`/`bottom` change the vertical endpoint.
+- Node anchors start at side midpoints. `left`/`right` change the horizontal endpoint; `top`/`bottom` change the vertical endpoint. For an automatic Architecture relationship, unobstructed facing ports whose axis offset is under 16px may share one horizontal or vertical axis when both endpoints retain the 16px corner gutter. If exactly one endpoint belongs to a spread group, only its unshared counterpart moves; relationships spread at both endpoints keep their distinct ports and outside bridge.
 - A side is a direction contract. The first and final route segment must be perpendicular and outward/inward in the named direction.
 - Automatic Port Spread is a default renderer behavior for architecture, workflow, data-flow, and lifecycle diagrams. Shared automatic endpoints spread deterministically and symmetrically with a 16px corner gutter. It does not apply to sequence messages, single relationships, or explicit `via`, `channelX`, `channelY`, `labelAt`, or non-`auto` routes.
 - Showcase route rhythm: every nonzero segment must be at least 8px; every interior segment must be at least 16px. When spread ports are nearly parallel, the router uses a 24px endpoint stub and a 16px outside bridge instead of manufacturing a tiny dogleg.
@@ -53,7 +94,14 @@ label mask width ≈ 6.5px × ASCII units + 13px
 CJK characters count as two units
 ```
 
-If the gap is too small, prefer an unlabeled obvious edge. Otherwise increase the clear gap or apply a diagnosed `labelAt`, `labelDx`/`labelDy`, or `labelSegment`. Never guess several geometry controls at once.
+Relationship labels are semantic data. If the gap is too small, move the label,
+adjust the route or spacing, then shorten the wording while preserving meaning.
+Only delete a label when both endpoints fully imply the relationship and it
+contains no protocol, action, direction, synchronous/asynchronous behavior, or
+cross-boundary mechanism. Explain why a deleted label is redundant. Never
+delete a meaningful label merely to pass `showcase`. Apply a diagnosed
+`labelAt`, `labelDx`/`labelDy`, or `labelSegment` before guessing several
+geometry controls at once.
 
 ### Repair order
 

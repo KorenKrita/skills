@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="generator" content="archify 2.13.0">
+  <meta name="generator" content="archify 2.14.0">
   <title>[PROJECT NAME] Architecture Diagram</title>
   <script>
     // Resolve the theme before first paint so light-preference users don't
@@ -50,7 +50,7 @@
       --text: #ffffff;
       --text-muted: #94a3b8;
       --text-dim: #475569;
-      /* UI chrome (menu hints, footer) needs more contrast than SVG .t-dim accents */
+      /* UI chrome and menu hints need more contrast than SVG .t-dim accents */
       --text-faint: #7d8da1;
 
       --panel: rgba(15, 23, 42, 0.5);
@@ -397,7 +397,6 @@
     html[data-embed="true"] .toolbar,
     html[data-embed="true"] .header,
     html[data-embed="true"] .cards,
-    html[data-embed="true"] .footer,
     html[data-embed="true"] .diagram-nav,
     html[data-embed="true"] .overview-map,
     html[data-embed="true"] .focus-chip,
@@ -593,16 +592,29 @@
       height: 100%;
       min-width: 0;
     }
-    html[data-present="true"]:not([data-embed="true"]) .cards,
-    html[data-present="true"]:not([data-embed="true"]) .footer { display: none; }
+    html[data-present="true"]:not([data-embed="true"]) .cards { display: none; }
     html[data-present="true"]:not([data-embed="true"]) #btn-present {
       border-color: var(--frontend-stroke);
       color: var(--frontend-stroke);
     }
 
-    .container { max-width: 1200px; margin: 0 auto; }
+    /* The reader owns only the outer scale. Wide diagrams keep one authored
+       SVG/viewBox while the runtime chooses a desktop width from the actual
+       vertical budget. This avoids device-specific files and breakpoint
+       jumps between a laptop and a tall monitor. */
+    .container {
+      width: 100%;
+      max-width: var(--archify-reader-width, 1440px);
+      margin: 0 auto;
+    }
+    @media (min-width: 768px) and (max-height: 920px) {
+      .header { margin-bottom: 1rem; }
+      .diagram-container { padding: 1rem; }
+      .cards { margin-top: 1rem; }
+      .card { padding: 1rem; }
+    }
 
-    .header { margin-bottom: 2rem; padding-right: 29.5rem; }
+    .header { margin-bottom: 1.5rem; padding-right: 29.5rem; }
 
     html[data-preset="signal-flow"] .header,
     html[data-preset="blueprint"] .header,
@@ -903,14 +915,18 @@
       z-index: 12;
       display: inline-flex;
       align-items: center;
-      padding: 0.25rem;
-      gap: 0.2rem;
-      border: 1px solid var(--toolbar-border);
-      border-radius: 0.65rem;
-      background: var(--toolbar-bg);
-      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+      max-width: calc(100% - 2rem);
+      padding: 0.15rem;
+      gap: 0;
+      overflow-x: auto;
+      border: 1px solid color-mix(in srgb, var(--toolbar-border) 48%, transparent);
+      border-radius: 0.58rem;
+      background: color-mix(in srgb, var(--toolbar-bg) 82%, transparent);
+      box-shadow: 0 5px 14px rgba(0, 0, 0, 0.07);
       backdrop-filter: blur(10px);
+      scrollbar-width: none;
     }
+    .diagram-nav::-webkit-scrollbar { display: none; }
     .diagram-nav button,
     .focus-chip button,
     .guided-views button {
@@ -923,10 +939,13 @@
     .diagram-nav button {
       min-width: 2rem;
       height: 2rem;
-      padding: 0 0.45rem;
-      border-radius: 0.4rem;
-      font-size: 0.75rem;
+      padding: 0 0.35rem;
+      border-radius: 0.35rem;
+      color: color-mix(in srgb, var(--toolbar-text) 68%, transparent);
+      font-size: 0.56rem;
       font-weight: 600;
+      letter-spacing: 0.02em;
+      transition: background 0.15s, color 0.15s;
     }
     .diagram-nav button:hover,
     .diagram-nav button:focus-visible,
@@ -941,11 +960,86 @@
       outline-offset: 1px;
     }
     .diagram-nav button:disabled { opacity: 0.38; cursor: default; }
-    .diagram-nav [data-view="reset"] { min-width: 3.35rem; font-size: 0.625rem; }
-    .diagram-container[data-camera-indicator="true"] .diagram-nav [data-view="reset"] {
-      min-width: 5.2rem;
-      color: var(--frontend-stroke);
+    .diagram-nav button:disabled:hover { background: transparent; }
+    .diagram-nav #btn-route-probe,
+    .diagram-nav #btn-overview-map,
+    .diagram-nav #btn-semantic-lens {
+      min-width: auto;
+      padding-inline: 0.5rem;
+      color: color-mix(in srgb, var(--toolbar-text) 86%, transparent);
+      font-weight: 650;
     }
+    .diagram-nav #btn-node-finder,
+    .diagram-nav [data-view="out"] {
+      position: relative;
+      margin-left: 0.25rem;
+    }
+    .diagram-nav #btn-node-finder::before,
+    .diagram-nav [data-view="out"]::before {
+      position: absolute;
+      top: 0.4rem;
+      bottom: 0.4rem;
+      left: -0.13rem;
+      width: 1px;
+      background: color-mix(in srgb, var(--toolbar-border) 62%, transparent);
+      content: "";
+      pointer-events: none;
+    }
+    .diagram-nav-icon {
+      display: block;
+      width: 0.72rem;
+      height: 0.72rem;
+      margin: auto;
+      background: currentColor;
+      -webkit-mask-position: center;
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-size: contain;
+      mask-position: center;
+      mask-repeat: no-repeat;
+      mask-size: contain;
+    }
+    .diagram-nav-icon.find {
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='8.5' cy='8.5' r='4.5' fill='none' stroke='black' stroke-width='1.8'/%3E%3Cpath d='m12 12 4 4' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='8.5' cy='8.5' r='4.5' fill='none' stroke='black' stroke-width='1.8'/%3E%3Cpath d='m12 12 4 4' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+    }
+    .diagram-nav-icon.guide {
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='7' fill='none' stroke='black' stroke-width='1.7'/%3E%3Cpath d='M7.8 7.3a2.4 2.4 0 014.6.9c0 1.8-2.4 2-2.4 3.7M10 14.9h.01' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E");
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='7' fill='none' stroke='black' stroke-width='1.7'/%3E%3Cpath d='M7.8 7.3a2.4 2.4 0 014.6.9c0 1.8-2.4 2-2.4 3.7M10 14.9h.01' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E");
+    }
+    .diagram-nav-icon.minus {
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 10h10' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 10h10' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+    }
+    .diagram-nav-icon.plus {
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 5v10M5 10h10' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 5v10M5 10h10' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E");
+    }
+    .diagram-nav [data-view="reset"] {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.2rem;
+      min-width: 3.1rem;
+      padding-inline: 0.35rem;
+    }
+    .diagram-nav [data-view="reset"][data-detail-visible] {
+      min-width: 3.8rem;
+    }
+    .diagram-nav-detail {
+      color: color-mix(in srgb, var(--toolbar-text) 52%, transparent);
+      font-size: 0.44rem;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 0.07em;
+    }
+    .diagram-nav-percent {
+      color: color-mix(in srgb, var(--toolbar-text) 84%, transparent);
+      font-size: 0.55rem;
+      font-weight: 650;
+      line-height: 1;
+    }
+    .diagram-container[data-camera-indicator="true"] .diagram-nav-detail,
+    .diagram-container[data-camera-indicator="true"] .diagram-nav-percent { color: var(--frontend-stroke); }
     .diagram-nav #btn-diagram-guide[aria-expanded="true"] {
       color: var(--cloud-stroke);
       background: var(--toolbar-hover);
@@ -2696,6 +2790,20 @@
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82), 0 12px 32px rgba(45, 78, 99, 0.08);
     }
 
+    /* Preserve the one-screen guarantee on ordinary laptop displays. The
+       high-screen expansion above must not trade a fuller canvas for page
+       scrolling at 900–1080px heights. */
+    @media (min-width: 768px) and (max-height: 1100px) {
+      .header { margin-bottom: 1rem; }
+      .diagram-container { padding: 0.875rem; }
+      .cards { margin-top: 1rem; }
+      .card { padding: 1rem; }
+    }
+    @media (min-width: 768px) and (max-height: 920px) {
+      .header { margin-bottom: 0.875rem; }
+      .cards { margin-top: 0.75rem; }
+    }
+
     html[data-preset="blueprint"] .card {
       position: relative;
       border-color: var(--panel-border);
@@ -2758,26 +2866,6 @@
     }
 
     .card li { margin-bottom: 0.375rem; }
-
-    .footer {
-      text-align: center;
-      margin-top: 1.5rem;
-      color: var(--text-faint);
-      font-size: 0.75rem;
-    }
-
-    .footer .artifact-start-link {
-      color: var(--text-faint);
-      text-decoration-color: color-mix(in srgb, var(--frontend-stroke) 48%, transparent);
-      text-underline-offset: 0.22em;
-      transition: color 0.15s ease, text-decoration-color 0.15s ease;
-    }
-
-    .footer .artifact-start-link:hover,
-    .footer .artifact-start-link:focus-visible {
-      color: var(--frontend-stroke);
-      text-decoration-color: currentColor;
-    }
 
     /* ==========================================================
        Print stylesheet — hide interactive controls, force light,
@@ -2876,7 +2964,12 @@
       top: 1rem;
       right: 1rem;
       display: flex;
+      align-items: center;
       gap: 0.5rem;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
       z-index: 100;
     }
     .toolbar button {
@@ -2884,13 +2977,15 @@
       color: var(--toolbar-text);
       border: 1px solid var(--toolbar-border);
       padding: 0.5rem 0.875rem;
-      border-radius: 0.5rem;
+      border-radius: 0.625rem;
       font-family: inherit;
       font-size: 0.75rem;
       font-weight: 500;
       cursor: pointer;
-      backdrop-filter: blur(8px);
-      transition: background 0.15s, border-color 0.15s;
+      white-space: nowrap;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
       display: inline-flex;
       align-items: center;
       gap: 0.375rem;
@@ -2898,7 +2993,22 @@
     }
     .toolbar button:hover {
       background: var(--toolbar-hover);
-      border-color: var(--arrow);
+      border-color: color-mix(in srgb, var(--arrow) 62%, var(--toolbar-border));
+    }
+    .toolbar button[aria-expanded="true"],
+    .toolbar button[aria-pressed="true"]:not(#btn-theme) {
+      background: color-mix(in srgb, var(--frontend-stroke) 10%, var(--toolbar-hover));
+      border-color: color-mix(in srgb, var(--frontend-stroke) 48%, var(--toolbar-border));
+    }
+    .toolbar #btn-export {
+      padding-right: 0.82rem;
+      padding-left: 0.82rem;
+    }
+    .toolbar #btn-export:hover,
+    .toolbar #btn-export[aria-expanded="true"] {
+      color: var(--toolbar-text);
+      background: color-mix(in srgb, var(--frontend-stroke) 10%, var(--toolbar-hover));
+      border-color: color-mix(in srgb, var(--frontend-stroke) 54%, var(--toolbar-border));
     }
     .toolbar button:focus-visible {
       outline: 2px solid var(--frontend-stroke);
@@ -2907,7 +3017,49 @@
     .toolbar #btn-motion[hidden] { display: none !important; }
     .toolbar #btn-motion { min-width: 4.4rem; }
     .toolbar #btn-motion:disabled { cursor: default; opacity: 0.58; }
-    .toolbar .preset-wrap { position: relative; }
+    .toolbar .preset-wrap,
+    .toolbar .export-wrap {
+      position: relative;
+    }
+    .toolbar-icon {
+      display: inline-block;
+      width: 0.95rem;
+      height: 0.95rem;
+      flex: 0 0 auto;
+      background: currentColor;
+      -webkit-mask-position: center;
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-size: contain;
+      mask-position: center;
+      mask-repeat: no-repeat;
+      mask-size: contain;
+    }
+    .toolbar-chevron {
+      width: 0.65rem;
+      height: 0.65rem;
+      transition: transform 0.15s ease;
+    }
+    [aria-expanded="true"] > .toolbar-chevron { transform: rotate(180deg); }
+    [data-theme="light"] #theme-icon {
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cg fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round'%3E%3Ccircle cx='10' cy='10' r='3.1'/%3E%3Cpath d='M10 2.2v1.4M10 16.4v1.4M2.2 10h1.4M16.4 10h1.4M4.5 4.5l1 1M14.5 14.5l1 1M15.5 4.5l-1 1M5.5 14.5l-1 1'/%3E%3C/g%3E%3C/svg%3E");
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cg fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round'%3E%3Ccircle cx='10' cy='10' r='3.1'/%3E%3Cpath d='M10 2.2v1.4M10 16.4v1.4M2.2 10h1.4M16.4 10h1.4M4.5 4.5l1 1M14.5 14.5l1 1M15.5 4.5l-1 1M5.5 14.5l-1 1'/%3E%3C/g%3E%3C/svg%3E");
+    }
+    [data-theme="dark"] #theme-icon {
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M15.2 12.7A6.3 6.3 0 017.3 4.8a6.3 6.3 0 107.9 7.9Z' fill='none' stroke='black' stroke-width='1.7' stroke-linejoin='round'/%3E%3C/svg%3E");
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M15.2 12.7A6.3 6.3 0 017.3 4.8a6.3 6.3 0 107.9 7.9Z' fill='none' stroke='black' stroke-width='1.7' stroke-linejoin='round'/%3E%3C/svg%3E");
+    }
+    #btn-present[aria-pressed="false"] #present-icon {
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M7.2 3.2h-4v4M12.8 3.2h4v4M7.2 16.8h-4v-4M12.8 16.8h4v-4' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E");
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M7.2 3.2h-4v4M12.8 3.2h4v4M7.2 16.8h-4v-4M12.8 16.8h4v-4' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E");
+    }
+    #btn-present[aria-pressed="true"] #present-icon {
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M7.2 7.2h-4v-4M12.8 7.2h4v-4M7.2 12.8h-4v4M12.8 12.8h4v4' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E");
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M7.2 7.2h-4v-4M12.8 7.2h4v-4M7.2 12.8h-4v4M12.8 12.8h4v4' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E");
+    }
+    .toolbar-chevron {
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='m3 4.5 3 3 3-3' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='m3 4.5 3 3 3-3' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    }
     .toolbar #btn-preset { min-width: 5.4rem; }
     .preset-control-mark {
       width: 0.58rem;
@@ -2940,14 +3092,24 @@
       top: calc(100% + 0.375rem);
       right: 0;
       display: none;
-      width: 16.5rem;
-      padding: 0.4rem;
+      width: 18.5rem;
+      max-width: calc(100vw - 2rem);
+      padding: 0.45rem;
       border: 1px solid var(--toolbar-border);
-      border-radius: 0.5rem;
+      border-radius: 0.875rem;
       background: var(--toolbar-menu-bg);
-      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24);
     }
     .toolbar .preset-menu.open { display: block; }
+    .toolbar .preset-menu.open,
+    .toolbar .export-menu.open {
+      animation: toolbar-menu-in 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
+      transform-origin: top right;
+    }
+    @keyframes toolbar-menu-in {
+      from { opacity: 0; transform: translateY(-0.25rem) scale(0.985); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
     .preset-menu-heading {
       display: flex;
       align-items: baseline;
@@ -2973,12 +3135,18 @@
       min-height: 3.35rem;
       padding: 0.5rem 0.62rem;
       border: 0;
-      border-radius: 0.34rem;
+      border-radius: 0.5rem;
       background: transparent;
+      box-shadow: none;
+      backdrop-filter: none;
       text-align: left;
     }
     .toolbar .preset-option:hover,
     .toolbar .preset-option:focus-visible { background: var(--toolbar-hover); }
+    .toolbar .preset-option[aria-checked="true"] {
+      background: color-mix(in srgb, var(--frontend-stroke) 9%, transparent);
+      border-color: color-mix(in srgb, var(--frontend-stroke) 36%, transparent);
+    }
     .preset-option-swatch {
       position: relative;
       width: 2rem;
@@ -3076,8 +3244,19 @@
       text-overflow: ellipsis;
     }
     .preset-option-check {
+      display: inline-block;
+      width: 0.9rem;
+      height: 0.9rem;
       color: var(--frontend-stroke);
-      font-size: 0.78rem;
+      background: currentColor;
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3 8.5 3 3 7-7' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      -webkit-mask-position: center;
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-size: contain;
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3 8.5 3 3 7-7' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      mask-position: center;
+      mask-repeat: no-repeat;
+      mask-size: contain;
       opacity: 0;
     }
     .preset-option[aria-checked="true"] .preset-option-check { opacity: 1; }
@@ -3107,42 +3286,171 @@
       background: transparent;
       box-shadow: none;
     }
-    .toolbar .export-wrap { position: relative; }
     .toolbar .export-menu {
       position: absolute;
       top: calc(100% + 0.375rem);
       right: 0;
       background: var(--toolbar-menu-bg);
       border: 1px solid var(--toolbar-border);
-      border-radius: 0.5rem;
-      padding: 0.375rem;
-      min-width: 160px;
+      width: 19rem;
+      max-width: calc(100vw - 2rem);
+      max-height: calc(100vh - 5.5rem);
+      overflow-y: auto;
+      border-radius: 0.875rem;
+      padding: 0.55rem;
       display: none;
       flex-direction: column;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+      box-shadow: 0 18px 48px rgba(0,0,0,0.24);
     }
     .toolbar .export-menu.open { display: flex; }
-    .toolbar .export-menu button {
-      background: transparent;
-      border: 0;
+    .export-menu-header {
+      display: flex;
+      align-items: flex-start;
       justify-content: space-between;
+      gap: 1rem;
+      padding: 0.5rem 0.55rem 0.72rem;
+    }
+    .export-menu-header strong,
+    .export-menu-header span { display: block; }
+    .export-menu-header strong {
+      color: var(--toolbar-text);
+      font-size: 0.78rem;
+      font-weight: 650;
+      letter-spacing: -0.015em;
+    }
+    .export-menu-header span {
+      margin-top: 0.16rem;
+      color: var(--text-faint);
+      font-size: 0.56rem;
+    }
+    .export-menu-header kbd {
+      padding: 0.16rem 0.36rem;
+      border: 1px solid var(--toolbar-border);
+      border-radius: 0.3rem;
+      color: var(--text-faint);
+      background: color-mix(in srgb, var(--toolbar-border) 16%, transparent);
+      font-family: inherit;
+      font-size: 0.54rem;
+      font-weight: 600;
+    }
+    .export-menu-section {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.18rem;
+    }
+    .export-menu-section + .export-menu-section {
+      margin-top: 0.42rem;
+      padding-top: 0.42rem;
+      border-top: 1px solid color-mix(in srgb, var(--toolbar-border) 68%, transparent);
+    }
+    .export-menu-heading {
+      grid-column: 1 / -1;
+      display: block;
+      padding: 0.24rem 0.55rem 0.2rem;
+      color: var(--text-faint);
+      font-size: 0.54rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .toolbar .export-menu button {
+      display: grid;
+      grid-template-columns: 1.15rem minmax(0, 1fr);
+      align-items: center;
+      column-gap: 0.52rem;
+      background: transparent;
+      border: 1px solid transparent;
+      box-shadow: none;
+      backdrop-filter: none;
       width: 100%;
+      min-height: 3rem;
       text-align: left;
-      padding: 0.5rem 0.75rem;
+      padding: 0.48rem 0.55rem;
+      border-radius: 0.5rem;
+      white-space: nowrap;
+    }
+    .export-item-copy {
+      display: block;
+      min-width: 0;
+    }
+    .export-item-copy strong,
+    .export-item-copy small { display: block; }
+    .export-item-copy strong {
+      overflow: hidden;
+      color: inherit;
+      font-size: 0.7rem;
+      font-weight: 550;
+      text-overflow: ellipsis;
+    }
+    .export-item-copy small {
+      margin-top: 0.12rem;
+      overflow: hidden;
+      color: var(--text-faint);
+      font-size: 0.55rem;
+      font-weight: 450;
+      text-overflow: ellipsis;
+    }
+    .toolbar .export-menu button::before {
+      width: 1rem;
+      height: 1rem;
+      background: currentColor;
+      content: "";
+      opacity: 0.72;
+      -webkit-mask-position: center;
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-size: contain;
+      mask-position: center;
+      mask-repeat: no-repeat;
+      mask-size: contain;
+    }
+    .toolbar .export-menu button[data-format="share-card"]::before,
+    .toolbar .export-menu button[data-action="route-share-card"]::before,
+    .toolbar .export-menu button[data-action="reach-share-card"]::before {
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='none' stroke='black' stroke-width='1.7' d='M3 4.5h14v11H3zM6 12l2.5-2.5 2 2 1.5-1.5 2 2'/%3E%3Ccircle cx='13.8' cy='7.3' r='1.2' fill='black'/%3E%3C/svg%3E");
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='none' stroke='black' stroke-width='1.7' d='M3 4.5h14v11H3zM6 12l2.5-2.5 2 2 1.5-1.5 2 2'/%3E%3Ccircle cx='13.8' cy='7.3' r='1.2' fill='black'/%3E%3C/svg%3E");
+    }
+    .toolbar .export-menu button[data-action^="copy"]::before {
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Crect x='6' y='6' width='10' height='10' rx='1.5' fill='none' stroke='black' stroke-width='1.7'/%3E%3Cpath d='M4 13H3.5A1.5 1.5 0 012 11.5v-8A1.5 1.5 0 013.5 2h8A1.5 1.5 0 0113 3.5V4' fill='none' stroke='black' stroke-width='1.7'/%3E%3C/svg%3E");
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Crect x='6' y='6' width='10' height='10' rx='1.5' fill='none' stroke='black' stroke-width='1.7'/%3E%3Cpath d='M4 13H3.5A1.5 1.5 0 012 11.5v-8A1.5 1.5 0 013.5 2h8A1.5 1.5 0 0113 3.5V4' fill='none' stroke='black' stroke-width='1.7'/%3E%3C/svg%3E");
+    }
+    .toolbar .export-menu button[data-format="png"]::before,
+    .toolbar .export-menu button[data-format="jpeg"]::before,
+    .toolbar .export-menu button[data-format="webp"]::before {
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 2.5h7l3 3v12H5zM12 2.5v3h3' fill='none' stroke='black' stroke-width='1.7'/%3E%3Cpath d='M7.5 14l2-2 1.5 1.5 1.5-1.5' fill='none' stroke='black' stroke-width='1.7'/%3E%3C/svg%3E");
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 2.5h7l3 3v12H5zM12 2.5v3h3' fill='none' stroke='black' stroke-width='1.7'/%3E%3Cpath d='M7.5 14l2-2 1.5 1.5 1.5-1.5' fill='none' stroke='black' stroke-width='1.7'/%3E%3C/svg%3E");
+    }
+    .toolbar .export-menu button[data-format="svg"]::before,
+    .toolbar .export-menu button[data-format="webm"]::before {
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 2.5l7 4v7l-7 4-7-4v-7zM3 6.5l7 4 7-4M10 10.5v7' fill='none' stroke='black' stroke-width='1.7'/%3E%3C/svg%3E");
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 2.5l7 4v7l-7 4-7-4v-7zM3 6.5l7 4 7-4M10 10.5v7' fill='none' stroke='black' stroke-width='1.7'/%3E%3C/svg%3E");
+    }
+    .toolbar .export-menu button[data-format="share-card"],
+    .toolbar .export-menu button[data-action="route-share-card"],
+    .toolbar .export-menu button[data-action="reach-share-card"] {
+      min-height: 3.35rem;
+      color: var(--toolbar-text);
+      background: color-mix(in srgb, var(--frontend-stroke) 8%, transparent);
+      border-color: color-mix(in srgb, var(--frontend-stroke) 24%, var(--toolbar-border));
     }
     .toolbar .export-menu button[hidden] { display: none; }
     .toolbar .export-menu button:hover {
       background: var(--toolbar-hover);
     }
+    .toolbar .export-menu button:focus-visible {
+      background: var(--toolbar-hover);
+      outline-offset: -2px;
+    }
+    .toolbar .export-menu button:disabled {
+      color: var(--text-faint);
+      background: color-mix(in srgb, var(--toolbar-border) 18%, transparent);
+      cursor: not-allowed;
+    }
+    .toolbar .export-menu button:disabled:hover {
+      border-color: transparent;
+    }
     .toolbar .export-menu .hint {
       color: var(--text-faint);
-      font-size: 0.625rem;
-    }
-    .toolbar .export-menu hr {
-      border: 0;
-      border-top: 1px solid var(--toolbar-border);
-      margin: 0.25rem 0.375rem;
-      opacity: 0.5;
+      font-size: 0.55rem;
     }
 
     /* Toast — brief feedback for actions like "copied" */
@@ -3171,16 +3479,21 @@
 
     @media (max-width: 720px) {
       body { padding: 1rem; }
-      .toolbar .preset-menu {
+      .toolbar .preset-menu,
+      .toolbar .export-menu {
         position: fixed;
         top: 4.5rem;
         right: 1rem;
         left: 1rem;
         width: auto;
+        max-width: none;
       }
       .toolbar {
         position: relative;
         justify-content: flex-end;
+        width: max-content;
+        max-width: 100%;
+        margin-left: auto;
         margin-bottom: 1rem;
       }
       .header { margin-bottom: 1.25rem; padding-right: 0; }
@@ -3242,6 +3555,12 @@
         transform: translateX(var(--archify-scroll-x, 0px));
       }
       .diagram-nav { right: 0.5rem; bottom: 0.5rem; }
+      .diagram-nav button {
+        min-width: 2.75rem;
+        height: 2.75rem;
+      }
+      .diagram-nav [data-view="reset"] { min-width: 3.75rem; }
+      .diagram-nav [data-view="reset"][data-detail-visible] { min-width: 4.35rem; }
       .overview-map {
         right: 0.5rem;
         bottom: 3.7rem;
@@ -3498,8 +3817,19 @@
       }
     }
 
+    @media (max-width: 420px) {
+      .export-menu-section { grid-template-columns: 1fr; }
+      .export-menu-heading,
+      .toolbar .export-menu button[data-format="share-card"],
+      .toolbar .export-menu button[data-action="route-share-card"],
+      .toolbar .export-menu button[data-action="reach-share-card"] { grid-column: 1; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .guided-story-caption { animation: none !important; }
+      .toolbar .preset-menu.open,
+      .toolbar .export-menu.open { animation: none; }
+      .toolbar-chevron { transition: none; }
     }
 
     @media (max-width: 360px) {
@@ -3688,7 +4018,7 @@
     }
     svg [data-legend-count-badge] text {
       fill: var(--text-muted);
-      font-size: 7px;
+      font-size: 8px;
       font-weight: 700;
       text-anchor: middle;
     }
@@ -4411,7 +4741,7 @@
             title="Toggle theme (T)"
             aria-label="Toggle color theme"
             aria-pressed="false">
-      <span id="theme-icon" aria-hidden="true">&#9790;</span>
+      <span id="theme-icon" class="toolbar-icon" aria-hidden="true"></span>
       <span id="theme-label">Dark</span>
     </button>
     <div class="preset-wrap">
@@ -4424,29 +4754,29 @@
               aria-keyshortcuts="S">
         <span class="preset-control-mark" aria-hidden="true"></span>
         <span id="preset-label">Style</span>
-        <span aria-hidden="true">&#9662;</span>
+        <span class="toolbar-icon toolbar-chevron" aria-hidden="true"></span>
       </button>
       <div class="preset-menu" id="preset-menu" role="menu" aria-label="Visual style">
         <div class="preset-menu-heading" role="presentation"><span>Visual identity</span><span>S cycles</span></div>
         <button class="preset-option" data-preset-value="classic" type="button" role="menuitemradio" aria-checked="false" tabindex="-1">
           <span class="preset-option-swatch classic" aria-hidden="true"></span>
           <span class="preset-option-copy"><strong>Classic</strong><small>Stable technical default</small></span>
-          <span class="preset-option-check" aria-hidden="true">&#10003;</span>
+          <span class="preset-option-check" aria-hidden="true"></span>
         </button>
         <button class="preset-option" data-preset-value="signal-flow" type="button" role="menuitemradio" aria-checked="false" tabindex="-1">
           <span class="preset-option-swatch signal-flow" aria-hidden="true"></span>
           <span class="preset-option-copy"><strong>Signal Flow</strong><small>Motion-forward presentation</small></span>
-          <span class="preset-option-check" aria-hidden="true">&#10003;</span>
+          <span class="preset-option-check" aria-hidden="true"></span>
         </button>
         <button class="preset-option" data-preset-value="blueprint" type="button" role="menuitemradio" aria-checked="false" tabindex="-1">
           <span class="preset-option-swatch blueprint" aria-hidden="true"></span>
           <span class="preset-option-copy"><strong>Blueprint</strong><small>Engineering review</small></span>
-          <span class="preset-option-check" aria-hidden="true">&#10003;</span>
+          <span class="preset-option-check" aria-hidden="true"></span>
         </button>
         <button class="preset-option" data-preset-value="editorial" type="button" role="menuitemradio" aria-checked="false" tabindex="-1">
           <span class="preset-option-swatch editorial" aria-hidden="true"></span>
           <span class="preset-option-copy"><strong>Editorial</strong><small>Publication and launch notes</small></span>
-          <span class="preset-option-check" aria-hidden="true">&#10003;</span>
+          <span class="preset-option-check" aria-hidden="true"></span>
         </button>
       </div>
     </div>
@@ -4461,7 +4791,7 @@
             title="Presentation stage (F)"
             aria-label="Enter presentation stage"
             aria-pressed="false">
-      <span id="present-icon" aria-hidden="true">&#9633;</span>
+      <span id="present-icon" class="toolbar-icon" aria-hidden="true"></span>
       <span id="present-label">Present</span>
     </button>
     <div class="export-wrap">
@@ -4471,22 +4801,32 @@
               aria-haspopup="menu"
               aria-expanded="false"
               aria-controls="export-menu">
-        Export <span aria-hidden="true">&#9662;</span>
+        Export <span class="toolbar-icon toolbar-chevron" aria-hidden="true"></span>
       </button>
       <div class="export-menu" id="export-menu" role="menu" aria-label="Export">
-        <button data-format="share-card" type="button" role="menuitem" tabindex="-1">Share Card <span class="hint">1200&times;630 PNG</span></button>
-        <button data-action="route-share-card" type="button" role="menuitem" tabindex="-1" hidden disabled>Route Share Card <span class="hint">1200&times;630 PNG</span></button>
-        <button data-action="reach-share-card" type="button" role="menuitem" tabindex="-1" hidden disabled>Reach Share Card <span class="hint">1200&times;630 PNG</span></button>
-        <button data-action="copy-share-card" type="button" role="menuitem" tabindex="-1">Copy Share Card <span class="hint">PNG</span></button>
-        <hr role="separator">
-        <button data-action="copy"  type="button" role="menuitem" tabindex="-1">Copy to clipboard <span class="hint">PNG</span></button>
-        <hr role="separator">
-        <button data-format="png"   type="button" role="menuitem" tabindex="-1">Download PNG</button>
-        <button data-format="jpeg"  type="button" role="menuitem" tabindex="-1">Download JPEG</button>
-        <button data-format="webp"  type="button" role="menuitem" tabindex="-1">Download WebP</button>
-        <hr role="separator">
-        <button data-format="svg"   type="button" role="menuitem" tabindex="-1">Download SVG <span class="hint">vector</span></button>
-        <button data-format="webm"  type="button" role="menuitem" tabindex="-1">Download WebM <span class="hint">6s motion</span></button>
+        <div class="export-menu-header" role="presentation">
+          <div><strong>Export diagram</strong><span>Portable, clean outputs</span></div>
+          <kbd>E</kbd>
+        </div>
+        <div class="export-menu-section" role="group" aria-label="Share">
+          <span class="export-menu-heading" aria-hidden="true">Share</span>
+          <button data-format="share-card" type="button" role="menuitem" tabindex="-1"><span class="export-item-copy"><strong>Share Card</strong><small class="hint">1200&times;630 PNG</small></span></button>
+          <button data-action="route-share-card" type="button" role="menuitem" tabindex="-1" hidden disabled><span class="export-item-copy"><strong>Route Share Card</strong><small class="hint">1200&times;630 PNG</small></span></button>
+          <button data-action="reach-share-card" type="button" role="menuitem" tabindex="-1" hidden disabled><span class="export-item-copy"><strong>Reach Share Card</strong><small class="hint">1200&times;630 PNG</small></span></button>
+          <button data-action="copy-share-card" type="button" role="menuitem" tabindex="-1"><span class="export-item-copy"><strong>Copy Share Card</strong><small class="hint">PNG to clipboard</small></span></button>
+          <button data-action="copy" type="button" role="menuitem" tabindex="-1"><span class="export-item-copy"><strong>Copy diagram</strong><small class="hint">PNG to clipboard</small></span></button>
+        </div>
+        <div class="export-menu-section" role="group" aria-label="Raster images">
+          <span class="export-menu-heading" aria-hidden="true">Image</span>
+          <button data-format="png" type="button" role="menuitem" tabindex="-1"><span class="export-item-copy"><strong>PNG</strong><small class="hint">Lossless image</small></span></button>
+          <button data-format="jpeg" type="button" role="menuitem" tabindex="-1"><span class="export-item-copy"><strong>JPEG</strong><small class="hint">Compact image</small></span></button>
+          <button data-format="webp" type="button" role="menuitem" tabindex="-1"><span class="export-item-copy"><strong>WebP</strong><small class="hint">Modern image</small></span></button>
+        </div>
+        <div class="export-menu-section" role="group" aria-label="Vector and motion">
+          <span class="export-menu-heading" aria-hidden="true">Vector &amp; motion</span>
+          <button data-format="svg" type="button" role="menuitem" tabindex="-1"><span class="export-item-copy"><strong>SVG</strong><small class="hint">Editable vector</small></span></button>
+          <button data-format="webm" type="button" role="menuitem" tabindex="-1"><span class="export-item-copy"><strong>WebM</strong><small class="hint">6s motion</small></span></button>
+        </div>
       </div>
     </div>
   </div>
@@ -4864,11 +5204,11 @@
         <button id="btn-route-probe" type="button" aria-label="Trace a directed route" aria-pressed="false" aria-controls="route-probe" title="Trace route (R)">PATH</button>
         <button id="btn-overview-map" type="button" aria-label="Open semantic radar" aria-expanded="false" aria-controls="overview-map" title="Semantic radar (M)">MAP</button>
         <button id="btn-semantic-lens" type="button" aria-label="Open semantic lens" aria-haspopup="dialog" aria-expanded="false" aria-pressed="false" aria-controls="semantic-lens" title="Semantic lens (L)">LENS</button>
-        <button id="btn-node-finder" type="button" aria-label="Find a node" aria-haspopup="dialog" aria-expanded="false" aria-controls="node-finder" title="Find a node (/)" data-node-finder-trigger>&#8981;</button>
-        <button id="btn-diagram-guide" type="button" aria-label="Open diagram guide" aria-haspopup="dialog" aria-expanded="false" aria-controls="diagram-guide" title="Diagram guide (?)">?</button>
-        <button data-view="out" type="button" aria-label="Zoom out" title="Zoom out (-)">&#8722;</button>
-        <button data-view="reset" type="button" aria-label="Reset diagram view" title="Reset view (0)">100%</button>
-        <button data-view="in" type="button" aria-label="Zoom in" title="Zoom in (+)">+</button>
+        <button id="btn-node-finder" type="button" aria-label="Find a node" aria-haspopup="dialog" aria-expanded="false" aria-controls="node-finder" title="Find a node (/)" data-node-finder-trigger><span class="diagram-nav-icon find" aria-hidden="true"></span></button>
+        <button id="btn-diagram-guide" type="button" aria-label="Open diagram guide" aria-haspopup="dialog" aria-expanded="false" aria-controls="diagram-guide" title="Diagram guide (?)"><span class="diagram-nav-icon guide" aria-hidden="true"></span></button>
+        <button data-view="out" type="button" aria-label="Zoom out" title="Zoom out (-)"><span class="diagram-nav-icon minus" aria-hidden="true"></span></button>
+        <button data-view="reset" type="button" aria-label="Reset diagram view" title="Reset view (0)"><span class="diagram-nav-detail" data-view-detail hidden>READ</span><span class="diagram-nav-percent" data-view-percent>100%</span></button>
+        <button data-view="in" type="button" aria-label="Zoom in" title="Zoom in (+)"><span class="diagram-nav-icon plus" aria-hidden="true"></span></button>
       </div>
     </div>
 
@@ -4915,10 +5255,6 @@
     </div>
     <!-- ARCHIFY:CARDS_SLOT_END -->
 
-    <!-- Footer -->
-    <p class="footer">
-      [Project Name] &bull; [Additional metadata]
-    </p>
   </div>
 
   <script>
@@ -5064,7 +5400,6 @@
       var STORAGE_KEY = 'archify-theme';
       var html = document.documentElement;
       var btn = document.getElementById('btn-theme');
-      var icon = document.getElementById('theme-icon');
       var label = document.getElementById('theme-label');
 
       // localStorage can throw (blocked cookies, sandboxed iframes); the whole
@@ -5094,7 +5429,6 @@
 
       function apply(theme) {
         html.setAttribute('data-theme', theme);
-        icon.textContent = theme === 'dark' ? '\u263E' : '\u263C';
         label.textContent = theme === 'dark' ? 'Dark' : 'Light';
         btn.setAttribute('aria-pressed', theme === 'light' ? 'true' : 'false');
       }
@@ -6217,12 +6551,10 @@
         if (it.dataset.format && !supports(it.dataset.format)) {
           it.disabled = true;
           it.title = 'Not supported by this browser';
-          it.style.opacity = '0.5';
         }
         if ((it.dataset.action === 'copy' || it.dataset.action === 'copy-share-card') && !canCopyImage()) {
           it.disabled = true;
           it.title = 'Clipboard image write not supported by this browser';
-          it.style.opacity = '0.5';
         }
       });
 
@@ -10098,11 +10430,164 @@
       };
     })();
 
+    /* ============================================================
+       Adaptive Reader Shell — one diagram across laptop and monitor.
+       The canonical SVG and viewBox never change. On ordinary desktop pages,
+       wide diagrams receive only enough outer width to use the available
+       height without pushing summary cards below the viewport. Mobile,
+       embed, presentation, print, and non-wide diagrams retain their own
+       established layout contracts.
+       ============================================================ */
+    Archify.readerLayout = (function () {
+      var html = document.documentElement;
+      var body = document.body;
+      var shell = document.querySelector('.container');
+      var diagram = document.querySelector('.diagram-container');
+      var svg = diagram && diagram.querySelector(':scope > svg');
+      var header = shell && shell.querySelector('.header');
+      var guided = shell && shell.querySelector('.guided-views');
+      var cards = shell && shell.querySelector('.cards');
+      var viewBox = svg && svg.viewBox && svg.viewBox.baseVal;
+      var ratio = viewBox && viewBox.height > 0 ? viewBox.width / viewBox.height : 0;
+      var frame = 0;
+      var settleFrame = 0;
+      var lastWidth = 0;
+      var WIDE_RATIO = 1.55;
+      var MIN_DESKTOP_WIDTH = 1024;
+      var MIN_READER_WIDTH = 960;
+      var MAX_READER_WIDTH = 1920;
+      var SAFE_BOTTOM_GAP = 12;
+
+      if (diagram && ratio >= WIDE_RATIO) {
+        diagram.setAttribute('data-wide-diagram', 'true');
+        html.setAttribute('data-diagram-shape', 'wide');
+      }
+
+      function number(value) {
+        var parsed = parseFloat(value);
+        return Number.isFinite(parsed) ? parsed : 0;
+      }
+      function visible(element) {
+        return Boolean(element && !element.hidden && window.getComputedStyle(element).display !== 'none');
+      }
+      function outerHeight(element) {
+        if (!visible(element)) return 0;
+        var style = window.getComputedStyle(element);
+        return element.getBoundingClientRect().height + number(style.marginTop) + number(style.marginBottom);
+      }
+      function eligible() {
+        return Boolean(
+          shell && diagram && svg && ratio >= WIDE_RATIO &&
+          window.innerWidth >= MIN_DESKTOP_WIDTH &&
+          html.getAttribute('data-embed') !== 'true' &&
+          html.getAttribute('data-present') !== 'true' &&
+          (!window.matchMedia || !window.matchMedia('print').matches)
+        );
+      }
+      function clear() {
+        html.style.removeProperty('--archify-reader-width');
+        html.removeAttribute('data-reader-layout');
+        html.removeAttribute('data-reader-overflow');
+        lastWidth = 0;
+      }
+      function chromeMetrics() {
+        var bodyStyle = window.getComputedStyle(body);
+        var diagramStyle = window.getComputedStyle(diagram);
+        return {
+          bodyX: number(bodyStyle.paddingLeft) + number(bodyStyle.paddingRight),
+          bodyY: number(bodyStyle.paddingTop) + number(bodyStyle.paddingBottom),
+          diagramX: number(diagramStyle.paddingLeft) + number(diagramStyle.paddingRight) +
+            number(diagramStyle.borderLeftWidth) + number(diagramStyle.borderRightWidth),
+          diagramY: number(diagramStyle.paddingTop) + number(diagramStyle.paddingBottom) +
+            number(diagramStyle.borderTopWidth) + number(diagramStyle.borderBottomWidth)
+        };
+      }
+      function applyWidth(width) {
+        var rounded = Math.round(width);
+        if (Math.abs(rounded - lastWidth) < 1) return false;
+        lastWidth = rounded;
+        html.style.setProperty('--archify-reader-width', rounded + 'px');
+        html.setAttribute('data-reader-layout', 'adaptive');
+        return true;
+      }
+      function settleOverflow(minWidth) {
+        if (settleFrame) cancelAnimationFrame(settleFrame);
+        settleFrame = requestAnimationFrame(function () {
+          settleFrame = 0;
+          if (!eligible() || !lastWidth) return;
+          var overflow = Math.max(
+            document.documentElement.scrollHeight,
+            document.body.scrollHeight
+          ) - window.innerHeight;
+          if (overflow > 1 && lastWidth > minWidth) {
+            applyWidth(Math.max(minWidth, lastWidth - overflow * ratio - 4));
+            html.setAttribute('data-reader-overflow', 'reduced');
+          } else if (overflow > 1) {
+            html.setAttribute('data-reader-overflow', 'authored');
+          } else {
+            html.removeAttribute('data-reader-overflow');
+          }
+        });
+      }
+      function measure() {
+        frame = 0;
+        if (!eligible()) {
+          clear();
+          return null;
+        }
+        var chrome = chromeMetrics();
+        var viewportCap = Math.max(0, window.innerWidth - chrome.bodyX);
+        var minWidth = Math.min(MIN_READER_WIDTH, viewportCap);
+        var maxWidth = Math.min(MAX_READER_WIDTH, viewportCap);
+        var fixedHeight = chrome.bodyY + chrome.diagramY + SAFE_BOTTOM_GAP +
+          outerHeight(header) + outerHeight(guided) + outerHeight(cards);
+        var availableSvgHeight = Math.max(1, window.innerHeight - fixedHeight);
+        var desiredWidth = availableSvgHeight * ratio + chrome.diagramX;
+        var width = Math.max(minWidth, Math.min(maxWidth, desiredWidth));
+        applyWidth(width);
+        settleOverflow(minWidth);
+        return {
+          ratio: ratio,
+          width: Math.round(width),
+          availableSvgHeight: Math.round(availableSvgHeight),
+          fixedHeight: Math.round(fixedHeight)
+        };
+      }
+      function schedule() {
+        if (frame) return;
+        frame = requestAnimationFrame(measure);
+      }
+
+      window.addEventListener('resize', schedule, { passive: true });
+      window.addEventListener('load', schedule, { once: true });
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(schedule).catch(function () {});
+      if (typeof ResizeObserver === 'function') {
+        var resizeObserver = new ResizeObserver(schedule);
+        [header, guided, cards].forEach(function (element) { if (element) resizeObserver.observe(element); });
+      }
+      if (typeof MutationObserver === 'function') {
+        var contentObserver = new MutationObserver(schedule);
+        if (guided) contentObserver.observe(guided, { attributes: true, childList: true, subtree: true });
+        if (cards) contentObserver.observe(cards, { attributes: true, childList: true, subtree: true });
+        contentObserver.observe(html, { attributes: true, attributeFilter: ['data-embed', 'data-present'] });
+      }
+      schedule();
+
+      return {
+        measure: measure,
+        schedule: schedule,
+        active: function () { return html.getAttribute('data-reader-layout') === 'adaptive'; },
+        receipt: function () { return { ratio: ratio, width: lastWidth }; }
+      };
+    })();
+
     Archify.view = (function () {
       var container = document.querySelector('.diagram-container');
       var svg = container.querySelector('svg');
       var outBtn = container.querySelector('[data-view="out"]');
       var resetBtn = container.querySelector('[data-view="reset"]');
+      var resetDetailLabel = resetBtn.querySelector('[data-view-detail]');
+      var resetPercentLabel = resetBtn.querySelector('[data-view-percent]');
       var inBtn = container.querySelector('[data-view="in"]');
       var state = { scale: 1, x: 0, y: 0, mode: 'overview' };
       var drag = null;
@@ -10114,9 +10599,6 @@
       var autoScrollUntil = 0;
 
       var viewBox = svg.viewBox && svg.viewBox.baseVal;
-      if (viewBox && viewBox.height > 0 && viewBox.width / viewBox.height >= 1.55) {
-        container.setAttribute('data-wide-diagram', 'true');
-      }
 
       function clamp() {
         var width = svg.clientWidth || 1;
@@ -10180,7 +10662,14 @@
           : detail === 'read'
             ? 'Zoom in again to reveal tags and annotations'
             : 'Full diagram detail';
-        resetBtn.textContent = (semantic ? 'AUTO ' : levelLabel) + percent;
+        var resolvedLevel = (semantic ? 'AUTO ' : levelLabel).trim();
+        var showDetailLevel = resolvedLevel !== 'READ';
+        if (resetDetailLabel) {
+          resetDetailLabel.textContent = resolvedLevel;
+          resetDetailLabel.hidden = !showDetailLevel;
+        }
+        if (resetPercentLabel) resetPercentLabel.textContent = percent;
+        resetBtn.toggleAttribute('data-detail-visible', showDetailLevel);
         resetBtn.title = (semantic ? 'Semantic camera active · ' : '') + detailHint + ' · reset view (0)';
         resetBtn.setAttribute('aria-label', detailHint + '. Reset diagram view');
         resetBtn.setAttribute('data-detail-level', detail);
@@ -10867,7 +11356,6 @@
     Archify.presentation = (function () {
       var html = document.documentElement;
       var btn = document.getElementById('btn-present');
-      var icon = document.getElementById('present-icon');
       var label = document.getElementById('present-label');
       var previousScrollY = 0;
 
@@ -10886,7 +11374,6 @@
         btn.setAttribute('aria-pressed', next ? 'true' : 'false');
         btn.setAttribute('aria-label', next ? 'Exit presentation stage' : 'Enter presentation stage');
         btn.title = next ? 'Exit presentation stage (F or Escape)' : 'Presentation stage (F)';
-        icon.textContent = next ? '\u00d7' : '\u25a1';
         label.textContent = next ? 'Exit' : 'Present';
       }
 

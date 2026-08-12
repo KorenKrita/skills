@@ -32,8 +32,7 @@ Workflow JSON files must set:
   "schema_version": 1,
   "diagram_type": "workflow",
   "meta": {
-    "title": "Agent Tool Call Workflow",
-    "subtitle": "Renderer-driven workflow prototype"
+    "title": "Agent Tool Call Workflow"
   },
   "lanes": [],
   "phases": [],

@@ -1,18 +1,10 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { esc, renderDefinitions, renderSemanticSigil, textUnits } from '../shared/utils.mjs';
-import { availableNodeTextWidth, fittedNodeFontSize, minimumNodeTextWidth } from '../shared/text-fit.mjs';
-
-// Font sizes for this renderer's state text; the fitting geometry is shared.
-const stateTextFit = {
-  sublabelPreferred: 7,
-  sublabelMinimum: 6,
-  tagPreferred: 7,
-  tagMinimum: 6,
-};
 import { animateAttr, focusEdgeAttrs, focusNodeAttrs, focusNodeTitle, loadDiagram, writeDiagram, svgAccessibleText, svgRootAttrs } from '../shared/cli.mjs';
 import { throwDiagnosticProblems } from '../shared/diagnostics.mjs';
 import { resolveLegend, renderLegend as renderResolvedLegend } from '../shared/legend.mjs';
+import { availableNodeTextWidth, fittedNodeFontSize, minimumNodeTextWidth } from '../shared/text-fit.mjs';
 import {
   asArray,
   isFinitePoint,
@@ -36,6 +28,13 @@ import {
   arrowClassMap,
   variantAccent
 } from '../shared/geometry.mjs';
+
+const stateTextFit = {
+  sublabelPreferred: 7,
+  sublabelMinimum: 6,
+  tagPreferred: 7,
+  tagMinimum: 6,
+};
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { diagram: lifecycle, template, outPath } = loadDiagram({
@@ -514,7 +513,6 @@ writeDiagram({
   template,
   diagramType: 'lifecycle',
   meta: lifecycle.meta,
-  footerLabel: 'Lifecycle diagram',
   svg: renderSvg(),
   cards: lifecycle.cards,
 });
