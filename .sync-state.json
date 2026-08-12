@@ -74,7 +74,7 @@
     ]
   },
   "nuclear-review": {
-    "sha": "6f7e183aa9f48805c38746705fe6a17d42cafb94",
+    "sha": "6dbbdd50cef1bdbfb540f80df8b598d0a546e3aa",
     "files": [
       "SKILL.md"
     ]
@@ -140,7 +140,7 @@
     ]
   },
   "archify": {
-    "sha": "5875dc81b5c77c7004d7c1d297dda470fce97f50",
+    "sha": "a3bf80c25a824f5d5c46dfdbfdb96cc52dd4742a",
     "files": [
       "LICENSE",
       "SKILL.md",
@@ -148,6 +148,7 @@
       "bin/archify.mjs",
       "bin/open-artifact.mjs",
       "bin/preview.mjs",
+      "bin/visual-check.mjs",
       "delta/architecture-delta.mjs",
       "examples/agent-run.lifecycle.json",
       "examples/agent-tool-call.workflow.json",
