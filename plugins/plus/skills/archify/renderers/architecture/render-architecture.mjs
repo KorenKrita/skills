@@ -1,19 +1,11 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { esc, renderDefinitions, renderSemanticSigil, textUnits } from '../shared/utils.mjs';
-import { availableNodeTextWidth, fittedNodeFontSize, minimumNodeTextWidth } from '../shared/text-fit.mjs';
-
-// Font sizes for this renderer's component text; the fitting geometry is shared.
-const componentTextFit = {
-  sublabelPreferred: 9,
-  sublabelMinimum: 6,
-  tagPreferred: 7,
-  tagMinimum: 6,
-};
 import { animateAttr, focusEdgeAttrs, focusNodeAttrs, focusNodeTitle, loadDiagram, writeDiagram, svgAccessibleText, svgRootAttrs } from '../shared/cli.mjs';
 import { componentBox, boundaryBox, connectionPath } from '../shared/layout-report.mjs';
 import { throwDiagnosticProblems } from '../shared/diagnostics.mjs';
 import { legendFootprint, relationshipLegendObstacles, resolveLegend, renderLegend as renderResolvedLegend } from '../shared/legend.mjs';
+import { availableNodeTextWidth, fittedNodeFontSize, minimumNodeTextWidth } from '../shared/text-fit.mjs';
 import { gridLayout, resolveComponentPos, validateGridPlacement } from './grid.mjs';
 import {
   asArray,
@@ -46,6 +38,13 @@ import {
   arrowClassMap,
   variantAccent,
 } from '../shared/geometry.mjs';
+
+const componentTextFit = {
+  sublabelPreferred: 9,
+  sublabelMinimum: 6,
+  tagPreferred: 7,
+  tagMinimum: 6,
+};
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const layoutJsonMode = process.argv.includes('--layout-json');
@@ -476,6 +475,82 @@ function sideAwareBridgeCandidates(start, end, fromSide, toSide) {
     .map((points) => points.slice(1, -1));
 }
 
+const AUTOMATIC_PORT_CORNER_GUTTER = 16;
+const AUTOMATIC_PORT_ALIGNMENT_DELTA = 16;
+
+function portHasCornerClearance(rect, side, point) {
+  if (side === 'left' || side === 'right') {
+    const inset = Math.min(AUTOMATIC_PORT_CORNER_GUTTER, rect.height / 2);
+    return point[1] >= rect.y + inset && point[1] <= rect.y + rect.height - inset;
+  }
+  if (side === 'top' || side === 'bottom') {
+    const inset = Math.min(AUTOMATIC_PORT_CORNER_GUTTER, rect.width / 2);
+    return point[0] >= rect.x + inset && point[0] <= rect.x + rect.width - inset;
+  }
+  return false;
+}
+
+function alignFacingPorts(conn, from, to, start, end, fromSide, toSide, ports) {
+  const hasExplicitGeometry = (
+    conn.via
+    || (conn.route && conn.route !== 'auto')
+    || conn.channelX !== undefined
+    || conn.channelY !== undefined
+    || conn.labelAt
+  );
+  const horizontallyFacing = (
+    (fromSide === 'right' && toSide === 'left')
+    || (fromSide === 'left' && toSide === 'right')
+  );
+  const verticallyFacing = (
+    (fromSide === 'bottom' && toSide === 'top')
+    || (fromSide === 'top' && toSide === 'bottom')
+  );
+  if (hasExplicitGeometry || (!horizontallyFacing && !verticallyFacing)) return { start, end };
+
+  const fromSpread = Boolean(ports?.from);
+  const toSpread = Boolean(ports?.to);
+  if (fromSpread && toSpread) return { start, end };
+  const hasExplicitSides = (
+    (conn.fromSide && conn.fromSide !== 'auto')
+    || (conn.toSide && conn.toSide !== 'auto')
+  );
+  if (!fromSpread && !toSpread && hasExplicitSides) return { start, end };
+
+  const alignmentDelta = horizontallyFacing
+    ? Math.abs(start[1] - end[1])
+    : Math.abs(start[0] - end[0]);
+  if (alignmentDelta >= AUTOMATIC_PORT_ALIGNMENT_DELTA) return { start, end };
+
+  // Keep the shared endpoint's distinct spread slot and move only the
+  // relationship's unshared endpoint onto that axis. With no spread endpoint,
+  // retain the existing least-movement choice between the two facing sides.
+  // If both endpoints are shared, preserve the outside bridge so no competing
+  // port is silently collapsed.
+  const alignEndToStart = horizontallyFacing
+    ? { start, end: [end[0], start[1]] }
+    : { start, end: [start[0], end[1]] };
+  const alignStartToEnd = horizontallyFacing
+    ? { start: [start[0], end[1]], end }
+    : { start: [end[0], start[1]], end };
+  const candidates = fromSpread
+    ? [alignEndToStart]
+    : toSpread
+      ? [alignStartToEnd]
+      : [alignEndToStart, alignStartToEnd];
+  for (const candidate of candidates) {
+    const points = [candidate.start, candidate.end];
+    if (portHasCornerClearance(from, fromSide, candidate.start)
+        && portHasCornerClearance(to, toSide, candidate.end)
+        && routeHonorsEndpointSides(points, fromSide, toSide)
+        && routeClearsEndpointComponents(points, from, to)
+        && routeClearsComponents(conn, points)) {
+      return candidate;
+    }
+  }
+  return { start, end };
+}
+
 function routeVia(conn, from, to, start, end, fromSide, toSide) {
   if (conn.via) return conn.via;
   switch (conn.route || 'auto') {
@@ -597,8 +672,18 @@ function pathFor(conn) {
   const to = components.get(conn.to);
   const ports = automaticPorts.get(conn);
   const { fromSide, toSide } = connectionSides(conn);
-  const start = ports?.from || anchor(from, fromSide);
-  const end = ports?.to || anchor(to, toSide);
+  const baseStart = ports?.from || anchor(from, fromSide);
+  const baseEnd = ports?.to || anchor(to, toSide);
+  const { start, end } = alignFacingPorts(
+    conn,
+    from,
+    to,
+    baseStart,
+    baseEnd,
+    fromSide,
+    toSide,
+    ports,
+  );
   const points = [start, ...routeVia(conn, from, to, start, end, fromSide, toSide), end];
   const routed = { d: roundedPath(points, 8), points };
   pathCache.set(conn, routed);
@@ -680,7 +765,7 @@ function renderLegend() {
       unfit: arch.meta?.legend === undefined ? 'hide' : 'error',
       diagramType: 'architecture',
     },
-    renderSwatch: (entry) => `<rect x="${entry.x}" y="${entry.baseline - 8}" width="14" height="9" rx="2" class="${componentFill[entry.kind] || 'c-external'}" stroke-width="1"/>`,
+    renderSwatch: (entry) => `<rect x="${entry.x}" y="${entry.baseline - 9}" width="16" height="10" rx="2.5" class="${componentFill[entry.kind] || 'c-external'}" stroke-width="1"/>`,
   });
 }
 
@@ -719,7 +804,6 @@ writeDiagram({
   template,
   diagramType: 'architecture',
   meta: arch.meta,
-  footerLabel: 'Architecture diagram',
   svg: renderSvg(),
   cards: arch.cards,
   sourceEvidence,

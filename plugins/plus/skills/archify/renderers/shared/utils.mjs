@@ -100,6 +100,7 @@ ${card.items.map((item) => `          <li>&bull; ${esc(item)}</li>`).join('\n')}
 
 const SVG_SLOT_RE = /      <!-- ARCHIFY:SVG_SLOT_START -->[\s\S]*?      <!-- ARCHIFY:SVG_SLOT_END -->/;
 const CARDS_SLOT_RE = /    <!-- ARCHIFY:CARDS_SLOT_START -->[\s\S]*?    <!-- ARCHIFY:CARDS_SLOT_END -->/;
+const SUBTITLE_SLOT_RE = /^([ \t]*)<p class="subtitle">\[Subtitle description\]<\/p>[ \t]*(\r?\n)?/m;
 const GUIDED_VIEWS_PLACEHOLDER = '<!-- ARCHIFY:GUIDED_VIEWS_DATA -->';
 const SOURCE_EVIDENCE_PLACEHOLDER = '    <!-- ARCHIFY:SOURCE_EVIDENCE_DATA -->';
 
@@ -107,19 +108,18 @@ const TEMPLATE_PLACEHOLDERS = [
   '<html lang="en" data-theme="dark" data-preset="[VISUAL PRESET]">',
   '<title>[PROJECT NAME] Architecture Diagram</title>',
   '<h1>[PROJECT NAME] Architecture</h1>',
-  '<p class="subtitle">[Subtitle description]</p>',
-  '[Project Name] &bull; [Additional metadata]',
   GUIDED_VIEWS_PLACEHOLDER,
 ];
 
-// `footer` is injected as raw HTML so callers can embed <kbd> hints;
-// pass only trusted strings here, never user input.
-export function applyTemplate(template, { title, subtitle, footer, svg, cards, visualPreset = 'classic', guidedViews = [], sourceEvidence = null }) {
+export function applyTemplate(template, { title, subtitle, svg, cards, visualPreset = 'classic', guidedViews = [], sourceEvidence = null }) {
   if (!SVG_SLOT_RE.test(template)) {
     throw new Error('applyTemplate: template missing ARCHIFY:SVG_SLOT sentinel');
   }
   if (!CARDS_SLOT_RE.test(template)) {
     throw new Error('applyTemplate: template missing ARCHIFY:CARDS_SLOT sentinel');
+  }
+  if (!SUBTITLE_SLOT_RE.test(template)) {
+    throw new Error('applyTemplate: template missing subtitle placeholder');
   }
   for (const ph of TEMPLATE_PLACEHOLDERS) {
     if (!template.includes(ph)) {
@@ -142,14 +142,18 @@ export function applyTemplate(template, { title, subtitle, footer, svg, cards, v
     .replaceAll('<', '\\u003c')
     .replaceAll('>', '\\u003e')
     .replaceAll('&', '\\u0026');
+  const renderedSubtitle = typeof subtitle === 'string' && subtitle.trim()
+    ? `<p class="subtitle">${esc(subtitle)}</p>`
+    : '';
   return template
     .replace(TEMPLATE_PLACEHOLDERS[0], () => `<html lang="en" data-theme="dark" data-preset="${esc(visualPreset)}">`)
     .replace(TEMPLATE_PLACEHOLDERS[1], () => `<title>${esc(title)} Diagram</title>`)
     .replace(TEMPLATE_PLACEHOLDERS[2], () => `<h1>${esc(title)}</h1>`)
-    .replace(TEMPLATE_PLACEHOLDERS[3], () => `<p class="subtitle">${esc(subtitle ?? '')}</p>`)
+    .replace(SUBTITLE_SLOT_RE, (_match, indent, newline = '') => renderedSubtitle
+      ? `${indent}${renderedSubtitle}${newline}`
+      : '')
     .replace(SVG_SLOT_RE, () => svg)
     .replace(CARDS_SLOT_RE, () => cards)
-    .replace(TEMPLATE_PLACEHOLDERS[4], () => footer)
     .replace(GUIDED_VIEWS_PLACEHOLDER, () => `<script id="archify-guided-views-data" type="application/json">${guidedViewsJson}</script>`)
     .replace(SOURCE_EVIDENCE_PLACEHOLDER, () => sourceEvidence
       ? `    <script id="archify-source-evidence-data" type="application/json">${sourceEvidenceJson}</script>`

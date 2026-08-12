@@ -3,7 +3,6 @@
   "diagram_type": "architecture",
   "meta": {
     "title": "Production Deployment Ownership",
-    "subtitle": "Regions, network boundaries, workload owners, state, and named crossings",
     "output": "examples/production-deployment.html",
     "visual_preset": "blueprint",
     "animation": "trace",

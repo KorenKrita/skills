@@ -21,6 +21,7 @@ function usage() {
   archify validate <type> <input.json> [--json] [--layout-json] [--quality standard|showcase] [--repo-root path]
   archify inspect <type> <input.json>
   archify check <output.html>
+  archify visual-check <output.html> [--json]
   archify guide [scenario or question] [--json] [--lang en|zh]
   archify examples
   archify doctor
@@ -1155,6 +1156,56 @@ function commandCheck(args) {
   if (result.status !== 0) exitFrom(result);
 }
 
+async function commandVisualCheck(args) {
+  const json = args.includes('--json');
+  const knownOptions = new Set(['--json']);
+  const unknown = args.filter((arg) => arg.startsWith('--') && !knownOptions.has(arg));
+  if (unknown.length) fail(`Unknown visual-check option "${unknown[0]}".`, 1);
+  const positional = args.filter((arg) => !knownOptions.has(arg));
+  if (positional.length !== 1) fail(usage(), 1);
+
+  let runVisualCheck;
+  try {
+    ({ runVisualCheck } = await import('./visual-check.mjs'));
+  } catch (error) {
+    fail(`Could not load visual-check: ${error.message}`, 1);
+  }
+
+  let result;
+  try {
+    result = await runVisualCheck({ artifactPath: positional[0] });
+  } catch (error) {
+    if (json) {
+      console.log(JSON.stringify({
+        schemaVersion: 1,
+        ok: false,
+        command: 'visual-check',
+        status: 'fail',
+        visualReview: 'pending',
+        artifact: { path: path.resolve(positional[0]) },
+        error: error.message,
+      }, null, 2));
+    } else {
+      console.error(`visual-check failed: ${error.message}`);
+    }
+    process.exitCode = 1;
+    return;
+  }
+
+  if (json) {
+    console.log(JSON.stringify(result.receipt, null, 2));
+  } else {
+    console.log(`visual-check ${result.receipt.status}: ${result.receipt.artifact.path}`);
+    console.log(`containment ${result.receipt.containment.status}; captures ${result.receipt.captures.status}; visual review pending`);
+    console.log(`receipt ${path.join(path.dirname(result.receipt.artifact.path), result.receipt.sidecars.receipt)}`);
+    if (result.receipt.captures.contactSheet) {
+      console.log(`contact sheet ${path.join(path.dirname(result.receipt.artifact.path), result.receipt.captures.contactSheet)}`);
+    }
+    if (result.receipt.error) console.error(result.receipt.error);
+  }
+  process.exitCode = result.exitCode;
+}
+
 function commandExamples() {
   const result = runNode([path.join(skillRoot, 'scripts/render-examples.mjs')], { cwd: skillRoot });
   if (result.status !== 0) exitFrom(result);
@@ -1189,6 +1240,13 @@ async function commandDoctor() {
     label: 'Live preview runtime',
     ok: fs.existsSync(previewRuntime),
     missing: fs.existsSync(previewRuntime) ? 0 : 1,
+  });
+
+  const visualCheckRuntime = path.join(skillRoot, 'bin/visual-check.mjs');
+  checks.push({
+    label: 'Visual-check runtime',
+    ok: fs.existsSync(visualCheckRuntime),
+    missing: fs.existsSync(visualCheckRuntime) ? 0 : 1,
   });
 
   const outputPathRuntime = path.join(skillRoot, 'renderers/shared/output-path.mjs');
@@ -1504,6 +1562,9 @@ switch (command) {
     break;
   case 'check':
     commandCheck(args);
+    break;
+  case 'visual-check':
+    await commandVisualCheck(args);
     break;
   case 'guide':
     await commandGuide(args);

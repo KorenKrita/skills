@@ -1,19 +1,16 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { esc, renderDefinitions, renderSemanticSigil, textUnits } from '../shared/utils.mjs';
-import { availableNodeTextWidth, fittedNodeFontSize, minimumNodeTextWidth } from '../shared/text-fit.mjs';
-
-// Font sizes for this renderer's participant text; the fitting geometry is
-// shared. Participant boxes are a fixed layout width with no author-facing
-// knob, so the only remedy the messages can offer is shorter text.
-const participantTextFit = {
-  sublabelPreferred: 7,
-  sublabelMinimum: 6,
-};
 import { animateAttr, focusEdgeAttrs, focusNodeAttrs, focusNodeTitle, loadDiagram, writeDiagram, svgAccessibleText, svgRootAttrs } from '../shared/cli.mjs';
 import { throwDiagnosticProblems } from '../shared/diagnostics.mjs';
 import { resolveLegend, renderLegend as renderResolvedLegend } from '../shared/legend.mjs';
 import { componentFill, arrowClassMap, rectsOverlap, cleanFlowProblems, cleanCrossingProblems, cleanAmbiguousCorridorProblems, cleanBorderRunProblems, cleanRouteRhythmProblems, cleanLabelRouteClearanceProblems, routePointsValue, asArray, isFinitePoint } from '../shared/geometry.mjs';
+import { availableNodeTextWidth, fittedNodeFontSize, minimumNodeTextWidth } from '../shared/text-fit.mjs';
+
+const participantTextFit = {
+  sublabelPreferred: 7,
+  sublabelMinimum: 6,
+};
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { diagram: sequence, template, outPath } = loadDiagram({
@@ -430,7 +427,6 @@ writeDiagram({
   template,
   diagramType: 'sequence',
   meta: sequence.meta,
-  footerLabel: 'Sequence diagram',
   svg: renderSvg(),
   cards: sequence.cards,
 });

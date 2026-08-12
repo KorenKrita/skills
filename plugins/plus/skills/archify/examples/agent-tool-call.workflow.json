@@ -3,7 +3,6 @@
   "diagram_type": "workflow",
   "meta": {
     "title": "Agent Tool Call Workflow",
-    "subtitle": "Renderer-driven workflow prototype with lanes, anchored nodes, and orthogonal edges",
     "animation": "trace",
     "visual_preset": "signal-flow",
     "quality_profile": "showcase",

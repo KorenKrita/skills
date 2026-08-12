@@ -23,7 +23,6 @@ Sequence JSON files must set:
   "diagram_type": "sequence",
   "meta": {
     "title": "Cache Miss Request Sequence",
-    "subtitle": "Frontend request path with auth and cache fallback",
     "viewBox": [920, 760]
   },
   "participants": [],
