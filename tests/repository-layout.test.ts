@@ -42,6 +42,7 @@ const EXPECTED_SKILLS = {
     "nuclear-review",
     "razor",
     "read",
+    "show-me",
     "pua",
   ],
 } as const

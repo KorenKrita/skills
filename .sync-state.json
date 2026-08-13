@@ -202,5 +202,11 @@
       "scripts/generate-validators.mjs",
       "scripts/render-examples.mjs"
     ]
+  },
+  "show-me": {
+    "sha": "4d8d644ca747517973f58d7953f58d7cd07520cd",
+    "files": [
+      "SKILL.md"
+    ]
   }
 }

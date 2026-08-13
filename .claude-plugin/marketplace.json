@@ -22,9 +22,9 @@
     },
     {
       "name": "plus",
-      "version": "0.0.18",
+      "version": "0.0.19",
       "source": "./plugins/plus",
-      "description": "决策方法、代码质量审查、读取工具、中文写作优化、架构图与 PUA 高能动性治理",
+      "description": "决策方法、代码质量审查、读取工具、中文写作优化、可视化讲解、架构图与 PUA 高能动性治理",
       "strict": false,
       "category": "productivity",
       "keywords": [

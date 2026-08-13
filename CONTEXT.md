@@ -7,7 +7,7 @@
 | **skill** | 一个 `SKILL.md` 加可选 scripts、references、assets、Skill metadata 的最小能力单元 |
 | **plugin** | Claude Code 的安装单元；本仓库固定为 `base`、`plus` 两个 |
 | **base** | 核心工程与协作流程，共 7 个 Skill；除 `improve-codebase-architecture` 外均跟随 mattpocock/skills |
-| **plus** | 决策方法、代码质量审查、通用工具、中文写作优化、架构图、白话重述和单一 PUA Skill，共 9 个 Skill；附带 Claude Code Agent |
+| **plus** | 决策方法、代码质量审查、通用工具、中文写作优化、可视化讲解、架构图、白话重述和单一 PUA Skill，共 10 个 Skill；附带 Claude Code Agent |
 | **marketplace** | `.claude-plugin/marketplace.json` 定义的两个 plugin 聚合入口 |
 
 ## Sync System

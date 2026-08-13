@@ -21,7 +21,7 @@
 
 ```text
 base               核心工程与协作流程
-base + plus  全部 18 个 Skill
+base + plus  全部 19 个 Skill
 ```
 
 ### Pi
@@ -57,7 +57,7 @@ pi install -l git:github.com/KorenKrita/skills
 | Plugin | 内容 | Skill 数量 |
 |---|---|---:|
 | **base** | 核心工程与协作流程 | 9 |
-| **plus** | 决策方法、代码质量审查、读取工具、中文写作优化、架构图、白话重述与单一 PUA Skill | 9 |
+| **plus** | 决策方法、代码质量审查、读取工具、中文写作优化、可视化讲解、架构图、白话重述与单一 PUA Skill | 10 |
 
 `plus` 还附带：
 
@@ -76,6 +76,7 @@ Pi 加载两个 plugin 的 `skills/`；`plus` 的 plugin-level Agent 仅对 Clau
 主要来源：
 
 - [mattpocock/skills](https://github.com/mattpocock/skills)
+- [humanlayer/skills](https://github.com/humanlayer/skills)
 - [tw93/Waza](https://github.com/tw93/Waza)
 - [hylarucoder/hai-stack](https://github.com/hylarucoder/hai-stack)
 - [shadcn/improve](https://github.com/shadcn/improve)

@@ -173,6 +173,12 @@ skills:
     exclude_files:
       - scripts/check-update.sh
 
+  # Upstream packages only SKILL.md; LICENSE is retained locally from the repository root.
+  show-me:
+    source: { repo: humanlayer/skills, path: plugins/show-me/skills/show-me, ref: main }
+    plugin: plus
+    patches: []
+
   # ─── plus: single upstream PUA Skill ───────────────────────────────────────
 
   pua:
