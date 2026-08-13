@@ -79,7 +79,13 @@ function readOverrides(): {
       ownership?: string
       provenance?: Record<string, string>
       exclude_files?: string[]
-      patches?: Array<{ type: string; pattern?: string; with?: string }>
+      patches?: Array<{
+        type: string
+        field?: string
+        value?: string | boolean | number
+        pattern?: string
+        with?: string
+      }>
       target_patches?: Array<{ target: string }>
     }
   >
@@ -360,6 +366,28 @@ describe("repository layout", () => {
     expect(skill).toContain("Re-pitch your last message")
     expect(skill).toContain("ASD-STE100 Simplified Technical English")
     expect(skill).toContain("`CONTEXT.md` when that file exists")
+  })
+
+  it("keeps i-have-adhd model-invocable across upstream sync", () => {
+    const entry = readOverrides().skills["i-have-adhd"]
+    const skill = readFileSync(
+      join(ROOT, "plugins", "plus", "skills", "i-have-adhd", "SKILL.md"),
+      "utf-8",
+    )
+    const patches = entry?.patches ?? []
+
+    expect(skill).not.toContain("disable-model-invocation:")
+    expect(skill).not.toContain("Invoke with /i-have-adhd")
+    expect(skill).toContain("Use when the user says they have ADHD")
+    expect(
+      patches.some(
+        (patch) =>
+          patch.type === "remove_frontmatter" && patch.field === "disable-model-invocation",
+      ),
+    ).toBe(true)
+    expect(
+      patches.some((patch) => patch.type === "set_frontmatter" && patch.field === "description"),
+    ).toBe(true)
   })
 
   it("keeps the local architecture skill free of removed skill and subagent calls", () => {

@@ -262,7 +262,11 @@ skills:
   i-have-adhd:
     source: { repo: ayghri/i-have-adhd, path: skills/i-have-adhd, ref: main }
     plugin: plus
-    patches: []
+    patches:
+      - { type: remove_frontmatter, field: disable-model-invocation }
+      - type: set_frontmatter
+        field: description
+        value: 'Shape output for a reader with ADHD: lead with the next action, number multi-step work, restate state across turns, suppress tangents, give specific time estimates, and make wins visible. Use when the user says they have ADHD, asks for ADHD-friendly formatting, or wants this mode enabled; it stays on until they say "stop adhd mode".'
 
   humanizer-zh:
     source: { repo: op7418/Humanizer-zh, path: ., ref: main }
