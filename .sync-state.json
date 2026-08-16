@@ -1,6 +1,6 @@
 {
   "diagnosing-bugs": {
-    "sha": "8b78b531ab965735c5dc74f6f7a219e1e37326df",
+    "sha": "068b6e0c62393147daf03530149cdce209c93da8",
     "files": [
       "SKILL.md",
       "agents/openai.yaml",
@@ -8,7 +8,7 @@
     ]
   },
   "prototype": {
-    "sha": "8b78b531ab965735c5dc74f6f7a219e1e37326df",
+    "sha": "068b6e0c62393147daf03530149cdce209c93da8",
     "files": [
       "LOGIC.md",
       "SKILL.md",
@@ -17,28 +17,28 @@
     ]
   },
   "grill-me": {
-    "sha": "8b78b531ab965735c5dc74f6f7a219e1e37326df",
+    "sha": "068b6e0c62393147daf03530149cdce209c93da8",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "handoff": {
-    "sha": "8b78b531ab965735c5dc74f6f7a219e1e37326df",
+    "sha": "068b6e0c62393147daf03530149cdce209c93da8",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "to-questionnaire": {
-    "sha": "8b78b531ab965735c5dc74f6f7a219e1e37326df",
+    "sha": "068b6e0c62393147daf03530149cdce209c93da8",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "wizard": {
-    "sha": "8b78b531ab965735c5dc74f6f7a219e1e37326df",
+    "sha": "068b6e0c62393147daf03530149cdce209c93da8",
     "files": [
       "SKILL.md",
       "agents/openai.yaml",
@@ -46,7 +46,7 @@
     ]
   },
   "teach": {
-    "sha": "8b78b531ab965735c5dc74f6f7a219e1e37326df",
+    "sha": "068b6e0c62393147daf03530149cdce209c93da8",
     "files": [
       "GLOSSARY-FORMAT.md",
       "LEARNING-RECORD-FORMAT.md",
@@ -57,7 +57,7 @@
     ]
   },
   "writing-for-agents": {
-    "sha": "8b78b531ab965735c5dc74f6f7a219e1e37326df",
+    "sha": "068b6e0c62393147daf03530149cdce209c93da8",
     "files": [
       "SKILL-MECHANICS.md",
       "SKILL.md",
@@ -88,7 +88,7 @@
     ]
   },
   "read": {
-    "sha": "24b8eecf1e7e522dedc7a6fb89535a878d9f48c0",
+    "sha": "3f135d26dab706d889b93b7ca0f4ab37f6b07579",
     "files": [
       "SKILL.md",
       "references/read-methods.md",
