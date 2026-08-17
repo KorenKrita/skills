@@ -8,9 +8,17 @@ skills:
       - type: replace
         pattern: "When exploring the codebase, read `CONTEXT.md` (if it exists) to get a clear mental model of the relevant modules, and check ADRs in the area you're touching."
         with: "When exploring the codebase, read whatever domain, architecture, or decision documents the project already keeps (if any) to get a clear mental model of the relevant modules and the decisions already made in the area you're touching."
+      # 上游 1dab982 删除了 Phase 6 的 post-mortem 段落（其 hand-off 指向
+      # user-invoked Skill，模型侧永远调不通；fork 版本不调用任何 Skill，
+      # 无此问题）。这里在新上游基线上恢复 fork 的自包含 post-mortem。
+      # 锚定末条 checklist 而非 append_content：上游再重构 Phase 6 时补丁
+      # 显式失败，而不是静默漂移到文件末尾。
       - type: replace
-        pattern: "hidden coupling) hand off to the `/improve-codebase-architecture` skill with the specifics."
-        with: "hidden coupling), record the specific architectural follow-up yourself in this session — name the files and seams involved, the change you would make, and why the bug was able to hide there."
+        pattern: "## Phase 6 — Cleanup"
+        with: "## Phase 6 — Cleanup + post-mortem"
+      - type: replace
+        pattern: "- [ ] The hypothesis that turned out correct is stated in the commit / PR message — so the next debugger learns"
+        with: "- [ ] The hypothesis that turned out correct is stated in the commit / PR message — so the next debugger learns\n\n**Then ask: what would have prevented this bug?** If the answer involves architectural change (no good test seam, tangled callers, hidden coupling), record the specific architectural follow-up yourself in this session — name the files and seams involved, the change you would make, and why the bug was able to hide there. Make the recommendation **after** the fix is in, not before — you have more information now than when you started."
 
   prototype:
     source: { repo: mattpocock/skills, path: skills/engineering/prototype, ref: main }

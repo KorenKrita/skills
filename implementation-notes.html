@@ -78,6 +78,15 @@
       <p><strong>决策：</strong>删除 <code>ding</code>、<code>mama</code>、<code>p10</code>、<code>p7</code>、<code>p9</code>、<code>pro</code>、<code>pua-en</code>、<code>pua-ja</code>、<code>pua-loop</code>、<code>shot</code>、<code>yes</code>；<code>plus</code> 只同步 <code>tanweai/pua/skills/pua</code>。通过声明式 patch 移除 sibling 路由和自动 hook/遥测保证，并排除团队层级、付费平台、loop 和多 Skill suite references。详见 ADR-0007。</p>
       <p><strong>版本：</strong><code>plus</code> 升至 <code>0.0.13</code>；最终为 <code>base</code> 7 个、<code>plus</code> 8 个，共 15 个 Skill。</p>
     </article>
+    <article id="stale-post-mortem-patch-2026-08-17">
+      <h2>上游删除 post-mortem 段落导致 diagnosing-bugs 补丁失效</h2>
+      <p><strong>状态：</strong>agent-resolved</p>
+      <p><strong>日期：</strong>2026-08-17</p>
+      <p><strong>背景：</strong>mattpocock/skills 提交 <code>1dab982</code>（"Stop skills from calling other user-invoked skills"）删除了 diagnosing-bugs Phase 6 的 post-mortem 段落并把标题改为 "Cleanup"。fork 的第二条 <code>replace</code> 补丁锚定被删段落中的 hand-off 措辞，锚点消失后每日同步产出 <code>[补丁失败]</code> 草稿 PR #176。上游删除的理由（hand-off 指向 user-invoked Skill，模型侧永远调不通）在 fork 中早已由补丁本身解决——fork 版本不调用任何 Skill，由当前 agent 自行记录架构后续建议（见 "base 精简为 7 个核心 Skill" 条目）。</p>
+      <p><strong>决策：</strong>保留 fork 的内联 post-mortem 行为，把失效补丁改写为两条锚定新上游基线的规则：恢复标题 <code>Phase 6 — Cleanup + post-mortem</code>，并在末条 checklist 之后重新插入自包含 post-mortem 段落。锚定 checklist 而非 <code>append_content</code>，使上游再次重构 Phase 6 时补丁显式失败而非静默漂移到文件末尾。同步更新 <code>repository-layout.test.ts</code> 中要求旧补丁形态的断言。PR #176 关闭：<code>SKILL.md</code> 净变更为零，无内容变更即无版本递增，规则改写直接落在 main。</p>
+      <p><strong>实现约束：</strong>旧 pattern 双重失效——上游 PR #878 先把 hand-off 措辞改为 "call the Skill tool"，<code>1dab982</code> 再整段删除；新规则不依赖该段落存在，只依赖 Phase 6 标题与末条 checklist。同步状态已指向 <code>068b6e0</code>，关闭 PR 后 <code>--force</code> 审计应产出 no-changes 并删除残留分支。</p>
+      <p><strong>验证：</strong><code>npm test</code>（61 passed）；补丁引擎本地重放：三条补丁作用于 <code>068b6e0</code> 上游原文全部命中，产物与 main 的 <code>SKILL.md</code> 逐字节一致；同步工作流 <code>--force</code> 重跑确认无新 PR。</p>
+    </article>
   </main>
 </body>
 </html>

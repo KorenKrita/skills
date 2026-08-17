@@ -300,22 +300,36 @@ describe("repository layout", () => {
     }
   })
 
-  it("declares the diagnosing-bugs dependency removals as replayable patches", () => {
+  it("declares the diagnosing-bugs fork adjustments as replayable patches", () => {
     const patches = readOverrides().skills["diagnosing-bugs"]?.patches ?? []
     const skill = readFileSync(
       join(ROOT, "plugins", "base", "skills", "diagnosing-bugs", "SKILL.md"),
       "utf-8",
     )
 
-    // Fixed CONTEXT.md/ADR layout and the /improve-codebase-architecture handoff
-    // are both removed declaratively, so a forced upstream replay reapplies them.
-    for (const marker of ["`CONTEXT.md`", "/improve-codebase-architecture"]) {
-      expect(skill, marker).not.toContain(marker)
-      expect(
-        patches.some((patch) => patch.type === "replace" && patch.pattern?.includes(marker)),
-        `diagnosing-bugs patch for ${marker}`,
-      ).toBe(true)
-    }
+    // Fixed CONTEXT.md/ADR layout is removed declaratively, so a forced
+    // upstream replay reapplies it.
+    expect(skill).not.toContain("`CONTEXT.md`")
+    expect(
+      patches.some((patch) => patch.type === "replace" && patch.pattern?.includes("`CONTEXT.md`")),
+      "diagnosing-bugs patch for `CONTEXT.md`",
+    ).toBe(true)
+
+    // Upstream 1dab982 deleted the Phase 6 post-mortem paragraph because its
+    // hand-off could never reach the user-invoked improve-codebase-architecture
+    // Skill. The fork version never delegates, so the self-contained
+    // post-mortem is re-inserted on the new upstream base instead.
+    expect(skill).not.toContain("/improve-codebase-architecture")
+    expect(skill).toContain("Phase 6 — Cleanup + post-mortem")
+    expect(skill).toContain("record the specific architectural follow-up yourself")
+    expect(
+      patches.some((patch) => patch.type === "replace" && patch.pattern === "## Phase 6 — Cleanup"),
+      "diagnosing-bugs Phase 6 heading patch",
+    ).toBe(true)
+    expect(
+      patches.some((patch) => patch.type === "replace" && patch.pattern?.includes("The hypothesis that turned out correct")),
+      "diagnosing-bugs post-mortem re-insertion patch",
+    ).toBe(true)
 
     // The debugging discipline the Skill exists for must survive the patches.
     expect(skill).toContain("Phase 1 — Build a feedback loop")
