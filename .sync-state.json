@@ -1,6 +1,6 @@
 {
   "diagnosing-bugs": {
-    "sha": "068b6e0c62393147daf03530149cdce209c93da8",
+    "sha": "9c9f36ccd3995266cd675468af71639c8dde1ec5",
     "files": [
       "SKILL.md",
       "agents/openai.yaml",
@@ -8,7 +8,7 @@
     ]
   },
   "prototype": {
-    "sha": "068b6e0c62393147daf03530149cdce209c93da8",
+    "sha": "9c9f36ccd3995266cd675468af71639c8dde1ec5",
     "files": [
       "LOGIC.md",
       "SKILL.md",
@@ -17,28 +17,28 @@
     ]
   },
   "grill-me": {
-    "sha": "068b6e0c62393147daf03530149cdce209c93da8",
+    "sha": "9c9f36ccd3995266cd675468af71639c8dde1ec5",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "handoff": {
-    "sha": "068b6e0c62393147daf03530149cdce209c93da8",
+    "sha": "9c9f36ccd3995266cd675468af71639c8dde1ec5",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "to-questionnaire": {
-    "sha": "068b6e0c62393147daf03530149cdce209c93da8",
+    "sha": "9c9f36ccd3995266cd675468af71639c8dde1ec5",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "wizard": {
-    "sha": "068b6e0c62393147daf03530149cdce209c93da8",
+    "sha": "9c9f36ccd3995266cd675468af71639c8dde1ec5",
     "files": [
       "SKILL.md",
       "agents/openai.yaml",
@@ -46,7 +46,7 @@
     ]
   },
   "teach": {
-    "sha": "068b6e0c62393147daf03530149cdce209c93da8",
+    "sha": "9c9f36ccd3995266cd675468af71639c8dde1ec5",
     "files": [
       "GLOSSARY-FORMAT.md",
       "LEARNING-RECORD-FORMAT.md",
@@ -57,7 +57,7 @@
     ]
   },
   "writing-for-agents": {
-    "sha": "068b6e0c62393147daf03530149cdce209c93da8",
+    "sha": "9c9f36ccd3995266cd675468af71639c8dde1ec5",
     "files": [
       "SKILL-MECHANICS.md",
       "SKILL.md",
@@ -74,7 +74,7 @@
     ]
   },
   "nuclear-review": {
-    "sha": "2a8044425c7bddf429c3bdedf3ab61e791d34d65",
+    "sha": "c7f203457c16815379130697c41e74fd202e9978",
     "files": [
       "SKILL.md"
     ]
@@ -125,7 +125,7 @@
     ]
   },
   "i-have-adhd": {
-    "sha": "2ed064090711586e0c97a2fbbf15465fe8f1808b",
+    "sha": "1fa9c7cc4b8a4e1e247388d213214bdc83ce8e67",
     "files": [
       "SKILL.md",
       "agents/gemini.toml",
@@ -140,7 +140,7 @@
     ]
   },
   "archify": {
-    "sha": "cffdd42eed0ebf013aa070378d94facdd3d56b10",
+    "sha": "e1ac748f19cf805e44bf74fb93c796662152e273",
     "files": [
       "LICENSE",
       "SKILL.md",
@@ -149,10 +149,13 @@
       "bin/open-artifact.mjs",
       "bin/preview.mjs",
       "bin/visual-check.mjs",
+      "brand-marks/README.md",
+      "brand-marks/catalog.json",
       "delta/architecture-delta.mjs",
       "examples/agent-run.lifecycle.json",
       "examples/agent-tool-call.workflow.json",
       "examples/async-job-roundtrip.sequence.json",
+      "examples/brand-aware-delivery.architecture.json",
       "examples/cache-miss-request.sequence.json",
       "examples/checkout-platform.base.architecture.json",
       "examples/checkout-platform.head.architecture.json",
@@ -167,6 +170,7 @@
       "package.json",
       "recipes/scenarios.mjs",
       "references/authoring-contract.md",
+      "references/brand-marks.md",
       "references/delivery-contract.md",
       "references/viewer-runtime.md",
       "renderers/architecture/grid.mjs",
@@ -177,9 +181,11 @@
       "renderers/lifecycle/render-lifecycle.mjs",
       "renderers/sequence/README.md",
       "renderers/sequence/render-sequence.mjs",
+      "renderers/shared/brand-marks.mjs",
       "renderers/shared/cli.mjs",
       "renderers/shared/diagnostics.mjs",
       "renderers/shared/engineering-profiles.mjs",
+      "renderers/shared/generated-brand-marks.mjs",
       "renderers/shared/generated-validators.mjs",
       "renderers/shared/geometry.mjs",
       "renderers/shared/layout-report.mjs",
@@ -199,6 +205,7 @@
       "schemas/sequence.schema.json",
       "schemas/workflow.schema.json",
       "scripts/check-render-output.mjs",
+      "scripts/generate-brand-marks.mjs",
       "scripts/generate-validators.mjs",
       "scripts/render-examples.mjs"
     ]
