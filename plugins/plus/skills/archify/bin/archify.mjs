@@ -23,6 +23,8 @@ function usage() {
   archify check <output.html>
   archify visual-check <output.html> [--json]
   archify guide [scenario or question] [--json] [--lang en|zh]
+  archify brands [name, alias, domain, or category] [--json]
+  archify brands capture <url> [--json]
   archify examples
   archify doctor
   archify demo [output-directory]
@@ -1404,6 +1406,62 @@ async function commandGuide(args) {
   console.log(json ? JSON.stringify(result, null, 2) : guide.formatScenarioRecommendation(result));
 }
 
+async function commandBrands(args) {
+  const json = args.includes('--json');
+  const unknown = args.filter((arg) => arg.startsWith('--') && arg !== '--json');
+  if (unknown.length) fail(`Unknown brands option "${unknown[0]}".`);
+  const positional = args.filter((arg) => arg !== '--json');
+  if (positional[0] === 'capture') {
+    if (positional.length !== 2) fail('Usage: archify brands capture <url> [--json]');
+    const { captureBrandReference } = await import('../renderers/shared/brand-marks.mjs');
+    let capture;
+    try {
+      capture = await captureBrandReference(positional[1]);
+    } catch (error) {
+      fail(error.message);
+    }
+    const result = {
+      schemaVersion: 1,
+      ok: true,
+      command: 'brands capture',
+      brand: capture.brand,
+      evidence: {
+        status: capture.resolved.status,
+        source: capture.resolved.sourceUrl,
+        ...(capture.resolved.sha256 ? { sha256: capture.resolved.sha256 } : {}),
+        ...(capture.resolved.contentType ? { contentType: capture.resolved.contentType } : {}),
+      },
+    };
+    console.log(json ? JSON.stringify(result, null, 2) : JSON.stringify(result.brand));
+    return;
+  }
+  const query = positional.join(' ').trim();
+  const { listBrandMarks } = await import('../renderers/shared/brand-marks.mjs');
+  const marks = listBrandMarks(query);
+  if (json) {
+    console.log(JSON.stringify({
+      schemaVersion: 1,
+      ok: true,
+      command: 'brands',
+      query,
+      count: marks.length,
+      marks,
+      fallback: 'Run "archify brands capture <url> --json", then use the returned digest-pinned brand value.',
+    }, null, 2));
+    return;
+  }
+  if (!marks.length) {
+    console.log(`No built-in brand matched "${query}". Run "archify brands capture <url> --json", then use the returned digest-pinned brand value.`);
+    return;
+  }
+  const grouped = Map.groupBy
+    ? Map.groupBy(marks, (mark) => mark.category)
+    : marks.reduce((map, mark) => map.set(mark.category, [...(map.get(mark.category) || []), mark]), new Map());
+  for (const [category, entries] of grouped) {
+    console.log(`${category}: ${entries.map((mark) => mark.id).join(', ')}`);
+  }
+}
+
 function commandDemo(args) {
   if (args.length > 1) fail(usage());
 
@@ -1570,6 +1628,9 @@ switch (command) {
     break;
   case 'guide':
     await commandGuide(args);
+    break;
+  case 'brands':
+    await commandBrands(args);
     break;
   case 'examples':
     commandExamples();
