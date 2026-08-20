@@ -13,12 +13,15 @@ skills:
       # 无此问题）。这里在新上游基线上恢复 fork 的自包含 post-mortem。
       # 锚定末条 checklist 而非 append_content：上游再重构 Phase 6 时补丁
       # 显式失败，而不是静默漂移到文件末尾。
+      # 上游 3216582 全仓去除 em-dash（Phase 6 标题与该 checklist 均改为冒号/逗号
+      # 风格），锚点随之更新；恢复的 post-mortem 文案同样改为无 em-dash 写法，
+      # 跟随上游 e6e9577 的写作约定。
       - type: replace
-        pattern: "## Phase 6 — Cleanup"
-        with: "## Phase 6 — Cleanup + post-mortem"
+        pattern: "## Phase 6: Cleanup"
+        with: "## Phase 6: Cleanup + post-mortem"
       - type: replace
-        pattern: "- [ ] The hypothesis that turned out correct is stated in the commit / PR message — so the next debugger learns"
-        with: "- [ ] The hypothesis that turned out correct is stated in the commit / PR message — so the next debugger learns\n\n**Then ask: what would have prevented this bug?** If the answer involves architectural change (no good test seam, tangled callers, hidden coupling), record the specific architectural follow-up yourself in this session — name the files and seams involved, the change you would make, and why the bug was able to hide there. Make the recommendation **after** the fix is in, not before — you have more information now than when you started."
+        pattern: "- [ ] The hypothesis that turned out correct is stated in the commit / PR message, so the next debugger learns"
+        with: "- [ ] The hypothesis that turned out correct is stated in the commit / PR message, so the next debugger learns\n\n**Then ask: what would have prevented this bug?** If the answer involves architectural change (no good test seam, tangled callers, hidden coupling), record the specific architectural follow-up yourself in this session: name the files and seams involved, the change you would make, and why the bug was able to hide there. Make the recommendation **after** the fix is in, not before. You have more information now than when you started."
 
   prototype:
     source: { repo: mattpocock/skills, path: skills/engineering/prototype, ref: main }
@@ -298,7 +301,7 @@ skills:
             pattern: "    \"test:webm\": \"node test/webm-artifact.smoke.mjs\",\n"
             with: ""
           - type: replace_all
-            pattern: "    \"test\": \"npm run check:validators && npm run check:release-identity && node test/golden.mjs && node ../scripts/run-tests.mjs\",\n"
+            pattern: "    \"test\": \"npm run check:brand-marks && npm run check:validators && npm run check:release-identity && node test/golden.mjs && node ../scripts/run-tests.mjs\",\n"
             with: ""
           - type: replace_all
             pattern: "    \"check:release-identity\": \"node ../scripts/check-release-identity.mjs\",\n"

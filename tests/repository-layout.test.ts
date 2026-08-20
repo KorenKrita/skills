@@ -320,10 +320,12 @@ describe("repository layout", () => {
     // Skill. The fork version never delegates, so the self-contained
     // post-mortem is re-inserted on the new upstream base instead.
     expect(skill).not.toContain("/improve-codebase-architecture")
-    expect(skill).toContain("Phase 6 — Cleanup + post-mortem")
+    // 上游 3216582 将标题分隔符从 em-dash 改为冒号；正则容忍两种分隔
+    // 符，断言的是 post-mortem 段落存活，而非钉死标点风格。
+    expect(skill).toMatch(/Phase 6 ?[:—] ?Cleanup \+ post-mortem/)
     expect(skill).toContain("record the specific architectural follow-up yourself")
     expect(
-      patches.some((patch) => patch.type === "replace" && patch.pattern === "## Phase 6 — Cleanup"),
+      patches.some((patch) => patch.type === "replace" && patch.pattern === "## Phase 6: Cleanup"),
       "diagnosing-bugs Phase 6 heading patch",
     ).toBe(true)
     expect(
@@ -332,9 +334,9 @@ describe("repository layout", () => {
     ).toBe(true)
 
     // The debugging discipline the Skill exists for must survive the patches.
-    expect(skill).toContain("Phase 1 — Build a feedback loop")
+    expect(skill).toMatch(/Phase 1 ?[:—] ?Build a feedback loop/)
     expect(skill).toContain("### Tighten the loop")
-    expect(skill).toContain("Phase 5 — Fix + regression test")
+    expect(skill).toMatch(/Phase 5 ?[:—] ?Fix \+ regression test/)
     expect(skill).toContain("No red-capable command, no Phase 2.")
   })
 
