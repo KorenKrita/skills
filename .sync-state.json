@@ -1,6 +1,6 @@
 {
   "diagnosing-bugs": {
-    "sha": "9c9f36ccd3995266cd675468af71639c8dde1ec5",
+    "sha": "885e2ca4d842d139e9aef4e48d366c63cb1b8013",
     "files": [
       "SKILL.md",
       "agents/openai.yaml",
@@ -8,7 +8,7 @@
     ]
   },
   "prototype": {
-    "sha": "9c9f36ccd3995266cd675468af71639c8dde1ec5",
+    "sha": "885e2ca4d842d139e9aef4e48d366c63cb1b8013",
     "files": [
       "LOGIC.md",
       "SKILL.md",
@@ -17,28 +17,28 @@
     ]
   },
   "grill-me": {
-    "sha": "9c9f36ccd3995266cd675468af71639c8dde1ec5",
+    "sha": "885e2ca4d842d139e9aef4e48d366c63cb1b8013",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "handoff": {
-    "sha": "9c9f36ccd3995266cd675468af71639c8dde1ec5",
+    "sha": "885e2ca4d842d139e9aef4e48d366c63cb1b8013",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "to-questionnaire": {
-    "sha": "9c9f36ccd3995266cd675468af71639c8dde1ec5",
+    "sha": "885e2ca4d842d139e9aef4e48d366c63cb1b8013",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "wizard": {
-    "sha": "9c9f36ccd3995266cd675468af71639c8dde1ec5",
+    "sha": "885e2ca4d842d139e9aef4e48d366c63cb1b8013",
     "files": [
       "SKILL.md",
       "agents/openai.yaml",
@@ -46,7 +46,7 @@
     ]
   },
   "teach": {
-    "sha": "9c9f36ccd3995266cd675468af71639c8dde1ec5",
+    "sha": "885e2ca4d842d139e9aef4e48d366c63cb1b8013",
     "files": [
       "GLOSSARY-FORMAT.md",
       "LEARNING-RECORD-FORMAT.md",
@@ -57,7 +57,7 @@
     ]
   },
   "writing-for-agents": {
-    "sha": "9c9f36ccd3995266cd675468af71639c8dde1ec5",
+    "sha": "885e2ca4d842d139e9aef4e48d366c63cb1b8013",
     "files": [
       "SKILL-MECHANICS.md",
       "SKILL.md",
@@ -74,7 +74,7 @@
     ]
   },
   "nuclear-review": {
-    "sha": "c7f203457c16815379130697c41e74fd202e9978",
+    "sha": "fd6dd6f7276956a532bb78a748a8d2818b6eb5f4",
     "files": [
       "SKILL.md"
     ]
@@ -125,7 +125,7 @@
     ]
   },
   "i-have-adhd": {
-    "sha": "1fa9c7cc4b8a4e1e247388d213214bdc83ce8e67",
+    "sha": "e7555fcaf612dfa1739dc86610ea926a906db614",
     "files": [
       "SKILL.md",
       "agents/gemini.toml",
@@ -140,7 +140,7 @@
     ]
   },
   "archify": {
-    "sha": "e1ac748f19cf805e44bf74fb93c796662152e273",
+    "sha": "82e63c9ec3cc169b87d2829faae061f3dac8dba1",
     "files": [
       "LICENSE",
       "SKILL.md",
