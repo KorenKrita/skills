@@ -1,10 +1,11 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { esc, renderDefinitions, renderSemanticSigil, textUnits } from '../shared/utils.mjs';
-import { animateAttr, focusEdgeAttrs, focusNodeAttrs, focusNodeTitle, loadDiagram, writeDiagram, svgAccessibleText, svgRootAttrs } from '../shared/cli.mjs';
+import { animateAttr, focusEdgeAttrs, focusNodeAttrs, focusNodeTitle, loadDiagramWithBrandMarks, writeDiagram, svgAccessibleText, svgRootAttrs } from '../shared/cli.mjs';
 import { throwDiagnosticProblems } from '../shared/diagnostics.mjs';
 import { resolveLegend, renderLegend as renderResolvedLegend } from '../shared/legend.mjs';
 import { availableNodeTextWidth, fittedNodeFontSize, minimumNodeTextWidth } from '../shared/text-fit.mjs';
+import { brandLabelFitWidth, brandMetadataFor, brandTopRailProblem, renderBrandMark } from '../shared/brand-marks.mjs';
 import {
   asArray,
   isFinitePoint,
@@ -39,7 +40,7 @@ const nodeTextFit = {
 };
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const { diagram: dataflow, template, outPath } = loadDiagram({
+const { diagram: dataflow, template, outPath } = await loadDiagramWithBrandMarks({
   rendererDir: __dirname,
   diagramType: 'dataflow',
   defaultExample: 'product-analytics.dataflow.json'
@@ -149,6 +150,8 @@ function validateDataflow() {
     if (estLabelW > node.width + 6) {
       problems.push(`Label "${node.label}" (~${Math.round(estLabelW)}px) is wider than node "${node.id}" (${node.width}px) — shorten the label or increase node.width.`);
     }
+    const brandRailProblem = brandTopRailProblem(node, node.width, 8);
+    if (brandRailProblem) problems.push(brandRailProblem);
     // sublabel and tag render as single unwrapped <text> elements; shrink-to-fit
     // handles the ordinary case, this rejects what it cannot rescue.
     const availableTextW = availableNodeTextWidth(node.width);
@@ -352,13 +355,15 @@ function renderNode(node) {
     : '';
   const stage = asArray(dataflow.stages)[node.stage];
   const context = stage ? `${String(node.stage + 1).padStart(2, '0')} / ${stage.label}` : 'Data-flow node';
-  const passport = { kind: node.type, sublabel: node.sublabel, tag: node.tag, context };
+  const brand = renderBrandMark(node, { x: node.x + node.width - 22, y: node.y + 6 });
+  const labelFontSize = fittedNodeFontSize(node.label, brandLabelFitWidth(node, node.width), 10, 8);
+  const passport = { kind: node.type, sublabel: node.sublabel, tag: node.tag, context, ...brandMetadataFor(node) };
   return `        <g ${focusNodeAttrs(node.id, node.label, passport)}>
           ${focusNodeTitle(node.label, passport)}
           <rect x="${node.x}" y="${node.y}" width="${node.width}" height="${node.height}" rx="6" class="c-mask"/>
           <rect x="${node.x}" y="${node.y}" width="${node.width}" height="${node.height}" rx="6" class="${fill}"${animateAttr(dataflow.meta, 'node', nodeSteps.get(node.id))} stroke-width="1.5"/>
-          ${renderSemanticSigil(node.type, { x: node.x + 6, y: node.y + 6 })}
-          <text${hasSub ? ' data-detail-anchor' : ''} x="${node.cx}" y="${node.y + 21}" class="t-primary" font-size="10" font-weight="600" text-anchor="middle">${esc(node.label)}</text>${sub}${tag}
+          ${renderSemanticSigil(node.type, { x: node.x + 6, y: node.y + 6 })}${brand ? `\n          ${brand}` : ''}
+          <text${hasSub ? ' data-detail-anchor' : ''} x="${node.cx}" y="${node.y + 21}" class="t-primary" font-size="${labelFontSize}" font-weight="600" text-anchor="middle">${esc(node.label)}</text>${sub}${tag}
         </g>`;
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "archify",
-  "version": "2.14.0",
+  "version": "2.15.0",
   "private": true,
   "type": "module",
   "description": "JSON-IR diagram renderers (architecture / workflow / sequence / dataflow / lifecycle).",
@@ -12,10 +12,13 @@
     "node": ">=18"
   },
   "scripts": {
+    "generate:brand-marks": "node scripts/generate-brand-marks.mjs",
+    "check:brand-marks": "node scripts/generate-brand-marks.mjs --check",
     "generate:validators": "node scripts/generate-validators.mjs",
     "check:validators": "node scripts/generate-validators.mjs --check"
   },
   "devDependencies": {
-    "ajv": "^8.17.1"
+    "ajv": "^8.17.1",
+    "simple-icons": "16.28.0"
   }
 }

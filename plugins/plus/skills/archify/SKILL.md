@@ -3,7 +3,7 @@ name: archify
 description: Create professional architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with SVG, pan/zoom, search, semantic relationship inspection, presentation mode, dark/light themes, optional motion, and PNG/JPEG/WebP/SVG/WebM export. Accepts plain-language descriptions or Mermaid flowchart, sequenceDiagram, and stateDiagram input, then lays diagrams out in Archify style. Use when the user asks for system or cloud architecture, infrastructure and network topology, security boundaries, technical or approval workflows, runbooks, CI/CD flows, API call sequences, request lifecycles, data pipelines, ETL/ELT, PII boundaries, data lineage, state machines, lifecycle/status transitions, or conversion/beautification of Mermaid diagrams.
 license: MIT
 metadata:
-  version: "2.14"
+  version: "2.15"
   author: tt-a1i
   based_on: Cocoon-AI/architecture-diagram-generator (MIT, v1.0)
 ---
@@ -17,7 +17,7 @@ Create a self-contained, interactive HTML diagram from a small typed JSON specif
 Use this bounded path for ordinary generation. Do not read the optional Viewer Runtime reference unless the user asks about those features.
 
 1. Choose `architecture`, `workflow`, `sequence`, `dataflow`, or `lifecycle` from the question.
-2. Read one matching schema in `schemas/`, `schemas/common.schema.json`, and one matching JSON example in `examples/`. Read only those files. Fresh authorship means new stable IDs, domain wording, and layout; use the example for field shape, not facts.
+2. Read one matching schema in `schemas/`, `schemas/common.schema.json`, and one matching JSON example in `examples/`. Read only those files. Fresh authorship means new stable IDs, domain wording, and layout; use the example for field shape, not facts. When real product identity matters, query `node bin/archify.mjs brands "<name>" --json`; read `references/brand-marks.md` only for an unknown brand with a user-provided URL.
 3. Artifact first: the next tool action must write the candidate. Write the candidate before inspecting renderer internals. Do not plan exact coordinates in prose. Start with one clear main path, short side branches, sparse labels, and at most 12 primary nodes. Set `meta.quality_profile` to `"showcase"` unless the user explicitly requests a dense `standard` map. Start with automatic routes and labels. Do not add `via`, `channelX`, `channelY`, or `labelAt` before a diagnostic calls for one; apply at most one diagnosed geometry control per repair.
 4. Validate after every candidate edit and immediately before handoff:
 
@@ -67,6 +67,7 @@ Read Mermaid for topology and meaning, then author fresh Archify JSON; do not me
 - Omit `meta.legend` for the truthful `auto` default. When needed, use only `mode: auto|all|hidden` and renderer-supported `entries.<kind>.label|visible`; labels never change semantics.
 - Match every reader-facing authored string to the language of the user's request, or the conversation's dominant language when the request is language-neutral. Apply it consistently to titles/subtitles, node/edge/boundary/lane/group text, guided-view labels/notes, legend label overrides, and card titles/items; use another language or bilingual copy only when the user asks.
 - Preserve exact product names, code identifiers, commands, protocols, API paths, and environment names. They may remain English inside localized copy, but never justify leaving the surrounding explanatory prose in another language.
+- Brand identity is optional and explicit. Put a canonical built-in ID in `brand` when the node names that real product. If no preset matches and the user supplied the official HTTP(S) URL, first run `node bin/archify.mjs brands capture "<url>" --json`, then author the returned digest-pinned `brand` object. Render and validate never perform an unpinned capture. Otherwise omit `brand`. Never infer a brand from a vague role such as "database", and never let a badge replace the semantic `type`, label, or relationship facts.
 - For sequence diagrams, omit `meta.column_fit` for the stable `fixed` layout. Set it to `"spread"` when a wide viewBox would otherwise leave unused horizontal space or when meaningful participant labels do not fit the fixed boxes; do not shorten semantic labels before trying `spread`.
 - Component types are `frontend`, `backend`, `database`, `cloud`, `security`, `messagebus`, and `external`; variants are `default`, `emphasis`, `security`, and `dashed`.
 - Relationship labels are semantic data. When one collides, move the label, adjust the route or spacing, then shorten the wording while preserving meaning. Only delete a label when both endpoints fully imply the relationship and it contains no protocol, action, direction, synchronous/asynchronous behavior, or cross-boundary mechanism; explain why the deleted label is redundant. Never delete a meaningful label merely to pass `showcase`.
