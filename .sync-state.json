@@ -74,7 +74,7 @@
     ]
   },
   "nuclear-review": {
-    "sha": "46125561306434d8a1d7745d540d8932ab0cd2a2",
+    "sha": "bdf7aa355337897f167153e05069aca505dae17c",
     "files": [
       "SKILL.md"
     ]
@@ -88,7 +88,7 @@
     ]
   },
   "read": {
-    "sha": "831d9b96d80165e8a0211314055da21452edda56",
+    "sha": "f902996e6da57311b206e88f9a4e8cad5f1cc601",
     "files": [
       "SKILL.md",
       "references/read-methods.md",
@@ -140,7 +140,7 @@
     ]
   },
   "archify": {
-    "sha": "95e8a3a9d50136bc34e1093edbca7d4a52e974aa",
+    "sha": "4be6da578b99fb3a5afaa2eea2fedcc956c1381e",
     "files": [
       "LICENSE",
       "SKILL.md",
@@ -189,6 +189,7 @@
       "renderers/shared/generated-brand-marks.mjs",
       "renderers/shared/generated-validators.mjs",
       "renderers/shared/geometry.mjs",
+      "renderers/shared/i18n.mjs",
       "renderers/shared/layout-report.mjs",
       "renderers/shared/legend.mjs",
       "renderers/shared/output-path.mjs",
