@@ -33,18 +33,37 @@ them, or widen the viewBox using the emitted diagnostic.
 
 ## Language consistency
 
-Default all reader-facing authored copy to the language of the user's request,
-or to the conversation's dominant language when the request itself is
-language-neutral. Apply that choice to titles, subtitles, node and relationship
-copy, boundaries, lanes, groups, guided views, legend labels, and cards. Use
-another language or bilingual copy only when the user asks for it.
+Choose one primary authored language. An explicit user choice wins; otherwise
+use the language of the request, or the conversation's dominant language when
+the request itself is language-neutral. Separately choose the Viewer locale.
+For supported languages, always write the matching `meta.locale`: `"en"` for
+English or `"zh-CN"` for Simplified Chinese. The renderer consumes the authored
+locale without inferring language from diagram strings. Documents that omit it
+remain valid and default to English.
+
+`meta.locale` controls only renderer-owned reader surfaces: `<html lang>`, the
+document-title suffix, default SVG description and focus labels, default legend
+labels, and fixed Viewer controls, statuses, accessibility names, and errors.
+It never translates authored content. Apply the primary language separately to
+titles, subtitles, node and relationship copy, boundaries, lanes, groups,
+guided views, legend label overrides, and cards. A bilingual diagram still
+chooses one primary locale for the Viewer; follow an explicit primary-language
+request, then prompt order or conversation dominance.
+
+For a requested language outside `en` and `zh-CN`, do not write an unsupported
+locale. Keep every reader-facing authored string in the requested language,
+omit `meta.locale` so the renderer safely uses English, and explicitly tell the
+user that fixed Viewer UI and `<html lang>` remain English and the artifact is
+not fully localized. The fallback applies only to renderer-owned surfaces; it
+never permits authored copy to fall back to English. Do not silently substitute
+`zh-CN` for another language or Chinese locale.
 
 Keep exact product names, code identifiers, commands, protocols, API paths, and
 environment names intact. Those terms may remain English inside localized copy,
-but surrounding explanatory prose must still use the selected language. For a
-non-English diagram, localize visible semantic legend labels through
-`meta.legend.entries`; renderer-owned viewer controls remain separate from
-authored copy and are not a reason to mix languages in the specification.
+but surrounding explanatory prose must still use the selected language.
+Renderer-owned default legend labels follow `meta.locale`; author a
+`meta.legend.entries.*.label` override only when the diagram needs different
+domain wording, and keep that authored override in the primary language.
 
 ## Visual preset default
 
