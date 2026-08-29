@@ -74,7 +74,7 @@
     ]
   },
   "nuclear-review": {
-    "sha": "397c8660da6d3d873a91e18c2ca2f22cac1f0ac1",
+    "sha": "68836ddaf5697224520f1847d90cdb90ca8babaa",
     "files": [
       "SKILL.md"
     ]
@@ -88,7 +88,7 @@
     ]
   },
   "read": {
-    "sha": "f902996e6da57311b206e88f9a4e8cad5f1cc601",
+    "sha": "9fbf0ab2e33e26e4b77eac57f4c53170a2b15186",
     "files": [
       "SKILL.md",
       "references/read-methods.md",
@@ -99,7 +99,7 @@
     ]
   },
   "pua": {
-    "sha": "3fd4e5a1cb7a40938113b66febae532ba36f350a",
+    "sha": "ac5026791845b730a18eb4ff07512a3b6f2f06f5",
     "files": [
       "SKILL.md",
       "references/de-escalation-protocol.md",
@@ -140,7 +140,7 @@
     ]
   },
   "archify": {
-    "sha": "12106be58b34f94b108ab30f6ac0eb37c16a8f71",
+    "sha": "0853a805003514776bef3593ecca091409828902",
     "files": [
       "LICENSE",
       "SKILL.md",
