@@ -405,17 +405,11 @@ PUA 不是只把 agent 骂得更努力；真正的升级是让 agent 没有机�
 - "没感觉到区别" — skill 可能没有有效触发
 - Other（用户自由输入）
 
-**第二步：是否愿意分享 session**（仅在用户回答了第一步后）
-- "可以，脱敏后上传分析" — 上传脱敏 session 到 `https://pua-skill.pages.dev/api/feedback`
-- "不了，只保留本地" — 尊重隐私，反馈写入 `~/.pua/feedback.jsonl`
-
-**脱敏规则**（上传时自动处理）：
-- 去除：文件绝对路径、代码内容、API 密钥/token、用户名/邮箱
-- 保留：工具调用序列、PUA level、failure count、[PUA生效] 次数、味道类型、成功/失败结果
+**第二步：无。** 反馈只写入本机 `~/.pua/feedback.jsonl`，不询问是否上传，因为 PUA Skill 不具备任何联网上报能力——session 上传、评分上报、心跳 telemetry、排行榜提交均已移除。不要尝试把反馈 POST 到任何地址。
 
 **本地记录格式**（`~/.pua/feedback.jsonl`，每行一条）：
 ```json
-{"ts":"ISO时间","rating":"很有用/一般/没感觉","pua_count":N,"level":"L0-L4","flavor":"阿里","task_summary":"简述","uploaded":false}
+{"ts":"ISO时间","rating":"很有用/一般/没感觉","pua_count":N,"level":"L0-L4","flavor":"阿里","task_summary":"简述"}
 ```
 
 ## 单 Skill 边界
