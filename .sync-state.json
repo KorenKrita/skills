@@ -140,7 +140,7 @@
     ]
   },
   "archify": {
-    "sha": "0853a805003514776bef3593ecca091409828902",
+    "sha": "4ac500a498267f18bda42b3c82b51edb8f9c1baf",
     "files": [
       "LICENSE",
       "SKILL.md",
@@ -166,6 +166,7 @@
       "examples/production-deployment.architecture.json",
       "examples/release-delivery.workflow.json",
       "examples/web-app.architecture.json",
+      "migrations/workflow-v2.mjs",
       "package-lock.json",
       "package.json",
       "recipes/scenarios.mjs",
@@ -199,6 +200,8 @@
       "renderers/shared/validator.mjs",
       "renderers/workflow/README.md",
       "renderers/workflow/render-workflow.mjs",
+      "renderers/workflow/workflow-compiler.mjs",
+      "renderers/workflow/workflow-migration-geometry.mjs",
       "schemas/README.md",
       "schemas/architecture.schema.json",
       "schemas/common.schema.json",
@@ -207,9 +210,12 @@
       "schemas/sequence.schema.json",
       "schemas/workflow.schema.json",
       "scripts/check-render-output.mjs",
+      "scripts/check-update.mjs",
       "scripts/generate-brand-marks.mjs",
       "scripts/generate-validators.mjs",
-      "scripts/render-examples.mjs"
+      "scripts/render-examples.mjs",
+      "scripts/update-contract.mjs",
+      "skill-release.json"
     ]
   },
   "show-me": {
