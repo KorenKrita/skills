@@ -7,20 +7,6 @@ import { isExcludedFile, isUpstreamOwned, upstreamOwnedNames } from "../scripts/
 const ROOT = new URL("../", import.meta.url).pathname.replace(/\/$/, "")
 const PLUGINS = ["base", "plus"] as const
 
-const REMOVED_PUA_SKILLS = [
-  "ding",
-  "mama",
-  "p10",
-  "p7",
-  "p9",
-  "pro",
-  "pua-en",
-  "pua-ja",
-  "pua-loop",
-  "shot",
-  "yes",
-] as const
-
 const EXPECTED_SKILLS = {
   base: [
     "diagnosing-bugs",
@@ -43,7 +29,6 @@ const EXPECTED_SKILLS = {
     "razor",
     "read",
     "show-me",
-    "pua",
   ],
 } as const
 
@@ -441,57 +426,16 @@ describe("repository layout", () => {
     expect(existsSync(join(dir, "HTML-REPORT.md"))).toBe(true)
   })
 
-  it("ships exactly one upstream PUA Skill inside Plus", () => {
+  it("does not publish or resync the removed pua Skill", () => {
     const overrides = readOverrides()
     const state = JSON.parse(readFileSync(join(ROOT, ".sync-state.json"), "utf-8")) as Record<
       string,
-      { sha?: string; files?: string[] }
+      unknown
     >
-    const plusRoot = join(ROOT, "plugins", "plus")
-    const puaRoot = join(plusRoot, "skills", "pua")
-    const entry = overrides.skills.pua
 
-    expect(entry?.plugin).toBe("plus")
-    expect(entry?.ownership).not.toBe("local")
-    expect((entry as { source?: { path?: string } })?.source?.path).toBe("skills/pua")
-    expect(state.pua?.sha).toMatch(/^[0-9a-f]{40}$/)
-    expect(existsSync(join(puaRoot, "SKILL.md"))).toBe(true)
-
-    for (const skill of REMOVED_PUA_SKILLS) {
-      expect(overrides.skills[skill], skill).toBeUndefined()
-      expect(state[skill], skill).toBeUndefined()
-      expect(existsSync(join(plusRoot, "skills", skill)), skill).toBe(false)
-    }
-
-    for (const asset of ["commands", "hooks", "scripts"]) {
-      expect(existsSync(join(plusRoot, asset)), asset).toBe(false)
-    }
-
-    for (const reference of entry?.exclude_files ?? []) {
-      expect(existsSync(join(puaRoot, reference)), reference).toBe(false)
-      expect(state.pua?.files ?? [], reference).not.toContain(reference)
-    }
-  })
-
-  it("keeps the single PUA Skill self-contained without sibling routes or automatic runtime claims", () => {
-    const root = join(ROOT, "plugins", "plus", "skills", "pua")
-    const runtime = textFiles(root).map((path) => readFileSync(path, "utf-8")).join("\n")
-
-    expect(runtime).toContain("**/plus/skills/pua/SKILL.md")
-    expect(runtime).toContain("## 单 Skill 边界")
-    expect(runtime).toContain("本发行版不附带遥测脚本")
-    expect(runtime).not.toMatch(/\/(?:pua|plus):[a-z0-9-]+/)
-    expect(runtime).not.toMatch(/\/(?:pua|plus)(?:\s|`)/)
-
-    for (const staleRuntimeClaim of [
-      "v3.1 起注册 SubagentStop",
-      "pua-loop-hook.sh 的 Gate 0 保留",
-      "default=true",
-      "hook 自动",
-      "每次标记时静默上报",
-    ]) {
-      expect(runtime, staleRuntimeClaim).not.toContain(staleRuntimeClaim)
-    }
+    expect(overrides.skills.pua).toBeUndefined()
+    expect(state.pua).toBeUndefined()
+    expect(existsSync(join(ROOT, "plugins", "plus", "skills", "pua"))).toBe(false)
   })
 
   it("keeps only the approved plugin-level assets", () => {

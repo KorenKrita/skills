@@ -1,6 +1,6 @@
 # ADR-0007: plus 只发布一个 PUA Skill
 
-## Status: Accepted
+## Status: Superseded by ADR-0008
 
 ## Context
 
