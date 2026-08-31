@@ -298,7 +298,7 @@ skills:
       - target: package.json
         patches:
           - type: replace_all
-            pattern: "    \"test:webm\": \"node test/webm-artifact.smoke.mjs\",\n"
+            pattern: "    \"test:webm\": \"node test/webm-artifact.smoke.mjs && node --test test/site-language-integration.mjs\",\n"
             with: ""
           - type: replace_all
             pattern: "    \"test\": \"npm run check:brand-marks && npm run check:validators && npm run check:release-identity && node test/golden.mjs && node ../scripts/run-tests.mjs\",\n"
