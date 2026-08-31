@@ -15,8 +15,8 @@ plugins:
       - prototyping
       - workflow
   plus:
-    version: 0.0.25
-    description: 决策方法、代码质量审查、读取工具、中文写作优化、可视化讲解、架构图与 PUA 高能动性治理
+    version: 0.0.26
+    description: 决策方法、代码质量审查、读取工具、中文写作优化、可视化讲解与架构图
     category: productivity
     keywords:
       - decision
@@ -25,6 +25,3 @@ plugins:
       - writing
       - diagram
       - architecture
-      - pua
-      - coaching
-      - agent-governance

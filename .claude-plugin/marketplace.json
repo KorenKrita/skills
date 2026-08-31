@@ -22,9 +22,9 @@
     },
     {
       "name": "plus",
-      "version": "0.0.25",
+      "version": "0.0.26",
       "source": "./plugins/plus",
-      "description": "决策方法、代码质量审查、读取工具、中文写作优化、可视化讲解、架构图与 PUA 高能动性治理",
+      "description": "决策方法、代码质量审查、读取工具、中文写作优化、可视化讲解与架构图",
       "strict": false,
       "category": "productivity",
       "keywords": [
@@ -33,10 +33,7 @@
         "review",
         "writing",
         "diagram",
-        "architecture",
-        "pua",
-        "coaching",
-        "agent-governance"
+        "architecture"
       ]
     }
   ]
