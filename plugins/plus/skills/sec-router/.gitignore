@@ -1,0 +1,9 @@
+# Runtime artifacts produced inside the vendored tree — never commit.
+vendor/work/
+vendor/mcps/
+vendor/master-route-*/
+vendor/**/master-route-*/
+vendor/LOCAL-READINESS.md
+vendor/skills/field-journal/*
+vendor/skills/apk-reverse/debug.keystore
+vendor/*.keystore

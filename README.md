@@ -21,7 +21,7 @@
 
 ```text
 base               核心工程与协作流程
-base + plus  全部 18 个 Skill
+base + plus  全部 19 个 Skill（plus 含安全/逆向技能路由）
 ```
 
 ### Pi
@@ -82,6 +82,7 @@ Pi 加载两个 plugin 的 `skills/`；`plus` 的 plugin-level Agent 仅对 Clau
 - [op7418/Humanizer-zh](https://github.com/op7418/Humanizer-zh)
 - [tt-a1i/archify](https://github.com/tt-a1i/archify)
 - [dmmulroy/.dotfiles](https://github.com/dmmulroy/.dotfiles)
+- [zhaoxuya520/reverse-skill](https://github.com/zhaoxuya520/reverse-skill)
 
 ## 许可证
 

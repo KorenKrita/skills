@@ -28,6 +28,7 @@ const EXPECTED_SKILLS = {
     "nuclear-review",
     "razor",
     "read",
+    "sec-router",
     "show-me",
   ],
 } as const

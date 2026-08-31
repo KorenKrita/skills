@@ -251,3 +251,19 @@ skills:
       - examples/web-app-rendered.html
       - examples/workflow-agent-tool-call-rendered.html
       - test/
+
+  # Vendored cybersecurity router (zhaoxuya520/reverse-skill). The entire
+  # upstream tree ships under sec-router/vendor/ with SKILL.md renamed to
+  # MOD.md (Pi discovers nested SKILL.md recursively); the top-level SKILL.md
+  # is a thin routing entry owned by this repository. Updates run
+  # sec-router/update-vendor.sh; provenance and deviations in sec-router/VENDOR.md.
+  sec-router:
+    ownership: local
+    plugin: plus
+    provenance:
+      repo: zhaoxuya520/reverse-skill
+      path: .
+      ref: main
+      forked_at_sha: 71acc8e3115f76bad7a914c36466c1086232288c
+      forked_at: 2026-08-31
+      license: MIT; upstream tree retained under sec-router/vendor/ with upstream LICENSE
