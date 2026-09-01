@@ -130,23 +130,19 @@ skills:
     patches: []
   # ─── plus: engineering, thinking, tools, and writing ───────────────────────
 
-  # The /bro entry now combines the original plain-language restatement with
-  # mattpocock/skills wait-what's context-aware re-pitch behavior.
+  # dmmulroy's original plain-language restatement Skill, kept verbatim.
+  # The wait-what context-aware re-pitch behavior moved back to base's
+  # official wait-what when base became the full Matt mirror (ADR-0009).
   bro:
     ownership: local
     plugin: plus
     provenance:
-      repo: mattpocock/skills
-      path: skills/productivity/wait-what
+      repo: dmmulroy/.dotfiles
+      path: home/.agents/skills/bro
       ref: main
-      forked_at_sha: 0986ebaf5d29e812162702b2633a2942c30200d2
+      forked_at_sha: c2322c6534f586b146ae0e8d9296019396aa32c0
       forked_at: 2026-08-05
-      license: upstream Skill text retained under its original mattpocock/skills license
-      original_repo: dmmulroy/.dotfiles
-      original_path: home/.agents/skills/bro
-      original_ref: main
-      original_sha: c2322c6534f586b146ae0e8d9296019396aa32c0
-      original_license: no license declared by the upstream repository at fork time
+      license: no license declared by the upstream repository at fork time
 
   improve:
     source: { repo: shadcn/improve, path: skills/improve, ref: main }

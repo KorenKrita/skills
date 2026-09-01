@@ -53,6 +53,7 @@ const EXPECTED_SKILL_COUNT = Object.values(EXPECTED_SKILLS).flat().length
 
 /** Skills this repository maintains itself, excluded from upstream sync. */
 const LOCAL_SKILLS = ["bro"] as const
+const LOCAL_PROVENANCE_REPOS: Record<string, string> = { bro: "dmmulroy/.dotfiles" }
 
 /** base Skills removed from the subscription; nothing may still route to them. */
 const REMOVED_BASE_SKILLS = [] as const
@@ -171,7 +172,7 @@ describe("repository layout", () => {
       expect("source" in entry!, skill).toBe(false)
       expect(state[skill], skill).toBeUndefined()
       // Provenance keeps the fork origin and its license auditable.
-      expect(entry?.provenance?.repo, skill).toBe("mattpocock/skills")
+      expect(entry?.provenance?.repo, skill).toBe(LOCAL_PROVENANCE_REPOS[skill])
       expect(entry?.provenance?.forked_at_sha, skill).toMatch(/^[0-9a-f]{40}$/)
       expect(entry?.provenance?.license, skill).toContain("license")
       expect(existsSync(join(ROOT, "plugins", entry!.plugin, "skills", skill)), skill).toBe(true)
@@ -286,21 +287,21 @@ describe("repository layout", () => {
     }
   })
 
-  it("keeps bro as the local context-aware re-pitch Skill", () => {
+  it("keeps bro as the local dmmulroy original restatement Skill", () => {
     const entry = readOverrides().skills.bro
     const skill = readFileSync(join(ROOT, "plugins", "plus", "skills", "bro", "SKILL.md"), "utf-8")
 
     expect(entry?.ownership).toBe("local")
-    expect(entry?.provenance?.path).toBe("skills/productivity/wait-what")
-    expect(entry?.provenance?.original_repo).toBe("dmmulroy/.dotfiles")
-    expect(entry?.provenance?.original_path).toBe("home/.agents/skills/bro")
-    expect(entry?.provenance?.original_sha).toBe("c2322c6534f586b146ae0e8d9296019396aa32c0")
-    expect(entry?.provenance?.original_license).toContain("no license declared")
-    expect(skill).toContain("Re-pitch your last message")
-    expect(skill).toContain("ASD-STE100 Simplified Technical English")
-    expect(skill).toContain("`CONTEXT.md` when that file exists")
+    expect(entry?.provenance?.repo).toBe("dmmulroy/.dotfiles")
+    expect(entry?.provenance?.path).toBe("home/.agents/skills/bro")
+    expect(entry?.provenance?.forked_at_sha).toBe("c2322c6534f586b146ae0e8d9296019396aa32c0")
+    expect(entry?.provenance?.license).toContain("no license declared")
+    expect(skill).toContain("Restate your last message. Stop using jargon and speak coherently.")
+    expect(skill).toContain("like one human talking to another")
+    // The wait-what merge is fully reverted; context-aware re-pitch lives in base.
+    expect(skill).not.toContain("ASD-STE100")
+    expect(skill).not.toContain("Re-pitch")
   })
-
   it("keeps i-have-adhd model-invocable across upstream sync", () => {
     const entry = readOverrides().skills["i-have-adhd"]
     const skill = readFileSync(

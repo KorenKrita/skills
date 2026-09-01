@@ -15,7 +15,7 @@ plugins:
       - prototyping
       - workflow
   plus:
-    version: 0.0.28
+    version: 0.0.29
     description: 决策方法、代码质量审查、读取工具、中文写作优化、可视化讲解、架构图与安全/逆向技能路由
     category: productivity
     keywords:
