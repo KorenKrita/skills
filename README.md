@@ -21,7 +21,7 @@
 
 ```text
 base               核心工程与协作流程
-base + plus  全部 19 个 Skill（plus 含安全/逆向技能路由）
+base + plus  全部 35 个 Skill（plus 含安全/逆向技能路由）
 ```
 
 ### Pi
@@ -56,8 +56,8 @@ pi install -l git:github.com/KorenKrita/skills
 
 | Plugin | 内容 | Skill 数量 |
 |---|---|---:|
-| **base** | 核心工程与协作流程 | 9 |
-| **plus** | 决策方法、代码质量审查、读取工具、中文写作优化、可视化讲解、架构图与白话重述 | 9 |
+| **base** | [mattpocock/skills](https://github.com/mattpocock/skills) engineering + productivity 完整镜像：工程流程与效率工具 | 25 |
+| **plus** | 决策方法、代码质量审查、读取工具、中文写作优化、可视化讲解、架构图、白话重述与安全/逆向技能路由 | 10 |
 
 `plus` 还附带：
 
@@ -69,7 +69,7 @@ Pi 加载两个 plugin 的 `skills/`；`plus` 的 plugin-level Agent 仅对 Clau
 
 `overrides.yaml` 记录每个 Skill 的归属：上游 Skill 声明来源、改名和兼容 patch，本地自有 Skill 用 `ownership: local` 声明并保留 fork provenance。GitHub Actions 每天按上游文件内容审计上游 Skill 并通过 PR 提交更新，本地自有 Skill 不受同步覆盖。
 
-`base` 的 `improve-codebase-architecture` 是本地自有 Skill，fork 自 [mattpocock/skills](https://github.com/mattpocock/skills)，因为上游版本依赖本仓库不再发布的 Skill。
+`base` 是 [mattpocock/skills](https://github.com/mattpocock/skills) `skills/engineering` + `skills/productivity` 的完整镜像：25 个 Skill 零 patch、零 fork，与上游一字不差（决策记录见 `docs/adr/0009-base-matt-upstream-mirror.md`）。
 
 主要来源：
 

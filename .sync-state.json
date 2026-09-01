@@ -1,10 +1,65 @@
 {
+  "ask-matt": {
+    "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+    "files": [
+      "PHASE-BOUNDARIES.md",
+      "SKILL.md",
+      "agents/openai.yaml"
+    ]
+  },
+  "code-review": {
+    "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+    "files": [
+      "SKILL.md",
+      "agents/openai.yaml"
+    ]
+  },
+  "codebase-design": {
+    "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+    "files": [
+      "DEEPENING.md",
+      "DESIGN-IT-TWICE.md",
+      "SKILL.md",
+      "agents/openai.yaml"
+    ]
+  },
   "diagnosing-bugs": {
     "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
     "files": [
       "SKILL.md",
       "agents/openai.yaml",
       "scripts/hitl-loop.template.sh"
+    ]
+  },
+  "domain-modeling": {
+    "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+    "files": [
+      "ADR-FORMAT.md",
+      "CONTEXT-FORMAT.md",
+      "SKILL.md",
+      "agents/openai.yaml"
+    ]
+  },
+  "grill-with-docs": {
+    "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+    "files": [
+      "SKILL.md",
+      "agents/openai.yaml"
+    ]
+  },
+  "implement": {
+    "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+    "files": [
+      "SKILL.md",
+      "agents/openai.yaml"
+    ]
+  },
+  "improve-codebase-architecture": {
+    "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+    "files": [
+      "HTML-REPORT.md",
+      "SKILL.md",
+      "agents/openai.yaml"
     ]
   },
   "prototype": {
@@ -16,21 +71,65 @@
       "agents/openai.yaml"
     ]
   },
-  "grill-me": {
+  "research": {
     "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
-  "handoff": {
+  "resolving-merge-conflicts": {
     "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
-  "to-questionnaire": {
+  "setup-matt-pocock-skills": {
+    "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+    "files": [
+      "SKILL.md",
+      "agents/openai.yaml",
+      "domain.md",
+      "issue-tracker-github.md",
+      "issue-tracker-gitlab.md",
+      "issue-tracker-local.md",
+      "triage-labels.md"
+    ]
+  },
+  "tdd": {
+    "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+    "files": [
+      "SKILL.md",
+      "agents/openai.yaml",
+      "mocking.md",
+      "tests.md"
+    ]
+  },
+  "to-spec": {
+    "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+    "files": [
+      "SKILL.md",
+      "agents/openai.yaml"
+    ]
+  },
+  "to-tickets": {
+    "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+    "files": [
+      "SKILL.md",
+      "agents/openai.yaml"
+    ]
+  },
+  "triage": {
+    "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+    "files": [
+      "AGENT-BRIEF.md",
+      "OUT-OF-SCOPE.md",
+      "SKILL.md",
+      "agents/openai.yaml"
+    ]
+  },
+  "wayfinder": {
     "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
     "files": [
       "SKILL.md",
@@ -45,6 +144,27 @@
       "template.sh"
     ]
   },
+  "grill-me": {
+    "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+    "files": [
+      "SKILL.md",
+      "agents/openai.yaml"
+    ]
+  },
+  "grilling": {
+    "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+    "files": [
+      "SKILL.md",
+      "agents/openai.yaml"
+    ]
+  },
+  "handoff": {
+    "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+    "files": [
+      "SKILL.md",
+      "agents/openai.yaml"
+    ]
+  },
   "teach": {
     "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
     "files": [
@@ -52,6 +172,20 @@
       "LEARNING-RECORD-FORMAT.md",
       "MISSION-FORMAT.md",
       "RESOURCES-FORMAT.md",
+      "SKILL.md",
+      "agents/openai.yaml"
+    ]
+  },
+  "to-questionnaire": {
+    "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+    "files": [
+      "SKILL.md",
+      "agents/openai.yaml"
+    ]
+  },
+  "wait-what": {
+    "sha": "6654f6b60cd9d5be8b54c6fafe44346dabeb3b76",
+    "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
@@ -96,6 +230,12 @@
       "scripts/fetch_feishu.py",
       "scripts/fetch_local.py",
       "scripts/fetch_weixin.py"
+    ]
+  },
+  "show-me": {
+    "sha": "3c2629142c5d437428269b1b722b08c0b87f574d",
+    "files": [
+      "SKILL.md"
     ]
   },
   "i-have-adhd": {
@@ -190,12 +330,6 @@
       "scripts/render-examples.mjs",
       "scripts/update-contract.mjs",
       "skill-release.json"
-    ]
-  },
-  "show-me": {
-    "sha": "3c2629142c5d437428269b1b722b08c0b87f574d",
-    "files": [
-      "SKILL.md"
     ]
   }
 }

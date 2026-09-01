@@ -9,15 +9,31 @@ const PLUGINS = ["base", "plus"] as const
 
 const EXPECTED_SKILLS = {
   base: [
+    "ask-matt",
+    "code-review",
+    "codebase-design",
     "diagnosing-bugs",
+    "domain-modeling",
     "grill-me",
+    "grill-with-docs",
+    "grilling",
     "handoff",
+    "implement",
     "improve-codebase-architecture",
     "prototype",
+    "research",
+    "resolving-merge-conflicts",
+    "setup-matt-pocock-skills",
+    "tdd",
     "teach",
     "to-questionnaire",
-    "writing-for-agents",
+    "to-spec",
+    "to-tickets",
+    "triage",
+    "wait-what",
+    "wayfinder",
     "wizard",
+    "writing-for-agents",
   ],
   plus: [
     "archify",
@@ -36,26 +52,11 @@ const EXPECTED_SKILLS = {
 const EXPECTED_SKILL_COUNT = Object.values(EXPECTED_SKILLS).flat().length
 
 /** Skills this repository maintains itself, excluded from upstream sync. */
-const LOCAL_SKILLS = ["bro", "improve-codebase-architecture"] as const
+const LOCAL_SKILLS = ["bro"] as const
+const LOCAL_PROVENANCE_REPOS: Record<string, string> = { bro: "dmmulroy/.dotfiles" }
 
 /** base Skills removed from the subscription; nothing may still route to them. */
-const REMOVED_BASE_SKILLS = [
-  "ask-matt",
-  "code-review",
-  "codebase-design",
-  "domain-modeling",
-  "grill-with-docs",
-  "grilling",
-  "implement",
-  "research",
-  "resolving-merge-conflicts",
-  "setup-matt-pocock-skills",
-  "tdd",
-  "to-spec",
-  "to-tickets",
-  "triage",
-  "wayfinder",
-] as const
+const REMOVED_BASE_SKILLS = [] as const
 
 function readOverrides(): {
   skills: Record<
@@ -171,7 +172,7 @@ describe("repository layout", () => {
       expect("source" in entry!, skill).toBe(false)
       expect(state[skill], skill).toBeUndefined()
       // Provenance keeps the fork origin and its license auditable.
-      expect(entry?.provenance?.repo, skill).toBe("mattpocock/skills")
+      expect(entry?.provenance?.repo, skill).toBe(LOCAL_PROVENANCE_REPOS[skill])
       expect(entry?.provenance?.forked_at_sha, skill).toMatch(/^[0-9a-f]{40}$/)
       expect(entry?.provenance?.license, skill).toContain("license")
       expect(existsSync(join(ROOT, "plugins", entry!.plugin, "skills", skill)), skill).toBe(true)
@@ -286,90 +287,21 @@ describe("repository layout", () => {
     }
   })
 
-  it("declares the diagnosing-bugs fork adjustments as replayable patches", () => {
-    const patches = readOverrides().skills["diagnosing-bugs"]?.patches ?? []
-    const skill = readFileSync(
-      join(ROOT, "plugins", "base", "skills", "diagnosing-bugs", "SKILL.md"),
-      "utf-8",
-    )
-
-    // Fixed CONTEXT.md/ADR layout is removed declaratively, so a forced
-    // upstream replay reapplies it.
-    expect(skill).not.toContain("`CONTEXT.md`")
-    expect(
-      patches.some((patch) => patch.type === "replace" && patch.pattern?.includes("`CONTEXT.md`")),
-      "diagnosing-bugs patch for `CONTEXT.md`",
-    ).toBe(true)
-
-    // Upstream 1dab982 deleted the Phase 6 post-mortem paragraph because its
-    // hand-off could never reach the user-invoked improve-codebase-architecture
-    // Skill. The fork version never delegates, so the self-contained
-    // post-mortem is re-inserted on the new upstream base instead.
-    expect(skill).not.toContain("/improve-codebase-architecture")
-    // 上游 3216582 将标题分隔符从 em-dash 改为冒号；正则容忍两种分隔
-    // 符，断言的是 post-mortem 段落存活，而非钉死标点风格。
-    expect(skill).toMatch(/Phase 6 ?[:—] ?Cleanup \+ post-mortem/)
-    expect(skill).toContain("record the specific architectural follow-up yourself")
-    expect(
-      patches.some((patch) => patch.type === "replace" && patch.pattern === "## Phase 6: Cleanup"),
-      "diagnosing-bugs Phase 6 heading patch",
-    ).toBe(true)
-    expect(
-      patches.some((patch) => patch.type === "replace" && patch.pattern?.includes("The hypothesis that turned out correct")),
-      "diagnosing-bugs post-mortem re-insertion patch",
-    ).toBe(true)
-
-    // The debugging discipline the Skill exists for must survive the patches.
-    expect(skill).toMatch(/Phase 1 ?[:—] ?Build a feedback loop/)
-    expect(skill).toContain("### Tighten the loop")
-    expect(skill).toMatch(/Phase 5 ?[:—] ?Fix \+ regression test/)
-    expect(skill).toContain("No red-capable command, no Phase 2.")
-  })
-
-  it("renames the upstream grilling payload to grill-me declaratively", () => {
-    const entry = readOverrides().skills["grill-me"]
-    expect((entry as { source?: { path?: string } })?.source?.path).toBe("skills/productivity/grilling")
-    expect(
-      entry?.patches?.some(
-        (patch) => patch.type === "set_frontmatter" && (patch as { field?: string }).field === "name",
-      ),
-    ).toBe(true)
-    expect(entry?.target_patches?.map(({ target }) => target)).toContain("agents/openai.yaml")
-
-    // The interview protocol is inlined; the old wrapper only forwarded to /grilling.
-    const skill = readFileSync(join(ROOT, "plugins", "base", "skills", "grill-me", "SKILL.md"), "utf-8")
-    expect(skill).toContain("Interview the user relentlessly")
-    expect(skill).not.toContain("Run a `/grilling` session")
-  })
-
-  it("keeps writing-for-agents metadata and sync patches aligned with its new identity", () => {
-    const entry = readOverrides().skills["writing-for-agents"]
-    const metadata = readFileSync(
-      join(ROOT, "plugins", "base", "skills", "writing-for-agents", "agents", "openai.yaml"),
-      "utf-8",
-    )
-
-    expect(metadata).toContain('display_name: "Writing for Agents"')
-    expect(metadata).toContain('short_description: "Write predictable agent-facing docs"')
-    expect(metadata).not.toContain("Writing Great Skills")
-    expect(entry?.target_patches?.map(({ target }) => target)).toContain("agents/openai.yaml")
-  })
-
-  it("keeps bro as the local context-aware re-pitch Skill", () => {
+  it("keeps bro as the local dmmulroy original restatement Skill", () => {
     const entry = readOverrides().skills.bro
     const skill = readFileSync(join(ROOT, "plugins", "plus", "skills", "bro", "SKILL.md"), "utf-8")
 
     expect(entry?.ownership).toBe("local")
-    expect(entry?.provenance?.path).toBe("skills/productivity/wait-what")
-    expect(entry?.provenance?.original_repo).toBe("dmmulroy/.dotfiles")
-    expect(entry?.provenance?.original_path).toBe("home/.agents/skills/bro")
-    expect(entry?.provenance?.original_sha).toBe("c2322c6534f586b146ae0e8d9296019396aa32c0")
-    expect(entry?.provenance?.original_license).toContain("no license declared")
-    expect(skill).toContain("Re-pitch your last message")
-    expect(skill).toContain("ASD-STE100 Simplified Technical English")
-    expect(skill).toContain("`CONTEXT.md` when that file exists")
+    expect(entry?.provenance?.repo).toBe("dmmulroy/.dotfiles")
+    expect(entry?.provenance?.path).toBe("home/.agents/skills/bro")
+    expect(entry?.provenance?.forked_at_sha).toBe("c2322c6534f586b146ae0e8d9296019396aa32c0")
+    expect(entry?.provenance?.license).toContain("no license declared")
+    expect(skill).toContain("Restate your last message. Stop using jargon and speak coherently.")
+    expect(skill).toContain("like one human talking to another")
+    // The wait-what merge is fully reverted; context-aware re-pitch lives in base.
+    expect(skill).not.toContain("ASD-STE100")
+    expect(skill).not.toContain("Re-pitch")
   })
-
   it("keeps i-have-adhd model-invocable across upstream sync", () => {
     const entry = readOverrides().skills["i-have-adhd"]
     const skill = readFileSync(
@@ -390,41 +322,6 @@ describe("repository layout", () => {
     expect(
       patches.some((patch) => patch.type === "set_frontmatter" && patch.field === "description"),
     ).toBe(true)
-  })
-
-  it("keeps the local architecture skill free of removed skill and subagent calls", () => {
-    const dir = join(ROOT, "plugins", "base", "skills", "improve-codebase-architecture")
-    const content = textFiles(dir).map((path) => readFileSync(path, "utf-8")).join("\n")
-
-    for (const marker of [
-      "/codebase-design",
-      "/grilling",
-      "/domain-modeling",
-      "subagent_type",
-      "`CONTEXT.md`",
-      "docs/adr/",
-    ]) {
-      expect(content, marker).not.toContain(marker)
-    }
-
-    // Self-contained rubric plus the HTML report flow must stay intact.
-    const skill = readFileSync(join(dir, "SKILL.md"), "utf-8")
-    expect(skill).toContain("## Architecture rubric")
-    expect(skill).toContain("The deletion test")
-    expect(skill).toContain("architecture-review-<timestamp>.html")
-    expect(skill).toContain("Which of these would you like to explore?")
-    const deepening = readFileSync(join(dir, "DEEPENING.md"), "utf-8")
-    for (const dependencyClass of [
-      "In-process",
-      "Local-substitutable",
-      "Remote but owned",
-      "True external",
-    ]) {
-      expect(deepening).toContain(dependencyClass)
-    }
-    expect(deepening).toContain("Testing strategy: replace, don't layer")
-    expect(skill).toContain("update the project's existing glossary or domain document immediately")
-    expect(existsSync(join(dir, "HTML-REPORT.md"))).toBe(true)
   })
 
   it("does not publish or resync the removed pua Skill", () => {
