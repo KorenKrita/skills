@@ -208,7 +208,7 @@
     ]
   },
   "nuclear-review": {
-    "sha": "b9ddc83c32972210b8a94d389130713e8eed346e",
+    "sha": "efa2a531985e0a8084d36ff3cf87233be8a9f34b",
     "files": [
       "SKILL.md"
     ]
@@ -222,7 +222,7 @@
     ]
   },
   "read": {
-    "sha": "9fbf0ab2e33e26e4b77eac57f4c53170a2b15186",
+    "sha": "3e2e1585d18827da672a9aadf5a593c6bf8746f4",
     "files": [
       "SKILL.md",
       "references/read-methods.md",
@@ -239,7 +239,7 @@
     ]
   },
   "i-have-adhd": {
-    "sha": "cbe69fb83c08a37cf54d5ec9ec6bb88c8bc9973c",
+    "sha": "58494af57962b2d7a996b4d419474380a299af5e",
     "files": [
       "SKILL.md",
       "agents/gemini.toml",
@@ -254,10 +254,11 @@
     ]
   },
   "archify": {
-    "sha": "199360cc6687a7857b54dd188d4922b09e466a4b",
+    "sha": "06dd052602dd9a369e4d034e24faef0917b5a60c",
     "files": [
       "LICENSE",
       "SKILL.md",
+      "THIRD_PARTY_NOTICES.md",
       "assets/template.html",
       "bin/archify.mjs",
       "bin/open-artifact.mjs",
