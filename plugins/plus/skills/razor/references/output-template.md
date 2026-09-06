@@ -2,7 +2,7 @@
 
 Use this template when auditing the existence necessity of requirements, workflow steps, fields,
 states, modules, abstractions, or any chain. It is the canonical output shape referenced from
-`SKILL.md` (Output section); the inline skeleton there is a summary of this. Keep verdicts
+`SKILL.md` (Output section). Keep verdicts
 evidence-led. The verdict vocabulary — Keep / Merge / Defer / Delete / Replace / Prove first — must
 match the decision table in `SKILL.md` verbatim.
 
@@ -27,9 +27,8 @@ match the decision table in `SKILL.md` verbatim.
 > If evidence is missing, say so directly and downgrade the affected verdict to "Prove first" or "assumption."
 
 ## Before / After
-<Required when the recommendation changes a substantial workflow, process, module chain, state
-machine, service boundary, or architecture flow — a structural cut relocates responsibility, and the
-reviewer must see the new owner. A small local audit may omit this with a stated reason.>
+<Include when a structural cut relocates responsibility and the new owner would otherwise be hard
+to understand. Omit for local cuts where the Razor Map is clearer.>
 
 ### Before
 ```mermaid
@@ -69,9 +68,6 @@ flowchart LR
 ## Next Steps
 <If executable, list the cut list; if evidence is thin, list the prove-first items; if it needs landing, route to an installed execution-planning Skill whose description clearly matches the task.>
 
-## HTML Artifact
-- **Path**: `/tmp/razor-<slug>/index.html`
-- **When**: required for a full audit; a small local audit may skip it with a stated reason.
-- **Contents**: verdict, evidence, before/after diagrams, Razor Map, cut/merge list, preserved complexity, risks, guardrails, next steps.
-- **Visual**: restrained, clear, scannable — do not just paste the Markdown into HTML.
+## HTML Artifact (only when explicitly requested)
+- **Path**: `<path returned by hai-visual-report>`
 ```
