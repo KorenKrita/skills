@@ -214,15 +214,16 @@
     ]
   },
   "razor": {
-    "sha": "f9af2306f5bced6a199dc6ba155ea3cd318ee570",
+    "sha": "9b1f8c8aa42b1caf4249a3db241fa9f65f625b1b",
     "files": [
       "SKILL.md",
       "agents/openai.yaml",
+      "references/llm-complexity-tells.md",
       "references/output-template.md"
     ]
   },
   "read": {
-    "sha": "535a3cdfa651695ecf032fe830861f8b51f29596",
+    "sha": "2d1420da16d22794ba100183bbd4198fd9d0ba03",
     "files": [
       "SKILL.md",
       "references/read-methods.md",
@@ -254,7 +255,7 @@
     ]
   },
   "archify": {
-    "sha": "d8e4daf2610d512821365f41b139d874b29efe81",
+    "sha": "ed7f4d4b48d4424d36edfed8043de3de8dea6b45",
     "files": [
       "LICENSE",
       "SKILL.md",
