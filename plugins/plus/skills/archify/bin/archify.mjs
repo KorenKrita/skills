@@ -444,12 +444,14 @@ async function commandCompare(args) {
 
   const basePath = path.resolve(baseInput);
   const headPath = path.resolve(headInput);
+  const receiptTarget = options.receipt || compareReceiptPath(path.resolve(requestedOutput || 'architecture-delta.html'));
   let outputPath;
   try {
     ({ outputPath } = resolveOutputPath({
       requestedOutput,
       defaultOutput: 'architecture-delta.html',
       inputPaths: [basePath, headPath],
+      otherOutputPaths: [path.resolve(receiptTarget)],
     }));
   } catch (error) {
     const outputDiagnostic = error.archifyDiagnostics?.[0];
@@ -471,6 +473,7 @@ async function commandCompare(args) {
     ({ outputPath: receiptPath } = resolveOutputPath({
       requestedOutput: options.receipt || compareReceiptPath(outputPath),
       defaultOutput: compareReceiptPath(outputPath),
+      requiredExtension: '.json',
       inputPaths: [basePath, headPath],
       otherOutputPaths: [outputPath],
     }));
@@ -640,10 +643,12 @@ async function commandCompare(args) {
         requestedOutput,
         defaultOutput: 'architecture-delta.html',
         inputPaths: [basePath, headPath],
+        otherOutputPaths: [receiptPath],
       }).outputPath;
       resolveOutputPath({
         requestedOutput: options.receipt || compareReceiptPath(currentOutput),
         defaultOutput: compareReceiptPath(currentOutput),
+        requiredExtension: '.json',
         inputPaths: [basePath, headPath],
         otherOutputPaths: [currentOutput],
       });
@@ -696,8 +701,15 @@ async function commandCompare(args) {
 function commandRender(args) {
   const qualityArgs = extractQualityArgs(args);
   const repoArgs = extractRepoRootArgs(qualityArgs.rest);
+  // render takes no options of its own once --quality and --repo-root are
+  // stripped, so anything left starting with -- is a typo. Without this a
+  // mistyped flag was taken as the output path: `render architecture spec.json
+  // --json out.html` wrote a file literally named `--json` and never wrote
+  // out.html, exiting 0. Every sibling subcommand already guards this.
+  const unknown = repoArgs.rest.filter((arg) => arg.startsWith('--'));
+  if (unknown.length) fail(`Unknown render option "${unknown[0]}".`);
   const [type, input, output] = repoArgs.rest;
-  if (!type || !input) fail(usage());
+  if (!type || !input || repoArgs.rest.length > 3) fail(usage());
   assertEvidenceType(type, repoArgs.repoRoot);
   const result = runNode([rendererPath(type), input, ...(output ? [output] : [])], {
     env: rendererEnv(qualityArgs.quality, repoArgs.repoRoot),
@@ -1828,7 +1840,9 @@ function commandValidate(args) {
     if (!['architecture', 'workflow'].includes(type)) {
       fail('--layout-json is currently supported for architecture and workflow diagrams only.');
     }
-    const result = runNode([renderer, input, '/dev/null', '--layout-json'], {
+    // Layout mode emits JSON without writing HTML; keep its unused target typed.
+    const layoutOutput = path.join(os.tmpdir(), `archify-layout-${process.pid}-${type}.html`);
+    const result = runNode([renderer, input, layoutOutput, '--layout-json'], {
       stdio: 'pipe',
       env: rendererEnv(quality, repoRoot, true),
     });
