@@ -175,10 +175,20 @@ skills:
     plugin: plus
     patches:
       - { type: set_frontmatter, field: name, value: razor }
+      # Upstream 9b1f8c8 shortened the description and embedded hai-prd/hai-architecture routes in it;
+      # keep the fuller trigger-rich description locally.
+      - type: set_frontmatter
+        field: description
+        value: 'Audits whether each requirement, workflow step, role, field, state, module, layer, abstraction, or rule deserves to exist and returns a razor verdict: a Keep/Merge/Defer/Delete/Replace/Prove-first classification of every concept, the strongest survival argument for anything cut, and a concrete cut/proof list. Use whenever the user wants to apply Occam''s razor, simplify or trim a PRD / architecture / workflow / data model / state machine, challenge whether something is necessary, or spot fake requirements, premature abstractions, or over-engineering — even if they never say "razor." Trigger on 用奥卡姆剃刀, 剃刀一下, 砍需求, 砍掉没用的东西, 收一收复杂度, 这个字段/状态/模块/分层有必要吗, 这个抽象是不是多余, 是不是伪需求, 是不是过度设计, 这步能不能去掉, 这些角色/状态是不是太多了, and English like "is this over-engineered", "do we really need this layer", "this feels bloated, what can we delete", "too many fields".'
       - type: replace
         pattern: "For Chinese readers, see `SKILL.zh_CN.md`. The English `SKILL.md` is the execution source of truth.\n\n"
         with: ""
-      - { type: replace_all, pattern: hai-razor, with: razor }
+      - type: replace
+        pattern: "If the user explicitly asks\n   for HTML or a visual report, hand the completed judgment to `hai-visual-report`; do not duplicate\n   its rendering workflow here."
+        with: "If the user explicitly asks\n   for HTML or a visual report, hand the completed judgment to an installed visual-report Skill whose\n   description clearly matches the task, or render it directly; do not duplicate that workflow here."
+      - type: replace
+        pattern: "HTML remains opt-in and belongs to `hai-visual-report`."
+        with: "HTML remains opt-in."
       - type: replace
         pattern: "- The question is whether the whole idea is worth doing at all — use `hai-idea`.\n"
         with: ""
@@ -202,7 +212,9 @@ skills:
           - { type: replace_all, pattern: "$hai-razor", with: "$razor" }
       - target: references/output-template.md
         patches:
-          - { type: replace_all, pattern: hai-razor, with: razor }
+          - type: replace_all
+            pattern: "- **Path**: `<path returned by hai-visual-report>`"
+            with: "- **Path**: `<path returned by the installed visual-report Skill, or /tmp/razor-<slug>/index.html when rendered directly>`"
           - type: replace_all
             pattern: "`hai-goal`"
             with: "an installed execution-planning Skill whose description clearly matches the task"
