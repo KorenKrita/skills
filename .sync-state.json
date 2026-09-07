@@ -223,7 +223,7 @@
     ]
   },
   "read": {
-    "sha": "2d1420da16d22794ba100183bbd4198fd9d0ba03",
+    "sha": "2ae9e487a97bc101ca23b7f5a8fd3389c1ecffe2",
     "files": [
       "SKILL.md",
       "references/read-methods.md",
@@ -255,7 +255,7 @@
     ]
   },
   "archify": {
-    "sha": "ed7f4d4b48d4424d36edfed8043de3de8dea6b45",
+    "sha": "c6519401f7b91b9d43011657880893b0a8955548",
     "files": [
       "LICENSE",
       "SKILL.md",
