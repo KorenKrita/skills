@@ -266,7 +266,7 @@ describe("repository layout", () => {
       .flatMap((skill) => textFiles(join(ROOT, "plugins", "plus", "skills", skill)))
       .map((path) => readFileSync(path, "utf-8"))
       .join("\n")
-    expect(content).not.toMatch(/\b(?:hai-goal|hai-prd|hai-naming|hai-architecture|hai-tdd|hai-rewrite-doc|entity-model-auditor|hai-audit-docs-internally|hai-audit-docs-against-code|hai-idea)\b/)
+    expect(content).not.toMatch(/\b(?:hai-goal|hai-prd|hai-naming|hai-architecture|hai-tdd|hai-rewrite-doc|entity-model-auditor|hai-audit-docs-internally|hai-audit-docs-against-code|hai-idea|hai-visual-report)\b/)
     expect(content).not.toContain("SKILL.zh_CN.md")
   })
 
