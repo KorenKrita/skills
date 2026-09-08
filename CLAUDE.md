@@ -1,6 +1,6 @@
 # KorenKrita Skills
 
-个人 Skill 订阅仓库，通过一个 Marketplace 分发两个 Claude Code plugin，并作为一个 Pi Package 加载全部 Skill。
+个人 Skill 订阅仓库，通过一个 Marketplace 分发两个 plugin（Claude Code 与 Cursor 各一套清单），并作为一个 Pi Package 加载全部 Skill。
 
 ## 项目结构
 
@@ -10,7 +10,9 @@ plugins/plus/skills/<skill>/SKILL.md      工程、思考、工具、写作、�
 plugins/plus/agents/*.md                  plus 的 Claude Code subagents
 overrides.yaml                            Skill 归属：上游来源、改名、排除、patch，本地自有声明
 marketplace.yaml                          两个 plugin 的 Marketplace 元数据
-.claude-plugin/marketplace.json           生成产物
+.claude-plugin/marketplace.json           生成产物（Claude Code）
+.cursor-plugin/marketplace.json           生成产物（Cursor）
+plugins/*/.cursor-plugin/plugin.json      生成产物（Cursor 每 plugin 清单）
 .sync-state.json                          上游 Skill 的 SHA 与文件清单（不含本地自有 Skill）
 ```
 
@@ -31,7 +33,7 @@ npm run sync
 - 本地自有 Skill：`plus/bro` 与 `plus/sec-router`；`base` 全部为上游同步。
 - Skill 目录名必须等于 `SKILL.md` frontmatter 的 `name`。
 - 同一个 Skill name 在整个仓库只出现一次，避免 Pi 递归发现 collision。
-- `.claude-plugin/marketplace.json` 由 `marketplace.yaml` 生成。
+- `.claude-plugin/marketplace.json`、`.cursor-plugin/marketplace.json`、`plugins/*/.cursor-plugin/plugin.json` 均由 `marketplace.yaml` 生成，不手改。
 - `.sync-state.json` 由同步流程维护，只覆盖上游 Skill；结构迁移时必须与上游 overrides key 和上游文件清单一起迁移。
 - `base` 固定 25 个 Skill、`plus` 固定 10 个；`base` 为 mattpocock/skills 上游纯镜像，本地改动只发生在 `plus`。
 - `plus/agents` 仅对 Claude Code 生效；Pi 只加载 `plugins/*/skills`。

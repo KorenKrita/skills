@@ -76,6 +76,12 @@ const SYNC_STATE_PATH = join(ROOT, ".sync-state.json")
 const OVERRIDES_PATH = join(ROOT, "overrides.yaml")
 const MARKETPLACE_CONFIG_PATH = join(ROOT, "marketplace.yaml")
 const MARKETPLACE_JSON_PATH = join(ROOT, ".claude-plugin", "marketplace.json")
+/** build-marketplace.ts 生成的全部清单（Claude Code + Cursor），版本递增后需一起入库。 */
+const GENERATED_MANIFEST_PATHS = [
+  MARKETPLACE_JSON_PATH,
+  join(ROOT, ".cursor-plugin", "marketplace.json"),
+  join(ROOT, "plugins", "*", ".cursor-plugin", "plugin.json"),
+]
 const FORCE_SYNC = process.argv.includes("--force")
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -329,7 +335,7 @@ function createPr(
   )
   writeFileSync(MARKETPLACE_CONFIG_PATH, versionBump.content)
   exec("npx tsx scripts/build-marketplace.ts")
-  stageSyncChanges([MARKETPLACE_CONFIG_PATH, MARKETPLACE_JSON_PATH], [])
+  stageSyncChanges([MARKETPLACE_CONFIG_PATH, ...GENERATED_MANIFEST_PATHS], [])
 
   exec(`git -c user.name="github-actions" -c user.email="actions@github.com" commit -m "同步：更新 ${skillName}"`)
   exec(`git push -u origin ${shellQuote(branch)}`)
@@ -516,7 +522,7 @@ const program = Effect.gen(function* () {
       destDir,
       ...extraMappingPaths,
       MARKETPLACE_CONFIG_PATH,
-      MARKETPLACE_JSON_PATH,
+      ...GENERATED_MANIFEST_PATHS,
     ]
     const forceAddPaths = [
       ...upstreamFiles.map(file => join(destDir, file)),

@@ -2,9 +2,15 @@ import { Effect } from "effect"
 import { readFileSync, writeFileSync, readdirSync, mkdirSync, statSync } from "node:fs"
 import { join } from "node:path"
 import { parse as parseYaml } from "yaml"
-import { generateMarketplace, type MarketplaceConfig, type PluginDir } from "./marketplace-generator.js"
+import {
+  generateCursorManifests,
+  generateMarketplace,
+  type MarketplaceConfig,
+  type PluginDir,
+} from "./marketplace-generator.js"
 
 const ROOT = new URL("../", import.meta.url).pathname.replace(/\/$/, "")
+const REPOSITORY = "https://github.com/KorenKrita/skills"
 
 const readConfig = (): MarketplaceConfig => {
   const raw = readFileSync(join(ROOT, "marketplace.yaml"), "utf-8")
@@ -28,19 +34,29 @@ const scanPlugins = (): PluginDir[] => {
     })
 }
 
+const writeJson = (path: string, value: unknown): void => {
+  mkdirSync(join(path, ".."), { recursive: true })
+  writeFileSync(path, JSON.stringify(value, null, 2) + "\n")
+}
+
 const program = Effect.gen(function* () {
   const config = readConfig()
   const dirs = scanPlugins()
+
+  // Claude Code
   const marketplace = yield* generateMarketplace(config, dirs)
-
-  const outDir = join(ROOT, ".claude-plugin")
-  mkdirSync(outDir, { recursive: true })
-  writeFileSync(
-    join(outDir, "marketplace.json"),
-    JSON.stringify(marketplace, null, 2) + "\n",
-  )
-
+  writeJson(join(ROOT, ".claude-plugin", "marketplace.json"), marketplace)
   console.log(`✅ 生成 .claude-plugin/marketplace.json（${marketplace.plugins.length} 个 plugin）`)
+
+  // Cursor
+  const cursor = yield* generateCursorManifests(config, dirs, REPOSITORY)
+  writeJson(join(ROOT, ".cursor-plugin", "marketplace.json"), cursor.marketplace)
+  for (const [name, manifest] of Object.entries(cursor.plugins)) {
+    writeJson(join(ROOT, "plugins", name, ".cursor-plugin", "plugin.json"), manifest)
+  }
+  console.log(
+    `✅ 生成 .cursor-plugin/marketplace.json + ${Object.keys(cursor.plugins).length} 个 plugins/*/.cursor-plugin/plugin.json`,
+  )
 })
 
 Effect.runPromise(program)

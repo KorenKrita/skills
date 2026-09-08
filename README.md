@@ -1,6 +1,6 @@
 # KorenKrita Skills
 
-个人 Agent Skills 订阅仓库，同时支持 Claude Code Marketplace 和 Pi Package。
+个人 Agent Skills 订阅仓库，同时支持 Claude Code Marketplace、Cursor Marketplace 和 Pi Package。
 
 ## 订阅
 
@@ -23,6 +23,16 @@
 base               核心工程与协作流程
 base + plus  全部 35 个 Skill（plus 含安全/逆向技能路由）
 ```
+
+### Cursor
+
+Cursor → Customize → Plugins → 添加 marketplace，填入仓库地址：
+
+```text
+https://github.com/KorenKrita/skills
+```
+
+随后按需安装 `base` / `plus`。Cursor 读取 `.cursor-plugin/marketplace.json` 与 `plugins/*/.cursor-plugin/plugin.json`，Skill 目录与 Claude Code 共用。
 
 ### Pi
 
