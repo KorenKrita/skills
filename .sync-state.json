@@ -208,7 +208,7 @@
     ]
   },
   "nuclear-review": {
-    "sha": "71ed0d1076fec562c1b74ee353121a8d00f75382",
+    "sha": "df3fb154fb982fb83f649de8646d4af6a0cb16b3",
     "files": [
       "SKILL.md"
     ]
@@ -240,7 +240,7 @@
     ]
   },
   "i-have-adhd": {
-    "sha": "58494af57962b2d7a996b4d419474380a299af5e",
+    "sha": "24d22f783e57cb73c957848b588c6f651b6f9cd8",
     "files": [
       "SKILL.md",
       "agents/gemini.toml",
@@ -255,11 +255,12 @@
     ]
   },
   "archify": {
-    "sha": "7ce87eff8e43e91069d43ed642f8845130e090c8",
+    "sha": "10722002bb8777ecb639d93c49586fae4adf3ae4",
     "files": [
       "LICENSE",
       "SKILL.md",
       "THIRD_PARTY_NOTICES.md",
+      "assets/JetBrainsMono-OFL.txt",
       "assets/template.html",
       "bin/archify.mjs",
       "bin/open-artifact.mjs",
@@ -311,6 +312,7 @@
       "renderers/shared/legend.mjs",
       "renderers/shared/output-path.mjs",
       "renderers/shared/repository-evidence.mjs",
+      "renderers/shared/repository-location.mjs",
       "renderers/shared/text-fit.mjs",
       "renderers/shared/utils.mjs",
       "renderers/shared/validator.mjs",
