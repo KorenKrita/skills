@@ -2,6 +2,12 @@
 
 个人 Agent Skills 订阅仓库，同时支持 Claude Code Marketplace、Cursor Marketplace 和 Pi Package。
 
+## Amp（本地适配分支）
+
+`amp-adapter` 分支提供独立生成的 Amp `base` / `plus` roots，保留原插件内容，默认隔离 `sec-router`。
+构建、准确的 `amp.skills.path`、逐技能清单、更新和回滚方法见 [Amp 适配说明](amp/README.md)。
+不要直接让 Amp 扫描未适配的 `plugins/*/skills`；本分支不会自动修改用户设置或安装工具。
+
 ## 订阅
 
 ### Claude Code
