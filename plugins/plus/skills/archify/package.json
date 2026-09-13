@@ -12,10 +12,14 @@
     "node": ">=18"
   },
   "scripts": {
+    "generate:viewer": "node ../scripts/generate-viewer.mjs",
+    "check:viewer": "node ../scripts/generate-viewer.mjs --check",
     "generate:brand-marks": "node scripts/generate-brand-marks.mjs",
     "check:brand-marks": "node scripts/generate-brand-marks.mjs --check",
     "generate:validators": "node scripts/generate-validators.mjs",
-    "check:validators": "node scripts/generate-validators.mjs --check"
+    "check:validators": "node scripts/generate-validators.mjs --check",
+    "test": "npm run check:viewer && npm run check:brand-marks && npm run check:validators && npm run check:release-identity && node test/golden.mjs && node ../scripts/run-tests.mjs",
+    "render:examples": "node scripts/render-examples.mjs ../examples"
   },
   "devDependencies": {
     "ajv": "^8.17.1",
