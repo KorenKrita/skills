@@ -1,5 +1,7 @@
 node_modules/
+/node_modules
 dist/
 .tmp-*/
 .DS_Store
 .in_use/
+amp/generated/
