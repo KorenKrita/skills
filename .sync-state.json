@@ -199,7 +199,7 @@
     ]
   },
   "improve": {
-    "sha": "03369ee6d7cafbfcecc4346539b05b3dc0a603bb",
+    "sha": "cac56e1ebd3c279aa9153616cfeac7b174ab90f9",
     "files": [
       "SKILL.md",
       "references/audit-playbook.md",
@@ -208,7 +208,7 @@
     ]
   },
   "nuclear-review": {
-    "sha": "889ec4b68fa5aab0e867dad71ec3fdf386ae48f3",
+    "sha": "5bf2b1544db739998121a306340631963c2ff3de",
     "files": [
       "SKILL.md"
     ]
@@ -255,7 +255,7 @@
     ]
   },
   "archify": {
-    "sha": "6db72a9aea3d0f67a6a034e41f8a5491476a11c1",
+    "sha": "a07fa1d5b2a10cbea110c5a2be2817397a301cdc",
     "files": [
       "LICENSE",
       "SKILL.md",
