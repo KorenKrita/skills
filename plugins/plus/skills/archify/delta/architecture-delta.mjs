@@ -555,6 +555,9 @@ function boundarySymbolMarkup(markup, state) {
 export function buildDeltaSvg(baseSvg, headSvg, receipt) {
   const [baseW, baseH] = viewBoxSize(baseSvg);
   const [headW, headH] = viewBoxSize(headSvg);
+  // Baseline paths and their definitions must travel together in a namespace
+  // distinct from the current snapshot before the final Delta prefix is added.
+  const baseRelationshipsSvg = prefixSvgIds(baseSvg, 'base');
   const nodes = changeMap(receipt.changes.components);
   const edges = changeMap(receipt.changes.connections);
   const boundaries = boundaryChangeMap(receipt.changes.boundaries);
@@ -571,11 +574,11 @@ export function buildDeltaSvg(baseSvg, headSvg, receipt) {
   }
   for (const change of edges.values()) {
     if (change.status === 'removed' || change.classifications.includes('topology')) {
-      const phantom = forceElementState(elementById(baseSvg, 'edge', change.id), 'removed', change.classifications);
+      const phantom = forceElementState(elementById(baseRelationshipsSvg, 'edge', change.id), 'removed', change.classifications);
       baseEdgePhantoms.push(phantom);
       edgeMarkers.push(edgeSymbolMarkup(phantom, 'removed'));
     } else if (change.classifications.includes('geometry')) {
-      const phantom = forceElementState(elementById(baseSvg, 'edge', change.id), 'moved-from', change.classifications);
+      const phantom = forceElementState(elementById(baseRelationshipsSvg, 'edge', change.id), 'moved-from', change.classifications);
       baseEdgePhantoms.push(phantom);
       edgeMarkers.push(edgeSymbolMarkup(phantom, 'moved-from'));
     }
@@ -598,6 +601,10 @@ export function buildDeltaSvg(baseSvg, headSvg, receipt) {
   }
 
   let delta = annotateArchitectureSideSvg(headSvg, receipt, 'head');
+  if (baseEdgePhantoms.length) {
+    const baseDefinitions = baseRelationshipsSvg.match(/<defs>([\s\S]*?)<\/defs>/)?.[1] || '';
+    delta = delta.replace('</defs>', `${baseDefinitions}</defs>`);
+  }
   delta = delta.replace(/^<svg[^>]+>/, (tag) => tag.replace(/viewBox="[^"]+"/, `viewBox="0 0 ${Math.max(baseW, headW) + 24} ${Math.max(baseH, headH) + 24}"`));
   delta = delta.replace('        <!-- Boundaries (behind everything) -->', `        <!-- Baseline boundary frame phantoms -->\n${baseBoundaryFramePhantoms.filter(Boolean).join('\n')}\n\n        <!-- Boundaries (behind everything) -->`);
   delta = delta.replace('        <!-- Connection paths (before components for correct z-order) -->', `        <!-- Baseline relationship phantoms -->\n${baseEdgePhantoms.join('\n')}\n\n        <!-- Connection paths (before components for correct z-order) -->`);
@@ -959,7 +966,9 @@ html[data-theme="dark"] body{background:#071019!important;background-image:none!
       'text[data-delta-boundary-state="added"]{fill:#34d399!important}text[data-delta-boundary-state="removed"]{fill:#fb7185!important}text[data-delta-boundary-state="changed"]{fill:#fbbf24!important}text[data-delta-boundary-state="moved-from"]{fill:#7dd3fc!important;opacity:.55}' +
       '.delta-node-marker circle{fill:#071019;stroke:currentColor;stroke-width:1.5}.delta-node-marker text,.delta-edge-marker,.delta-boundary-marker{fill:currentColor;font:800 9px ui-monospace,SFMono-Regular,Menlo,monospace}';
     clone.insertBefore(style, clone.firstChild);
-    return new XMLSerializer().serializeToString(clone);
+    // The XML declaration pins UTF-8: without it, consumers that guess an
+    // encoding instead of defaulting to UTF-8 mangle non-ASCII text.
+    return '<?xml version="1.0" encoding="UTF-8"?>\\n' + new XMLSerializer().serializeToString(clone);
   }
 
   function artifactName(suffix) {
