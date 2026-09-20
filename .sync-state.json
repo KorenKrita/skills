@@ -223,7 +223,7 @@
     ]
   },
   "read": {
-    "sha": "2cb5d0c6cc69333c1575cd72f2585f1c7eb0d703",
+    "sha": "59323dee82b04fa8b9ad97a8ee503ca8aee7eb3c",
     "files": [
       "SKILL.md",
       "references/read-methods.md",
@@ -241,7 +241,7 @@
     ]
   },
   "i-have-adhd": {
-    "sha": "b15d0be58f55b33972ba3e39709e0e5208ef30cb",
+    "sha": "839872f9d1cd634fed642b4589ce7226199cc15f",
     "files": [
       "SKILL.md",
       "agents/gemini.toml",
