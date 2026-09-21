@@ -208,7 +208,7 @@
     ]
   },
   "nuclear-review": {
-    "sha": "032be146865d973682535de75f2287da438550bf",
+    "sha": "6ed0f7a9504f577d7529064103cecce9be7dfc5e",
     "files": [
       "SKILL.md"
     ]
@@ -256,7 +256,7 @@
     ]
   },
   "archify": {
-    "sha": "72c750bb070d95171dbb2244e5b62b1b7da69c12",
+    "sha": "5289f6867f048a7450ec5718f58459613a84cf41",
     "files": [
       "LICENSE",
       "SKILL.md",
