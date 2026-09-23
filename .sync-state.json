@@ -208,7 +208,7 @@
     ]
   },
   "nuclear-review": {
-    "sha": "53e579f1481697931fc44f5445171397cfa2b24b",
+    "sha": "b42effe0aa50f59c693d7e2924714e015e00bf7c",
     "files": [
       "SKILL.md"
     ]
@@ -223,7 +223,7 @@
     ]
   },
   "read": {
-    "sha": "59323dee82b04fa8b9ad97a8ee503ca8aee7eb3c",
+    "sha": "30d669c84afb32a8d4c35d8e9853b9b2d3302c2a",
     "files": [
       "SKILL.md",
       "references/read-methods.md",
@@ -249,14 +249,19 @@
     ]
   },
   "humanizer-zh": {
-    "sha": "91f3d394db8419c20d67ebe22a96cf8fee0a404b",
+    "sha": "f4518a8eab97b8bfebc66a89d34320a89bef6930",
     "files": [
+      "CHANGELOG.md",
       "LICENSE",
-      "SKILL.md"
+      "SKILL.md",
+      "tests/README.md",
+      "tests/check_structure.py",
+      "tests/fixtures/cases.json",
+      "tests/fixtures/structure.md"
     ]
   },
   "archify": {
-    "sha": "5289f6867f048a7450ec5718f58459613a84cf41",
+    "sha": "8809b273c278a813a47fa37698864779c0d4cf08",
     "files": [
       "LICENSE",
       "SKILL.md",
