@@ -69,5 +69,5 @@ flowchart LR
 <If executable, list the cut list; if evidence is thin, list the prove-first items; if it needs landing, route to an installed execution-planning Skill whose description clearly matches the task.>
 
 ## HTML Artifact (only when explicitly requested)
-- **Path**: `<path returned by the installed visual-report Skill, or /tmp/razor-<slug>/index.html when rendered directly>`
+- **Path**: `<path returned by hai-visual-explainer>`
 ```
