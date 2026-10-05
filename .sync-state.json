@@ -1,6 +1,6 @@
 {
   "ask-matt": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "PHASE-BOUNDARIES.md",
       "SKILL.md",
@@ -8,14 +8,14 @@
     ]
   },
   "code-review": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "codebase-design": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "DEEPENING.md",
       "DESIGN-IT-TWICE.md",
@@ -24,7 +24,7 @@
     ]
   },
   "diagnosing-bugs": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "SKILL.md",
       "agents/openai.yaml",
@@ -32,7 +32,7 @@
     ]
   },
   "domain-modeling": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "ADR-FORMAT.md",
       "GLOSSARY-FORMAT.md",
@@ -41,21 +41,21 @@
     ]
   },
   "grill-with-docs": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "implement": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "improve-codebase-architecture": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "HTML-REPORT.md",
       "SKILL.md",
@@ -63,7 +63,7 @@
     ]
   },
   "prototype": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "LOGIC.md",
       "SKILL.md",
@@ -72,7 +72,7 @@
     ]
   },
   "research": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
@@ -86,7 +86,7 @@
     ]
   },
   "setup-matt-pocock-skills": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "SKILL.md",
       "agents/openai.yaml",
@@ -98,7 +98,7 @@
     ]
   },
   "tdd": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "SKILL.md",
       "agents/openai.yaml",
@@ -107,21 +107,21 @@
     ]
   },
   "to-spec": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "to-tickets": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "triage": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "AGENT-BRIEF.md",
       "OUT-OF-SCOPE.md",
@@ -130,14 +130,14 @@
     ]
   },
   "wayfinder": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "wizard": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "SKILL.md",
       "agents/openai.yaml",
@@ -145,28 +145,28 @@
     ]
   },
   "grill-me": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "grilling": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "handoff": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "teach": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "GLOSSARY-FORMAT.md",
       "LEARNING-RECORD-FORMAT.md",
@@ -177,21 +177,21 @@
     ]
   },
   "to-questionnaire": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "wait-what": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
     ]
   },
   "writing-for-agents": {
-    "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
       "SKILL-MECHANICS.md",
       "SKILL.md",
@@ -208,13 +208,13 @@
     ]
   },
   "nuclear-review": {
-    "sha": "e43c7ee26e0038c6c1fa8380dd34ce86ff94cb2a",
+    "sha": "4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536",
     "files": [
       "SKILL.md"
     ]
   },
   "razor": {
-    "sha": "9b1f8c8aa42b1caf4249a3db241fa9f65f625b1b",
+    "sha": "a6c7ed23aee5fe9a3d9cb7e162cd8a6c0862ce8c",
     "files": [
       "SKILL.md",
       "agents/openai.yaml",
@@ -261,7 +261,7 @@
     ]
   },
   "archify": {
-    "sha": "3a5e785d68ab45ee43cc3ae7b5a4e2e5188d1e31",
+    "sha": "a21ed05c9e9c910b66cae912e642ad044302720d",
     "files": [
       "LICENSE",
       "SKILL.md",
