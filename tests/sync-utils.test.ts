@@ -11,6 +11,9 @@ import {
   isUpstreamOwned,
   planSparseCheckout,
   planSync,
+  syncStateAfterPr,
+  syncStateForPrBranch,
+  findOpenSyncBranch,
   toSparseDir,
   upstreamOwnedNames,
 } from "../scripts/sync-utils.js"
@@ -150,5 +153,41 @@ describe("sync-utils", () => {
 
   it("does not invent conflicts before a manifest has been recorded", () => {
     expect(findNewFileConflicts(["SKILL.md"], undefined, ["SKILL.md"])).toEqual([])
+  })
+
+  describe("sync state lifecycle", () => {
+    const accepted = { sha: "old", files: ["SKILL.md", "CONTEXT-FORMAT.md"] }
+    const candidate = { sha: "new", files: ["SKILL.md", "GLOSSARY-FORMAT.md"] }
+
+    it("keeps main on the accepted manifest while a sync PR is unmerged", () => {
+      // Advancing main before merge made the next run forget CONTEXT-FORMAT.md was upstream-managed.
+      for (const result of ["created", "branch-exists"] as const) {
+        const state = { "domain-modeling": accepted }
+        const next = syncStateAfterPr(state, "domain-modeling", candidate, result)
+        expect(next).toEqual({ "domain-modeling": accepted })
+        expect(findRemovedFiles(next["domain-modeling"]!.files!, candidate.files)).toEqual(["CONTEXT-FORMAT.md"])
+      }
+    })
+
+    it("advances main only when upstream produced no content change", () => {
+      const next = syncStateAfterPr({ "domain-modeling": accepted }, "domain-modeling", candidate, "no-changes")
+      expect(next).toEqual({ "domain-modeling": candidate })
+    })
+
+    it("ships the candidate manifest inside the sync PR so merge accepts files and state together", () => {
+      const main = { "domain-modeling": accepted, tdd: { sha: "t", files: ["SKILL.md"] } }
+      expect(syncStateForPrBranch(main, "domain-modeling", candidate)).toEqual({
+        "domain-modeling": candidate,
+        tdd: { sha: "t", files: ["SKILL.md"] },
+      })
+      expect(main["domain-modeling"]).toBe(accepted)
+    })
+
+    it("treats any open sync PR of the same Skill as pending, whatever upstream SHA it carries", () => {
+      const open = ["sync/domain-modeling-1111111", "sync/domain-modeling-extra-2222222", "feature/x"]
+      expect(findOpenSyncBranch(open, "domain-modeling")).toBe("sync/domain-modeling-1111111")
+      expect(findOpenSyncBranch(["sync/domain-modeling-extra-2222222"], "domain-modeling")).toBeUndefined()
+      expect(findOpenSyncBranch([], "domain-modeling")).toBeUndefined()
+    })
   })
 })
