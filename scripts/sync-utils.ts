@@ -83,6 +83,15 @@ export function syncStateForPrBranch(
   return { ...state, [skillName]: candidate }
 }
 
+/** Sync branches are `sync/<skill>-<sha7>`; match by Skill so an older SHA still counts. */
+export function findOpenSyncBranch(
+  openHeadRefs: readonly string[],
+  skillName: string,
+): string | undefined {
+  const prefix = `sync/${skillName}-`
+  return openHeadRefs.find((ref) => ref.startsWith(prefix) && /^[0-9a-f]{7}$/.test(ref.slice(prefix.length)))
+}
+
 export interface SparseCheckoutPlan {
   readonly checkoutWholeRepo: boolean
   readonly directories: readonly string[]

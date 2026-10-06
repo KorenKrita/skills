@@ -13,6 +13,7 @@ import {
   planSync,
   syncStateAfterPr,
   syncStateForPrBranch,
+  findOpenSyncBranch,
   toSparseDir,
   upstreamOwnedNames,
 } from "../scripts/sync-utils.js"
@@ -180,6 +181,13 @@ describe("sync-utils", () => {
         tdd: { sha: "t", files: ["SKILL.md"] },
       })
       expect(main["domain-modeling"]).toBe(accepted)
+    })
+
+    it("treats any open sync PR of the same Skill as pending, whatever upstream SHA it carries", () => {
+      const open = ["sync/domain-modeling-1111111", "sync/domain-modeling-extra-2222222", "feature/x"]
+      expect(findOpenSyncBranch(open, "domain-modeling")).toBe("sync/domain-modeling-1111111")
+      expect(findOpenSyncBranch(["sync/domain-modeling-extra-2222222"], "domain-modeling")).toBeUndefined()
+      expect(findOpenSyncBranch([], "domain-modeling")).toBeUndefined()
     })
   })
 })

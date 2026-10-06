@@ -15,6 +15,7 @@ import {
   planSync,
   syncStateAfterPr,
   syncStateForPrBranch,
+  findOpenSyncBranch,
   type SyncState,
   type SyncStateEntry,
 } from "./sync-utils.js"
@@ -256,11 +257,9 @@ function remoteBranchExists(branch: string): boolean {
   }
 }
 
-function branchHasOpenPr(branch: string): boolean {
-  const count = exec(
-    `gh pr list --state open --head ${shellQuote(branch)} --json number --jq 'length'`,
-  )
-  return Number(count) > 0
+function listOpenPrHeads(): string[] {
+  const heads = exec(`gh pr list --state open --base main --limit 1000 --json headRefName --jq '.[].headRefName'`)
+  return heads ? heads.split("\n") : []
 }
 
 function deleteLocalBranch(branch: string): void {
@@ -309,8 +308,10 @@ function createPr(
 
   const labelList = isDraft ? ["自动同步", "补丁失败"] : ["自动同步"]
 
+  // Any open sync PR for this Skill, even for an older upstream SHA, is still pending review.
+  if (findOpenSyncBranch(listOpenPrHeads(), skillName)) return "branch-exists"
+
   if (remoteBranchExists(branch)) {
-    if (branchHasOpenPr(branch)) return "branch-exists"
     console.log(`  🧹 ${skillName}: 删除没有 Open PR 的旧同步分支 ${branch}`)
     exec(`git push origin --delete ${shellQuote(branch)}`)
   }
