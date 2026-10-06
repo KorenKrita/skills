@@ -13,6 +13,11 @@ import {
   isExcludedFile,
   planSparseCheckout,
   planSync,
+  syncStateAfterPr,
+  syncStateForPrBranch,
+  findOpenSyncBranch,
+  type SyncState,
+  type SyncStateEntry,
 } from "./sync-utils.js"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -60,15 +65,6 @@ interface SkillOverride {
   exclude_files?: string[]
 }
 
-interface SyncStateEntry {
-  sha: string
-  files?: string[]
-}
-
-interface SyncState {
-  [skillName: string]: SyncStateEntry
-}
-
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const ROOT = new URL("../", import.meta.url).pathname.replace(/\/$/, "")
@@ -90,7 +86,7 @@ function exec(cmd: string): string {
   return execSync(cmd, { encoding: "utf-8", cwd: ROOT }).trim()
 }
 
-function readSyncState(): SyncState {
+function readSyncState(): Record<string, SyncStateEntry> {
   if (!existsSync(SYNC_STATE_PATH)) return {}
   return JSON.parse(readFileSync(SYNC_STATE_PATH, "utf-8"))
 }
@@ -261,11 +257,9 @@ function remoteBranchExists(branch: string): boolean {
   }
 }
 
-function branchHasOpenPr(branch: string): boolean {
-  const count = exec(
-    `gh pr list --state open --head ${shellQuote(branch)} --json number --jq 'length'`,
-  )
-  return Number(count) > 0
+function listOpenPrHeads(): string[] {
+  const heads = exec(`gh pr list --state open --base main --limit 1000 --json headRefName --jq '.[].headRefName'`)
+  return heads ? heads.split("\n") : []
 }
 
 function deleteLocalBranch(branch: string): void {
@@ -306,6 +300,7 @@ function createPr(
   body: string,
   stagePaths: string[],
   forceAddPaths: string[],
+  branchSyncState: SyncState,
 ): PrResult {
   const title = isDraft
     ? `同步：更新 ${skillName}（来自 ${repo}）[补丁失败]`
@@ -313,8 +308,10 @@ function createPr(
 
   const labelList = isDraft ? ["自动同步", "补丁失败"] : ["自动同步"]
 
+  // Any open sync PR for this Skill, even for an older upstream SHA, is still pending review.
+  if (findOpenSyncBranch(listOpenPrHeads(), skillName)) return "branch-exists"
+
   if (remoteBranchExists(branch)) {
-    if (branchHasOpenPr(branch)) return "branch-exists"
     console.log(`  🧹 ${skillName}: 删除没有 Open PR 的旧同步分支 ${branch}`)
     exec(`git push origin --delete ${shellQuote(branch)}`)
   }
@@ -335,7 +332,9 @@ function createPr(
   )
   writeFileSync(MARKETPLACE_CONFIG_PATH, versionBump.content)
   exec("npx tsx scripts/build-marketplace.ts")
-  stageSyncChanges([MARKETPLACE_CONFIG_PATH, ...GENERATED_MANIFEST_PATHS], [])
+  // The accepted manifest must land with the files it describes, at merge time.
+  writeSyncState(branchSyncState)
+  stageSyncChanges([MARKETPLACE_CONFIG_PATH, SYNC_STATE_PATH, ...GENERATED_MANIFEST_PATHS], [])
 
   exec(`git -c user.name="github-actions" -c user.email="actions@github.com" commit -m "同步：更新 ${skillName}"`)
   exec(`git push -u origin ${shellQuote(branch)}`)
@@ -516,6 +515,7 @@ const program = Effect.gen(function* () {
     }
 
     // Create PR
+    const candidateState: SyncStateEntry = { sha: latestSha, files: upstreamFiles }
     const branch = `sync/${skillName}-${latestSha.slice(0, 7)}`
     const extraMappingPaths = (extra_mappings ?? []).map(m => join(ROOT, m.to))
     const stagePaths = [
@@ -539,25 +539,30 @@ const program = Effect.gen(function* () {
         body,
         stagePaths,
         forceAddPaths,
+        // Base on main's committed state so the PR carries only this Skill's entry.
+        syncStateForPrBranch(readSyncState(), skillName, candidateState),
       )
       if (result === "created") {
-        console.log(`  📬 PR 已创建${patchFailed ? " (Draft)" : ""}`)
+        console.log(`  📬 PR 已创建${patchFailed ? " (Draft)" : ""}，同步状态随 PR 合入`)
       } else if (result === "no-changes") {
         console.log(`  ⏭️  ${skillName}: 文件内容无变化，记录最新状态`)
       } else {
-        console.log(`  ⏭️  ${skillName}: 分支已存在，记录最新状态`)
+        console.log(`  ⏭️  ${skillName}: 已有 Open PR，保持已接受的同步状态`)
         cleanPaths(stagePaths, forceAddPaths)
       }
 
-      syncState[skillName] = { sha: latestSha, files: upstreamFiles }
-      updated = true
+      const nextState = syncStateAfterPr(syncState, skillName, candidateState, result)
+      if (nextState !== syncState) {
+        syncState[skillName] = candidateState
+        updated = true
+      }
     } catch (e) {
       try {
         exec("git checkout main")
       } catch {
         // Already on main or checkout is blocked by an unexpected failure.
       }
-      cleanPaths(stagePaths, forceAddPaths)
+      cleanPaths([...stagePaths, SYNC_STATE_PATH], forceAddPaths)
       console.log(`  ❌ PR 创建失败: ${e}`)
     }
   }

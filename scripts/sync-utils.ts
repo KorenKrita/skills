@@ -54,6 +54,44 @@ export function findOrphanedStateKeys(
   return stateKeys.filter((key) => !configured.has(key))
 }
 
+export interface SyncStateEntry {
+  readonly sha: string
+  readonly files?: readonly string[]
+}
+
+export type SyncState = Readonly<Record<string, SyncStateEntry>>
+
+/**
+ * `.sync-state.json` on main is the accepted manifest that later runs diff
+ * against to delete files upstream removed. It may only advance when nothing
+ * is pending review; otherwise the candidate travels inside the sync PR.
+ */
+export function syncStateAfterPr(
+  state: SyncState,
+  skillName: string,
+  candidate: SyncStateEntry,
+  result: "created" | "no-changes" | "branch-exists",
+): SyncState {
+  return result === "no-changes" ? { ...state, [skillName]: candidate } : state
+}
+
+export function syncStateForPrBranch(
+  state: SyncState,
+  skillName: string,
+  candidate: SyncStateEntry,
+): SyncState {
+  return { ...state, [skillName]: candidate }
+}
+
+/** Sync branches are `sync/<skill>-<sha7>`; match by Skill so an older SHA still counts. */
+export function findOpenSyncBranch(
+  openHeadRefs: readonly string[],
+  skillName: string,
+): string | undefined {
+  const prefix = `sync/${skillName}-`
+  return openHeadRefs.find((ref) => ref.startsWith(prefix) && /^[0-9a-f]{7}$/.test(ref.slice(prefix.length)))
+}
+
 export interface SparseCheckoutPlan {
   readonly checkoutWholeRepo: boolean
   readonly directories: readonly string[]
