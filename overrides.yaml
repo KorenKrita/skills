@@ -39,8 +39,18 @@ skills:
     plugin: base
     patches: []
 
+  implement-spec:
+    source: { repo: mattpocock/skills, path: skills/engineering/implement-spec, ref: main }
+    plugin: base
+    patches: []
+
   improve-codebase-architecture:
     source: { repo: mattpocock/skills, path: skills/engineering/improve-codebase-architecture, ref: main }
+    plugin: base
+    patches: []
+
+  pr:
+    source: { repo: mattpocock/skills, path: skills/engineering/pr, ref: main }
     plugin: base
     patches: []
 
@@ -54,8 +64,8 @@ skills:
     plugin: base
     patches: []
 
-  resolving-merge-conflicts:
-    source: { repo: mattpocock/skills, path: skills/engineering/resolving-merge-conflicts, ref: main }
+  retro:
+    source: { repo: mattpocock/skills, path: skills/engineering/retro, ref: main }
     plugin: base
     patches: []
 
@@ -184,10 +194,10 @@ skills:
         pattern: "For Chinese readers, see `SKILL.zh_CN.md`. The English `SKILL.md` is the execution source of truth.\n\n"
         with: ""
       - type: replace
-        pattern: "If the user explicitly asks\n   for HTML or a visual report, hand the completed judgment to `hai-visual-report`; do not duplicate\n   its rendering workflow here."
+        pattern: "If the user explicitly asks\n   for HTML or a visual report, hand the completed judgment to `hai-visual-explainer`; do not duplicate\n   its rendering workflow here."
         with: "If the user explicitly asks\n   for HTML or a visual report, hand the completed judgment to an installed visual-report Skill whose\n   description clearly matches the task, or render it directly; do not duplicate that workflow here."
       - type: replace
-        pattern: "HTML remains opt-in and belongs to `hai-visual-report`."
+        pattern: "HTML remains opt-in and belongs to `hai-visual-explainer`."
         with: "HTML remains opt-in."
       - type: replace
         pattern: "- The question is whether the whole idea is worth doing at all — use `hai-idea`.\n"
@@ -213,7 +223,7 @@ skills:
       - target: references/output-template.md
         patches:
           - type: replace_all
-            pattern: "- **Path**: `<path returned by hai-visual-report>`"
+            pattern: "- **Path**: `<path returned by hai-visual-explainer>`"
             with: "- **Path**: `<path returned by the installed visual-report Skill, or /tmp/razor-<slug>/index.html when rendered directly>`"
           - type: replace_all
             pattern: "`hai-goal`"
@@ -291,7 +301,7 @@ skills:
             pattern: "    \"build:readme-showcase\": \"node ../scripts/build-readme-showcase.mjs\",\n"
             with: ""
           - type: replace_all
-            pattern: "    \"check:validators\": \"node scripts/generate-validators.mjs --check\",\n    \"render:examples\": \"node scripts/render-examples.mjs ../examples\"\n"
+            pattern: "    \"check:validators\": \"node scripts/generate-validators.mjs --check\",\n    \"test:browser\": \"node ../scripts/run-browser-tests.mjs\",\n    \"render:examples\": \"node scripts/render-examples.mjs ../examples\"\n"
             with: "    \"check:validators\": \"node scripts/generate-validators.mjs --check\"\n"
       - target: schemas/README.md
         patches:

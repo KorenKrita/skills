@@ -5,7 +5,7 @@
 ## 项目结构
 
 ```text
-plugins/base/skills/<skill>/SKILL.md      mattpocock/skills engineering + productivity 完整镜像（25）
+plugins/base/skills/<skill>/SKILL.md      mattpocock/skills engineering + productivity 完整镜像（27）
 plugins/plus/skills/<skill>/SKILL.md      工程、思考、工具、写作、可视化与安全/逆向（10）
 plugins/plus/agents/*.md                  plus 的 Claude Code subagents
 overrides.yaml                            Skill 归属：上游来源、改名、排除、patch，本地自有声明
@@ -35,7 +35,7 @@ npm run sync
 - 同一个 Skill name 在整个仓库只出现一次，避免 Pi 递归发现 collision。
 - `.claude-plugin/marketplace.json`、`.cursor-plugin/marketplace.json`、`plugins/*/.cursor-plugin/plugin.json` 均由 `marketplace.yaml` 生成，不手改。
 - `.sync-state.json` 由同步流程维护，只覆盖上游 Skill；结构迁移时必须与上游 overrides key 和上游文件清单一起迁移。
-- `base` 固定 25 个 Skill、`plus` 固定 10 个；`base` 为 mattpocock/skills 上游纯镜像，本地改动只发生在 `plus`。
+- `base` 固定 27 个 Skill（随上游 engineering + productivity 目录增减而变，变更时同步 overrides、同步状态、布局测试与文档）、`plus` 固定 10 个；`base` 为 mattpocock/skills 上游纯镜像，本地改动只发生在 `plus`。
 - `plus/agents` 仅对 Claude Code 生效；Pi 只加载 `plugins/*/skills`。
 - 仓库只发布 `base` 和 `plus` 两个 plugin。
 

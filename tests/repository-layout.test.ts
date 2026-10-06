@@ -19,10 +19,12 @@ const EXPECTED_SKILLS = {
     "grilling",
     "handoff",
     "implement",
+    "implement-spec",
     "improve-codebase-architecture",
+    "pr",
     "prototype",
     "research",
-    "resolving-merge-conflicts",
+    "retro",
     "setup-matt-pocock-skills",
     "tdd",
     "teach",
@@ -56,7 +58,7 @@ const LOCAL_SKILLS = ["bro"] as const
 const LOCAL_PROVENANCE_REPOS: Record<string, string> = { bro: "dmmulroy/.dotfiles" }
 
 /** base Skills removed from the subscription; nothing may still route to them. */
-const REMOVED_BASE_SKILLS = [] as const
+const REMOVED_BASE_SKILLS = ["resolving-merge-conflicts"] as const
 
 function readOverrides(): {
   skills: Record<

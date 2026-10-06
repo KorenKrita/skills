@@ -23,3 +23,7 @@
 - 官方 Skill 中的 "Call the Skill tool" 语义面向 Claude Code；Pi 侧这些指令为惰性文本，Pi 用户通过 description 自动加载或 `/skill:<name>` 手动调用。
 - base 常驻上下文从 9 个 Skill 描述增长到 25 个，安装 base+plus 的会话多付出约一倍的 skill description 开销。
 - ADR-0005 的 local ownership 机制继续服务于 `plus` 的 `bro` 与 `sec-router`。
+
+## 后续变更
+
+- 2026-10-06：上游在 2026-09-24 新增 `engineering/implement-spec`、`engineering/pr`、`engineering/retro`，删除 `engineering/resolving-merge-conflicts`；按本 ADR 的完整镜像决策跟随，base 变为 engineering（20）+ productivity（7）= 27 个 Skill。
