@@ -78,13 +78,6 @@
       "agents/openai.yaml"
     ]
   },
-  "resolving-merge-conflicts": {
-    "sha": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
-    "files": [
-      "SKILL.md",
-      "agents/openai.yaml"
-    ]
-  },
   "setup-matt-pocock-skills": {
     "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
     "files": [
@@ -367,6 +360,28 @@
       "scripts/render-examples.mjs",
       "scripts/update-contract.mjs",
       "skill-release.json"
+    ]
+  },
+  "implement-spec": {
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
+    "files": [
+      "SKILL.md",
+      "agents/openai.yaml"
+    ]
+  },
+  "pr": {
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
+    "files": [
+      "CREDITS.md",
+      "SKILL.md",
+      "agents/openai.yaml"
+    ]
+  },
+  "retro": {
+    "sha": "f6abdeb8dd2a9be64f924ab44c7af374cb76726d",
+    "files": [
+      "SKILL.md",
+      "agents/openai.yaml"
     ]
   }
 }

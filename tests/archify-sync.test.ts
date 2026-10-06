@@ -7,9 +7,9 @@ import { isExcludedFile } from "../scripts/sync-utils.js"
 
 const read = (path: string) => readFileSync(new URL(path, import.meta.url), "utf-8")
 
-// Unmodified upstream manifest from tt-a1i/archify at a07fa1d5b2a1 (PR #221).
+// Unmodified upstream manifest from tt-a1i/archify at a21ed05c9e9c (PR #253).
 // Keep the fixture independent of overrides so stale exact-match patches fail.
-const upstream = read("./fixtures/archify-a07fa1d.package.json")
+const upstream = read("./fixtures/archify-a21ed05.package.json")
 const config = parseYaml(read("../overrides.yaml")) as {
   skills: { archify: { patches: Patch[]; exclude_files: string[]; target_patches: { target: string; patches: Patch[] }[] } }
 }
