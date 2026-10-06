@@ -21,7 +21,7 @@
 
 ```text
 base               核心工程与协作流程
-base + plus  全部 35 个 Skill（plus 含安全/逆向技能路由）
+base + plus  全部 37 个 Skill（plus 含安全/逆向技能路由）
 ```
 
 ### Cursor
