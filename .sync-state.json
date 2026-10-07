@@ -79,7 +79,7 @@
     ]
   },
   "setup-matt-pocock-skills": {
-    "sha": "4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d",
+    "sha": "5da500e727a5878bcd4d3278dfec741e01917652",
     "files": [
       "SKILL.md",
       "agents/openai.yaml",
