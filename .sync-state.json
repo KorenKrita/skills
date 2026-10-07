@@ -234,7 +234,7 @@
     ]
   },
   "i-have-adhd": {
-    "sha": "839872f9d1cd634fed642b4589ce7226199cc15f",
+    "sha": "723af7d9afaf43eb871dbcce6129e2bf80de90d5",
     "files": [
       "SKILL.md",
       "agents/gemini.toml",
