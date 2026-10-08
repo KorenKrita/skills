@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "base",
-      "version": "0.0.16",
+      "version": "0.0.17",
       "source": "./plugins/base",
       "description": "mattpocock/skills engineering + productivity 完整镜像：调试、TDD、代码审查、架构、领域建模、规格与工单工作流、访谈、交接、教学、写作与路由",
       "strict": false,
