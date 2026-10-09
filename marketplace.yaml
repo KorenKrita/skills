@@ -5,7 +5,7 @@ marketplace:
   description: KorenKrita 的 Skill 订阅库
 plugins:
   base:
-    version: 0.0.16
+    version: 0.0.17
     description: mattpocock/skills engineering + productivity 完整镜像：调试、TDD、代码审查、架构、领域建模、规格与工单工作流、访谈、交接、教学、写作与路由
     category: engineering
     keywords:
@@ -15,7 +15,7 @@ plugins:
       - prototyping
       - workflow
   plus:
-    version: 0.0.42
+    version: 0.0.43
     description: 决策方法、代码质量审查、读取工具、中文写作优化、可视化讲解、架构图与安全/逆向技能路由
     category: productivity
     keywords:
