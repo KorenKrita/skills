@@ -227,7 +227,7 @@
     ]
   },
   "show-me": {
-    "sha": "ca7c8088db69e315a8b2deea43820270457f8f3c",
+    "sha": "653b6411c1f70c275a18e37673b042ff99f67ceb",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
@@ -254,7 +254,7 @@
     ]
   },
   "archify": {
-    "sha": "73aaa0696e8f72c232ea710e6fa94fd953f3e773",
+    "sha": "bb990b17b886e83d633e273221615eb259a92c78",
     "files": [
       "LICENSE",
       "SKILL.md",
