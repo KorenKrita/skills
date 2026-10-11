@@ -201,7 +201,7 @@
     ]
   },
   "nuclear-review": {
-    "sha": "d73344bee8cf22e53b9d5f4cf5749d38ba38c174",
+    "sha": "11713c683fe4add4fd403ea880580abbc9e0875f",
     "files": [
       "SKILL.md"
     ]
@@ -216,7 +216,7 @@
     ]
   },
   "read": {
-    "sha": "cbaf6e7abe6c9e43ecca5d5e8d7242b277a24090",
+    "sha": "8b2c3560ba0b174a5c984b75e4417d5c2e7453f8",
     "files": [
       "SKILL.md",
       "references/read-methods.md",
@@ -254,7 +254,7 @@
     ]
   },
   "archify": {
-    "sha": "54edef453ca3fc495f488c30de97eaea0c789f19",
+    "sha": "58ab0b98d2d0def8e49dced705c7b566936723ec",
     "files": [
       "LICENSE",
       "SKILL.md",
