@@ -216,10 +216,11 @@
     ]
   },
   "read": {
-    "sha": "2585ee0f46bcefd9adb1b8f5d4ce19184a4d2929",
+    "sha": "840f926af48c98e0b36a3a64658a9ddc4cf7e716",
     "files": [
       "SKILL.md",
       "references/read-methods.md",
+      "scripts/deepseek.py",
       "scripts/fetch.sh",
       "scripts/fetch_feishu.py",
       "scripts/fetch_local.py",
