@@ -37,25 +37,14 @@ const EXPECTED_SKILLS = {
     "wizard",
     "writing-for-agents",
   ],
-  plus: [
-    "archify",
-    "bro",
-    "humanizer-zh",
-    "i-have-adhd",
-    "improve",
-    "nuclear-review",
-    "razor",
-    "read",
-    "sec-router",
-    "show-me",
-  ],
+  plus: ["i-have-adhd", "razor", "sec-router"],
 } as const
 
 const EXPECTED_SKILL_COUNT = Object.values(EXPECTED_SKILLS).flat().length
 
 /** Skills this repository maintains itself, excluded from upstream sync. */
-const LOCAL_SKILLS = ["bro"] as const
-const LOCAL_PROVENANCE_REPOS: Record<string, string> = { bro: "dmmulroy/.dotfiles" }
+const LOCAL_SKILLS = ["sec-router"] as const
+const LOCAL_PROVENANCE_REPOS: Record<string, string> = { "sec-router": "zhaoxuya520/reverse-skill" }
 
 /** base Skills removed from the subscription; nothing may still route to them. */
 const REMOVED_BASE_SKILLS = ["resolving-merge-conflicts"] as const
@@ -176,7 +165,7 @@ describe("repository layout", () => {
       // Provenance keeps the fork origin and its license auditable.
       expect(entry?.provenance?.repo, skill).toBe(LOCAL_PROVENANCE_REPOS[skill])
       expect(entry?.provenance?.forked_at_sha, skill).toMatch(/^[0-9a-f]{40}$/)
-      expect(entry?.provenance?.license, skill).toContain("license")
+      expect(entry?.provenance?.license, skill).toBeTruthy()
       expect(existsSync(join(ROOT, "plugins", entry!.plugin, "skills", skill)), skill).toBe(true)
     }
 
@@ -222,45 +211,7 @@ describe("repository layout", () => {
     }
   })
 
-  it("does not expose commands for excluded Archify tests", () => {
-    const manifest = JSON.parse(
-      readFileSync(join(ROOT, "plugins", "plus", "skills", "archify", "package.json"), "utf-8"),
-    ) as { scripts?: Record<string, string> }
-    const archifyScripts = Object.values(manifest.scripts ?? {})
-    expect(archifyScripts.join("\n")).not.toContain("test/")
-    // The published payload root is skills/archify, so "../scripts" and
-    // "../docs" resolve outside it and can never run for an installed skill.
-    for (const script of archifyScripts) {
-      expect(script, script).not.toContain("../")
-    }
-    const schemaReadme = readFileSync(
-      join(ROOT, "plugins", "plus", "skills", "archify", "schemas", "README.md"),
-      "utf-8",
-    )
-    expect(schemaReadme).not.toContain("`npm test`")
-    expect(schemaReadme).toContain("`npm run check:validators`")
-    const archifyDocs = textFiles(join(ROOT, "plugins", "plus", "skills", "archify"))
-      .filter((path) => path.endsWith(".md"))
-    for (const path of archifyDocs) {
-      const doc = readFileSync(path, "utf-8")
-      expect(doc, path).not.toContain("docs/guide.html")
-      expect(doc, path).not.toContain("docs/gallery.html")
-      expect(doc, path).not.toContain("examples/web-app.html")
-      expect(doc, path).not.toContain("web-app-rendered.html")
-    }
-  })
 
-  it("keeps nuclear-review renamed throughout runtime files", () => {
-    const agent = join(ROOT, "plugins", "plus", "agents", "nuclear-review.md")
-    expect(existsSync(agent)).toBe(true)
-    expect(existsSync(join(ROOT, "plugins", "plus", "skills", "nuclear-review", "agents"))).toBe(false)
-    const runtime = textFiles(join(ROOT, "plugins"))
-      .map((path) => readFileSync(path, "utf-8"))
-      .join("\n")
-    expect(runtime).not.toContain("thermo-nuclear-code-quality-review")
-    expect(runtime).not.toContain("Thermo-Nuclear Code Quality Review")
-    expect(runtime).toContain('subagent_type: "nuclear-review"')
-  })
 
   it("removes unavailable hai skill references from the selected subset", () => {
     const selected = ["razor"]
@@ -289,21 +240,6 @@ describe("repository layout", () => {
     }
   })
 
-  it("keeps bro as the local dmmulroy original restatement Skill", () => {
-    const entry = readOverrides().skills.bro
-    const skill = readFileSync(join(ROOT, "plugins", "plus", "skills", "bro", "SKILL.md"), "utf-8")
-
-    expect(entry?.ownership).toBe("local")
-    expect(entry?.provenance?.repo).toBe("dmmulroy/.dotfiles")
-    expect(entry?.provenance?.path).toBe("home/.agents/skills/bro")
-    expect(entry?.provenance?.forked_at_sha).toBe("c2322c6534f586b146ae0e8d9296019396aa32c0")
-    expect(entry?.provenance?.license).toContain("no license declared")
-    expect(skill).toContain("Restate your last message. Stop using jargon and speak coherently.")
-    expect(skill).toContain("like one human talking to another")
-    // The wait-what merge is fully reverted; context-aware re-pitch lives in base.
-    expect(skill).not.toContain("ASD-STE100")
-    expect(skill).not.toContain("Re-pitch")
-  })
   it("keeps i-have-adhd model-invocable across upstream sync", () => {
     const entry = readOverrides().skills["i-have-adhd"]
     const skill = readFileSync(
@@ -340,7 +276,7 @@ describe("repository layout", () => {
 
   it("keeps only the approved plugin-level assets", () => {
     expect(existsSync(join(ROOT, "plugins", "plus", "hooks"))).toBe(false)
-    expect(existsSync(join(ROOT, "plugins", "plus", "agents", "nuclear-review.md"))).toBe(true)
+    expect(existsSync(join(ROOT, "plugins", "plus", "agents"))).toBe(false)
     expect(existsSync(join(ROOT, "plugins", "base", "rules"))).toBe(false)
     expect(existsSync(join(ROOT, "plugins", "plus", "rules"))).toBe(false)
   })

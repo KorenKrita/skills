@@ -191,21 +191,6 @@
       "agents/openai.yaml"
     ]
   },
-  "improve": {
-    "sha": "cac56e1ebd3c279aa9153616cfeac7b174ab90f9",
-    "files": [
-      "SKILL.md",
-      "references/audit-playbook.md",
-      "references/closing-the-loop.md",
-      "references/plan-template.md"
-    ]
-  },
-  "nuclear-review": {
-    "sha": "eb4db2b55b2b7dec3d9282754cddf0a56bf4ff10",
-    "files": [
-      "SKILL.md"
-    ]
-  },
   "razor": {
     "sha": "a6c7ed23aee5fe9a3d9cb7e162cd8a6c0862ce8c",
     "files": [
@@ -215,151 +200,12 @@
       "references/output-template.md"
     ]
   },
-  "read": {
-    "sha": "2585ee0f46bcefd9adb1b8f5d4ce19184a4d2929",
-    "files": [
-      "SKILL.md",
-      "references/read-methods.md",
-      "scripts/fetch.sh",
-      "scripts/fetch_feishu.py",
-      "scripts/fetch_local.py",
-      "scripts/fetch_weixin.py"
-    ]
-  },
-  "show-me": {
-    "sha": "653b6411c1f70c275a18e37673b042ff99f67ceb",
-    "files": [
-      "SKILL.md",
-      "agents/openai.yaml"
-    ]
-  },
   "i-have-adhd": {
     "sha": "1ecea1993b7fce257ffbd686c070948b5e07eda6",
     "files": [
       "SKILL.md",
       "agents/gemini.toml",
       "agents/openai.yaml"
-    ]
-  },
-  "humanizer-zh": {
-    "sha": "f4518a8eab97b8bfebc66a89d34320a89bef6930",
-    "files": [
-      "CHANGELOG.md",
-      "LICENSE",
-      "SKILL.md",
-      "tests/README.md",
-      "tests/check_structure.py",
-      "tests/fixtures/cases.json",
-      "tests/fixtures/structure.md"
-    ]
-  },
-  "archify": {
-    "sha": "58ab0b98d2d0def8e49dced705c7b566936723ec",
-    "files": [
-      "LICENSE",
-      "SKILL.md",
-      "THIRD_PARTY_NOTICES.md",
-      "assets/JetBrainsMono-OFL.txt",
-      "assets/template.html",
-      "bin/archify.mjs",
-      "bin/delivery-update.mjs",
-      "bin/finalize.mjs",
-      "bin/open-artifact.mjs",
-      "bin/preview.mjs",
-      "bin/recover-output.mjs",
-      "bin/visual-check.mjs",
-      "brand-marks/README.md",
-      "brand-marks/catalog.json",
-      "delta/architecture-delta.mjs",
-      "examples/agent-run.lifecycle.json",
-      "examples/agent-tool-call.workflow.json",
-      "examples/async-job-roundtrip.sequence.json",
-      "examples/brand-aware-delivery.architecture.json",
-      "examples/cache-miss-request.sequence.json",
-      "examples/checkout-platform.base.architecture.json",
-      "examples/checkout-platform.head.architecture.json",
-      "examples/deployment-release.lifecycle.json",
-      "examples/event-stream.dataflow.json",
-      "examples/holiday-planning.workflow.json",
-      "examples/incident-response.workflow.json",
-      "examples/locales/de.json",
-      "examples/locales/es.json",
-      "examples/locales/fr.json",
-      "examples/locales/fr.partial.json",
-      "examples/locales/it.json",
-      "examples/locales/ja.json",
-      "examples/locales/ko.json",
-      "examples/locales/pt.json",
-      "examples/locales/ru.json",
-      "examples/product-analytics.dataflow.json",
-      "examples/production-deployment.architecture.json",
-      "examples/release-delivery.workflow.json",
-      "examples/web-app.architecture.json",
-      "migrations/workflow-v2.mjs",
-      "package-lock.json",
-      "package.json",
-      "recipes/scenarios.mjs",
-      "references/architecture-layout-repair.md",
-      "references/authoring-contract.md",
-      "references/authoring-defaults.md",
-      "references/brand-marks.md",
-      "references/delivery-contract.md",
-      "references/repository-authoring.md",
-      "references/update-awareness.md",
-      "references/viewer-runtime.md",
-      "renderers/architecture/grid.mjs",
-      "renderers/architecture/labels.mjs",
-      "renderers/architecture/render-architecture.mjs",
-      "renderers/architecture/routing.mjs",
-      "renderers/dataflow/README.md",
-      "renderers/dataflow/render-dataflow.mjs",
-      "renderers/lifecycle/README.md",
-      "renderers/lifecycle/grid-routing.mjs",
-      "renderers/lifecycle/render-lifecycle.mjs",
-      "renderers/sequence/README.md",
-      "renderers/sequence/render-sequence.mjs",
-      "renderers/shared/atomic-output.mjs",
-      "renderers/shared/brand-marks.mjs",
-      "renderers/shared/cli.mjs",
-      "renderers/shared/desktop-readability.mjs",
-      "renderers/shared/diagnostics.mjs",
-      "renderers/shared/engineering-profiles.mjs",
-      "renderers/shared/generated-brand-marks.mjs",
-      "renderers/shared/generated-validators.mjs",
-      "renderers/shared/geometry.mjs",
-      "renderers/shared/i18n.mjs",
-      "renderers/shared/layout-report.mjs",
-      "renderers/shared/legend.mjs",
-      "renderers/shared/output-path.mjs",
-      "renderers/shared/path-semantics.mjs",
-      "renderers/shared/portable-path.mjs",
-      "renderers/shared/repository-evidence.mjs",
-      "renderers/shared/repository-location.mjs",
-      "renderers/shared/route-quality.mjs",
-      "renderers/shared/sidecar-path.mjs",
-      "renderers/shared/spatial-grid.mjs",
-      "renderers/shared/text-fit.mjs",
-      "renderers/shared/utils.mjs",
-      "renderers/shared/validator.mjs",
-      "renderers/workflow/README.md",
-      "renderers/workflow/render-workflow.mjs",
-      "renderers/workflow/workflow-compiler.mjs",
-      "renderers/workflow/workflow-migration-geometry.mjs",
-      "schemas/README.md",
-      "schemas/architecture.schema.json",
-      "schemas/common.schema.json",
-      "schemas/dataflow.schema.json",
-      "schemas/lifecycle.schema.json",
-      "schemas/sequence.schema.json",
-      "schemas/workflow.schema.json",
-      "scripts/check-render-output.mjs",
-      "scripts/check-update.mjs",
-      "scripts/delivery-update-child.mjs",
-      "scripts/generate-brand-marks.mjs",
-      "scripts/generate-validators.mjs",
-      "scripts/render-examples.mjs",
-      "scripts/update-contract.mjs",
-      "skill-release.json"
     ]
   },
   "implement-spec": {

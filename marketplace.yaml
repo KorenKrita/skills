@@ -15,16 +15,12 @@ plugins:
       - prototyping
       - workflow
   plus:
-    version: 0.0.43
-    description: 决策方法、代码质量审查、读取工具、中文写作优化、可视化讲解、架构图与安全/逆向技能路由
+    version: 0.0.44
+    description: ADHD 友好输出、需求剃刀与安全/逆向技能路由
     category: productivity
     keywords:
+      - adhd
       - decision
-      - reading
-      - review
-      - writing
-      - diagram
-      - architecture
       - security
       - reverse-engineering
       - pentest

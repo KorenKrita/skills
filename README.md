@@ -67,13 +67,9 @@ pi install -l git:github.com/KorenKrita/skills
 | Plugin | 内容 | Skill 数量 |
 |---|---|---:|
 | **base** | [mattpocock/skills](https://github.com/mattpocock/skills) engineering + productivity 完整镜像：工程流程与效率工具 | 27 |
-| **plus** | 决策方法、代码质量审查、读取工具、中文写作优化、可视化讲解、架构图、白话重述与安全/逆向技能路由 | 10 |
+| **plus** | ADHD 友好输出、需求剃刀与安全/逆向技能路由 | 3 |
 
-`plus` 还附带：
-
-- `agents/nuclear-review.md`：`nuclear-review` Skill 的 Claude Code subagent。
-
-Pi 加载两个 plugin 的 `skills/`；`plus` 的 plugin-level Agent 仅对 Claude Code 生效。
+Pi 加载两个 plugin 的 `skills/`。
 
 ## 上游同步
 
@@ -84,14 +80,8 @@ Pi 加载两个 plugin 的 `skills/`；`plus` 的 plugin-level Agent 仅对 Clau
 主要来源：
 
 - [mattpocock/skills](https://github.com/mattpocock/skills)
-- [humanlayer/skills](https://github.com/humanlayer/skills)
-- [tw93/Waza](https://github.com/tw93/Waza)
 - [hylarucoder/hai-stack](https://github.com/hylarucoder/hai-stack)
-- [shadcn/improve](https://github.com/shadcn/improve)
-- [cursor/plugins](https://github.com/cursor/plugins)
-- [op7418/Humanizer-zh](https://github.com/op7418/Humanizer-zh)
-- [tt-a1i/archify](https://github.com/tt-a1i/archify)
-- [dmmulroy/.dotfiles](https://github.com/dmmulroy/.dotfiles)
+- [ayghri/i-have-adhd](https://github.com/ayghri/i-have-adhd)
 - [zhaoxuya520/reverse-skill](https://github.com/zhaoxuya520/reverse-skill)
 
 ## 许可证

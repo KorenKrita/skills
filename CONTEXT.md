@@ -7,7 +7,7 @@
 | **skill** | 一个 `SKILL.md` 加可选 scripts、references、assets、Skill metadata 的最小能力单元 |
 | **plugin** | Claude Code 的安装单元；本仓库固定为 `base`、`plus` 两个 |
 | **base** | mattpocock/skills 的 engineering + productivity 完整镜像，共 27 个 Skill，零 patch 零 fork |
-| **plus** | 决策方法、代码质量审查、通用工具、中文写作优化、可视化讲解、架构图、白话重述与安全/逆向技能路由，共 10 个 Skill；附带 Claude Code Agent |
+| **plus** | ADHD 友好输出、需求剃刀与安全/逆向技能路由，共 3 个 Skill |
 | **marketplace** | `.claude-plugin/marketplace.json` 定义的两个 plugin 聚合入口 |
 
 ## Sync System
@@ -36,5 +36,4 @@
 - Plugin：`base`、`plus`。
 - Skill 目录名 = Skill 调用名 = frontmatter `name`。
 - 外部 Skill 改名由 overrides key + `set_frontmatter` + 相关 metadata patch 共同完成。
-- `nuclear-review` 的 plugin-level Agent 与 Skill 使用同一个最终名称。
 - 来源名称与运行名称分离；上游原名只保留在 overrides 的 source/provenance 配置中。
