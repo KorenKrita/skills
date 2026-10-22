@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs"
+import { homedir } from "node:os"
 import { join } from "node:path"
 
 /** Skill set name = the directory under plugins/. */
@@ -33,10 +34,65 @@ export function parseConfig(raw: unknown): SkillsConfig {
 
 /** Read `<packageRoot>/pi.config.json`; a missing or invalid file means defaults. */
 export function readConfig(packageRoot: string): SkillsConfig {
+  const raw = readJson(join(packageRoot, "pi.config.json"))
+  return raw === undefined ? DEFAULT_CONFIG : parseConfig(raw)
+}
+
+/**
+ * Package config with the user-level file layered on top. The user file holds
+ * only the keys it wants to override, so it survives `pi update` replacing the
+ * package checkout.
+ */
+export function readEffectiveConfig(packageRoot: string, agentDir = agentDirFromEnv()): SkillsConfig {
+  const base = readConfig(packageRoot)
+  const user = parsePartialConfig(readJson(join(agentDir, "skills-injection.json")))
+  return user ? mergeConfig(base, user) : base
+}
+
+/** Pi's agent directory, honoring the same environment variable Pi reads. */
+export function agentDirFromEnv(env: NodeJS.ProcessEnv = process.env): string {
+  const configured = env.PI_CODING_AGENT_DIR?.trim()
+  return configured && configured.length > 0 ? configured : join(homedir(), ".pi", "agent")
+}
+
+/** Overlay `top` onto `base`; a missing key in `top` keeps the base value. */
+export function mergeConfig(base: SkillsConfig, top: PartialConfig): SkillsConfig {
+  return {
+    defaults: {
+      base: top.defaults?.base ?? base.defaults.base,
+      plus: top.defaults?.plus ?? base.defaults.plus,
+    },
+    mattCommand: top.mattCommand ?? base.mattCommand,
+  }
+}
+
+/** Keys a config document may set; used for the user override. */
+export type PartialConfig = {
+  defaults?: Partial<Record<SkillSet, boolean>>
+  mattCommand?: boolean
+}
+
+/** Parse a config document without filling defaults; undefined when it sets nothing. */
+export function parsePartialConfig(raw: unknown): PartialConfig | undefined {
+  if (!isObject(raw)) return undefined
+  const partial: PartialConfig = {}
+  if (isObject(raw.defaults)) {
+    const defaults: Partial<Record<SkillSet, boolean>> = {}
+    for (const set of SETS) {
+      const value = raw.defaults[set]
+      if (typeof value === "boolean") defaults[set] = value
+    }
+    if (Object.keys(defaults).length > 0) partial.defaults = defaults
+  }
+  if (typeof raw.mattCommand === "boolean") partial.mattCommand = raw.mattCommand
+  return partial.defaults || partial.mattCommand !== undefined ? partial : undefined
+}
+
+function readJson(path: string): unknown {
   try {
-    return parseConfig(JSON.parse(readFileSync(join(packageRoot, "pi.config.json"), "utf8")))
+    return JSON.parse(readFileSync(path, "utf8"))
   } catch {
-    return DEFAULT_CONFIG
+    return undefined
   }
 }
 

@@ -93,6 +93,12 @@ Pi 加载两个 plugin 的 `skills/`。
 - `/matt on`：本会话注入 base 技能（覆盖 `defaults.base`），写入会话记录并重载。
 - `/matt status`：显示配置默认值、本会话覆盖、实际生效的技能数。
 
+用户级覆盖写在 `~/.pi/agent/skills-injection.json`（或 `$PI_CODING_AGENT_DIR` 下的同名文件），只需写要覆盖的键，优先级高于仓库配置，`pi update` 覆盖安装副本时不受影响：
+
+```json
+{ "defaults": { "base": false, "plus": true }, "mattCommand": true }
+```
+
 改完配置执行 `/reload` 生效。`/matt on` 只影响当前会话，fork 与 resume 沿分支继承，新会话回到配置默认值。
 
 ## 上游同步
