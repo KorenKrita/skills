@@ -7,6 +7,9 @@
 ```text
 plugins/base/skills/<skill>/SKILL.md      mattpocock/skills engineering + productivity 完整镜像（27）
 plugins/plus/skills/<skill>/SKILL.md      ADHD 输出、需求剃刀与安全/逆向（3）
+pi/index.ts                               Pi 扩展：按 pi.config.json 决定注入哪些 Skill 集
+pi/settings.ts                            配置解析与 Skill 路径计算（纯函数，tests/ 覆盖）
+pi.config.json                            Pi 注入配置：defaults.base / defaults.plus / mattCommand
 overrides.yaml                            Skill 归属：上游来源、改名、排除、patch，本地自有声明
 marketplace.yaml                          两个 plugin 的 Marketplace 元数据
 .claude-plugin/marketplace.json           生成产物（Claude Code）
@@ -35,7 +38,7 @@ npm run sync
 - `.claude-plugin/marketplace.json`、`.cursor-plugin/marketplace.json`、`plugins/*/.cursor-plugin/plugin.json` 均由 `marketplace.yaml` 生成，不手改。
 - `.sync-state.json` 由同步流程维护，只覆盖上游 Skill；结构迁移时必须与上游 overrides key 和上游文件清单一起迁移。
 - `base` 固定 27 个 Skill（随上游 engineering + productivity 目录增减而变，变更时同步 overrides、同步状态、布局测试与文档）、`plus` 固定 3 个；`base` 为 mattpocock/skills 上游纯镜像，本地改动只发生在 `plus`。
-- Pi 只加载 `plugins/*/skills`。
+- Pi 通过 `pi/index.ts` 按 `pi.config.json` 注入 `plugins/*/skills`；`package.json` 的 `pi` 键只声明扩展，不直接列 Skill。
 - 仓库只发布 `base` 和 `plus` 两个 plugin。
 
 ## Agent skills

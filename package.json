@@ -6,8 +6,8 @@
     "pi-package"
   ],
   "pi": {
-    "skills": [
-      "./plugins/*/skills"
+    "extensions": [
+      "./pi/index.ts"
     ]
   },
   "scripts": {
