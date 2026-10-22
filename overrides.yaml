@@ -143,43 +143,6 @@ skills:
   # dmmulroy's original plain-language restatement Skill, kept verbatim.
   # The wait-what context-aware re-pitch behavior moved back to base's
   # official wait-what when base became the full Matt mirror (ADR-0009).
-  bro:
-    ownership: local
-    plugin: plus
-    provenance:
-      repo: dmmulroy/.dotfiles
-      path: home/.agents/skills/bro
-      ref: main
-      forked_at_sha: c2322c6534f586b146ae0e8d9296019396aa32c0
-      forked_at: 2026-08-05
-      license: no license declared by the upstream repository at fork time
-
-  improve:
-    source: { repo: shadcn/improve, path: skills/improve, ref: main }
-    plugin: plus
-    patches: []
-
-  nuclear-review:
-    source: { repo: cursor/plugins, path: cursor-team-kit/skills/thermo-nuclear-code-quality-review, ref: main }
-    plugin: plus
-    patches:
-      - { type: set_frontmatter, field: name, value: nuclear-review }
-      - type: set_frontmatter
-        field: description
-        value: Run an extremely strict maintainability review for abstraction quality, giant files, and spaghetti-condition growth. Use for a nuclear review, deep code quality audit, or especially harsh maintainability review.
-      - { type: replace_all, pattern: "Thermo-Nuclear Code Quality Review", with: "Nuclear Review" }
-    extra_mappings:
-      - from: cursor-team-kit/agents/thermo-nuclear-code-quality-review.md
-        to: plugins/plus/agents/nuclear-review.md
-        patches:
-          - { type: set_frontmatter, field: name, value: nuclear-review }
-          - type: set_frontmatter
-            field: description
-            value: Nuclear code quality audit for maintainability, structure, giant files, spaghetti growth, and code-judo opportunities. Invoked via Task after a parent gathers diff and file contents. Loads the rubric from the nuclear-review Skill in the plus plugin.
-          - { type: replace_all, pattern: thermo-nuclear-code-quality-review, with: nuclear-review }
-          - { type: replace_all, pattern: "Thermo-Nuclear Code Quality Review", with: "Nuclear Review" }
-          - { type: replace_all, pattern: "cursor-team-kit plugin", with: "plus plugin" }
-
   razor:
     source: { repo: hylarucoder/hai-stack, path: skills/hai-razor, ref: main }
     plugin: plus
@@ -233,19 +196,7 @@ skills:
             with: ""
     exclude_files:
       - SKILL.zh_CN.md
-  read:
-    source: { repo: tw93/Waza, path: skills/read, ref: main }
-    plugin: plus
-    patches: []
-    exclude_files:
-      - scripts/check-update.sh
-
   # Upstream packages only SKILL.md; LICENSE is retained locally from the repository root.
-  show-me:
-    source: { repo: humanlayer/skills, path: plugins/show-me/skills/show-me, ref: main }
-    plugin: plus
-    patches: []
-
   i-have-adhd:
     source: { repo: ayghri/i-have-adhd, path: skills/i-have-adhd, ref: main }
     plugin: plus
@@ -254,65 +205,6 @@ skills:
       - type: set_frontmatter
         field: description
         value: 'Shape output for a reader with ADHD: lead with the next action, number multi-step work, restate state across turns, suppress tangents, give specific time estimates, and make wins visible. Use when the user says they have ADHD, asks for ADHD-friendly formatting, or wants this mode enabled; it stays on until they say "stop adhd mode".'
-
-  humanizer-zh:
-    source: { repo: op7418/Humanizer-zh, path: ., ref: main }
-    plugin: plus
-    patches: []
-    exclude_files:
-      - .gitignore
-      - README.md
-
-  archify:
-    source: { repo: tt-a1i/archify, path: archify, ref: main }
-    plugin: plus
-    patches:
-      - type: set_frontmatter
-        field: description
-        value: Create professional architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with SVG, pan/zoom, search, semantic relationship inspection, presentation mode, dark/light themes, optional motion, and PNG/JPEG/WebP/SVG/WebM export. Accepts plain-language descriptions or Mermaid flowchart, sequenceDiagram, and stateDiagram input, then lays diagrams out in Archify style. Use when the user asks for system or cloud architecture, infrastructure and network topology, security boundaries, technical or approval workflows, runbooks, CI/CD flows, API call sequences, request lifecycles, data pipelines, ETL/ELT, PII boundaries, data lineage, state machines, lifecycle/status transitions, or conversion/beautification of Mermaid diagrams.
-    target_patches:
-      - target: package.json
-        patches:
-          - type: replace_all
-            pattern: "    \"generate:viewer\": \"node ../scripts/generate-viewer.mjs\",\n"
-            with: ""
-          - type: replace_all
-            pattern: "    \"check:viewer\": \"node ../scripts/generate-viewer.mjs --check\",\n"
-            with: ""
-          - type: replace_all
-            pattern: "    \"test:webm\": \"node test/webm-artifact.smoke.mjs && node --test test/site-language-integration.mjs\",\n"
-            with: ""
-          - type: replace_all
-            pattern: "    \"test\": \"npm run check:viewer && npm run check:brand-marks && npm run check:validators && npm run check:release-identity && node test/golden.mjs && node ../scripts/run-tests.mjs\",\n"
-            with: ""
-          - type: replace_all
-            pattern: "    \"check:release-identity\": \"node ../scripts/check-release-identity.mjs\",\n"
-            with: ""
-          - type: replace_all
-            pattern: "    \"build:gallery\": \"node ../scripts/build-gallery.mjs ../docs\",\n"
-            with: ""
-          - type: replace_all
-            pattern: "    \"build:guide\": \"node ../scripts/build-guide.mjs ../docs/guide.html\",\n"
-            with: ""
-          - type: replace_all
-            pattern: "    \"build:start\": \"node ../scripts/build-start.mjs ../docs/start.html\",\n"
-            with: ""
-          - type: replace_all
-            pattern: "    \"build:readme-showcase\": \"node ../scripts/build-readme-showcase.mjs\",\n"
-            with: ""
-          - type: replace_all
-            pattern: "    \"check:validators\": \"node scripts/generate-validators.mjs --check\",\n    \"test:browser\": \"node ../scripts/run-browser-tests.mjs\",\n    \"render:examples\": \"node scripts/render-examples.mjs ../examples\"\n"
-            with: "    \"check:validators\": \"node scripts/generate-validators.mjs --check\"\n"
-      - target: schemas/README.md
-        patches:
-          - { type: replace_all, pattern: "`npm test`", with: "`npm run check:validators`" }
-    exclude_files:
-      - examples/dataflow-product-analytics.html
-      - examples/lifecycle-agent-run.html
-      - examples/sequence-cache-miss-request.html
-      - examples/web-app-rendered.html
-      - examples/workflow-agent-tool-call-rendered.html
-      - test/
 
   # Vendored cybersecurity router (zhaoxuya520/reverse-skill). The entire
   # upstream tree ships under sec-router/vendor/ with SKILL.md renamed to
