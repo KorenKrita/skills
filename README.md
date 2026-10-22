@@ -71,6 +71,30 @@ pi install -l git:github.com/KorenKrita/skills
 
 Pi 加载两个 plugin 的 `skills/`。
 
+## Pi 包
+
+`package.json` 的 `pi` 键只声明 `pi/index.ts`。哪些 Skill 注入由 `pi.config.json` 决定：
+
+```json
+{
+  "defaults": { "base": true, "plus": true },
+  "mattCommand": false
+}
+```
+
+| 键 | 含义 |
+|---|---|
+| `defaults.base` | 默认注入 `plugins/base/skills`（27 个） |
+| `defaults.plus` | 默认注入 `plugins/plus/skills`（3 个） |
+| `mattCommand` | 注册 `/matt` 命令，默认关闭 |
+
+`mattCommand` 为 `true` 时可用：
+
+- `/matt on`：本会话注入 base 技能（覆盖 `defaults.base`），写入会话记录并重载。
+- `/matt status`：显示配置默认值、本会话覆盖、实际生效的技能数。
+
+改完配置执行 `/reload` 生效。`/matt on` 只影响当前会话，fork 与 resume 沿分支继承，新会话回到配置默认值。
+
 ## 上游同步
 
 `overrides.yaml` 记录每个 Skill 的归属：上游 Skill 声明来源、改名和兼容 patch，本地自有 Skill 用 `ownership: local` 声明并保留 fork provenance。GitHub Actions 每天按上游文件内容审计上游 Skill 并通过 PR 提交更新，本地自有 Skill 不受同步覆盖。
