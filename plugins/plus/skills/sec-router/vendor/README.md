@@ -70,7 +70,7 @@ User task
 
 | Routing rules | Regression benchmark | Core skill modules | CI platforms | Client model |
 |---:|---:|---:|---|---|
-| 43 (R0–R44) | 173 cases | 44 tracked modules | Windows + Ubuntu | Client-neutral |
+| 44 (R0–R45) | 175 cases | 45 tracked modules | Windows + Ubuntu | Client-neutral |
 
 The routing core is driven by one structured configuration, validated by cross-platform CI, and kept separate from optional client adapters.
 
@@ -135,7 +135,7 @@ PRIMARY ladder: [skills/MASTER-ROUTING.md](skills/MASTER-ROUTING.md) · Full mat
 
 <p align="left">
   <img src="https://skillicons.dev/icons?i=py,nodejs,powershell,bash,java,docker,git&theme=light" /><br/>
-  <code>IDA Pro</code> · <code>radare2</code> · <code>Ghidra</code>
+  <code>IDA Pro</code> · <code>radare2</code> · <code>Ghidra</code> · <code>Binary Ninja</code>
 </p>
 
 <p align="right">(<a href="#about">back to top</a>)</p>
@@ -185,6 +185,7 @@ Platform-specific docs:
 | APK / Android analysis | `skills/apk-reverse/` |
 | iOS / mobile | `skills/mobile-reverse/` |
 | Binary reverse (exe/dll/so/elf) | `skills/ida-reverse/` / `skills/radare2/` |
+| Binary Ninja / HLIL / MLIL / MCP | `skills/binary-ninja-reverse/` |
 | .NET / C# | `skills/dotnet-reverse/` |
 | Frontend JS / encrypted params | `skills/js-reverse/` |
 | DSL VM / custom JS opcode VM | `skills/reverse-engineering/dsl-vm-reverse/` |
@@ -243,6 +244,8 @@ GitHub Actions CI runs all of the above on **Windows + Ubuntu** for every push/P
 ### Client-neutral integration
 
 The routing core, regression suite, manifests, and case workflow do not depend on a specific AI client. Claude Code, Codex, Cursor, OpenCode, and other clients should load the repository through their own adapter or project-instruction mechanism. Client-specific configuration must remain optional and outside the core routing contract.
+
+For Codex, the repository also exposes an optional adapter plugin at [`plugins/reverse-skill/`](plugins/reverse-skill/). It delegates to the repository's existing routing core and does not register external MCP servers automatically.
 
 ### Repository layout
 
@@ -324,7 +327,7 @@ This project is intended solely for lawful security research, education, CTF com
 
 ## Installation and download security
 
-See [Installation and Download Security Guidance](docs/UV-AND-DOWNLOAD-SECURITY.md).
+See [Security Policy](SECURITY.md), [Installation and Download Security Guidance](docs/UV-AND-DOWNLOAD-SECURITY.md), and the [2026-09-03 repository security review](docs/SECURITY-REVIEW-2026-09-03.md).
 
 ## Community quick start and issue triage
 

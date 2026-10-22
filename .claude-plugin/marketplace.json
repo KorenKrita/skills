@@ -22,7 +22,7 @@
     },
     {
       "name": "plus",
-      "version": "0.0.44",
+      "version": "0.0.45",
       "source": "./plugins/plus",
       "description": "ADHD 友好输出、需求剃刀与安全/逆向技能路由",
       "strict": false,

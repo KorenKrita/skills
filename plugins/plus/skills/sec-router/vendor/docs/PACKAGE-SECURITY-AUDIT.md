@@ -1,5 +1,7 @@
 # reverse-skill 包内安全审计（可执行面）
 
+> 2026-09-03 复审：已扩展到 Git 对象、payload 身份、符号链接、二进制 allowlist、GitHub Action 固定与 Gradle Wrapper 验证。详见 [Repository security review — 2026-09-03](SECURITY-REVIEW-2026-09-03.md)。
+
 > 日期：2026-08-02
 > 范围：`skills/**/scripts`、`skills/scripts`、`kali/scripts`、`burp-mcp-full` 可执行脚本与 bootstrap 清单  
 > **不含**：`src-hunter` / payloader 等**教学型 payload 文档**（其 DROP/注入样例属方法论，非自动执行）
@@ -124,4 +126,3 @@ rg -n "Invoke-Expression|FromBase64String|DownloadString|rm -rf /|DROP DATABASE"
 
 - 审计执行：仓库本地静态扫描 + 关键路径人工复核  
 - 结果：无后门 / 无自动删库；供应链加固列为后续改进项  
-'@

@@ -72,7 +72,7 @@
 
 | 路由规则 | 回归基准 | 核心 Skill | CI 平台 | 客户端模型 |
 |---:|---:|---:|---|---|
-| 43 条（R0–R44） | 173 条用例 | 44 个已跟踪模块 | Windows + Ubuntu | 平台无关 |
+| 44 条（R0–R45） | 175 条用例 | 45 个已跟踪模块 | Windows + Ubuntu | 平台无关 |
 
 路由核心由单一结构化配置驱动，通过跨平台 CI 验证，并与各客户端的可选适配层保持分离。
 
@@ -137,7 +137,7 @@ PRIMARY 快路径：[skills/MASTER-ROUTING.md](skills/MASTER-ROUTING.md) · 全�
 
 <p align="left">
   <img src="https://skillicons.dev/icons?i=py,nodejs,powershell,bash,java,docker,git&theme=light" /><br/>
-  <code>IDA Pro</code> · <code>radare2</code> · <code>Ghidra</code>
+  <code>IDA Pro</code> · <code>radare2</code> · <code>Ghidra</code> · <code>Binary Ninja</code>
 </p>
 
 <p align="right">(<a href="#关于项目">返回顶部</a>)</p>
@@ -181,6 +181,7 @@ git clone https://github.com/zhaoxuya520/reverse-skill.git
 | APK / Android 逆向 | `skills/apk-reverse/` |
 | iOS / 移动端 | `skills/mobile-reverse/` |
 | 二进制逆向 (exe/dll/so/elf) | `skills/ida-reverse/` / `skills/radare2/` |
+| Binary Ninja / HLIL / MLIL / MCP | `skills/binary-ninja-reverse/` |
 | .NET / C# | `skills/dotnet-reverse/` |
 | 前端 JS 签名 / 加密参数 | `skills/js-reverse/` |
 | DSL VM / 风控自定义 VM | `skills/reverse-engineering/dsl-vm-reverse/` |
@@ -215,7 +216,7 @@ git clone https://github.com/zhaoxuya520/reverse-skill.git
 | [skills/scripts/master-route.ps1](skills/scripts/master-route.ps1) | 一键分诊 |
 | [skills/scripts/case-init.ps1](skills/scripts/case-init.ps1) | 作战 case 目录（scope/timeline） |
 | [skills/case-review/](skills/case-review/) | 只读 Evidence 图审查与 artifact fixity 校验 |
-| [skills/scripts/test-routing.ps1](skills/scripts/test-routing.ps1) | 173 条路由回归基准 |
+| [skills/scripts/test-routing.ps1](skills/scripts/test-routing.ps1) | 175 条路由回归基准 |
 | [skills/scripts/verify-routing-coherence.ps1](skills/scripts/verify-routing-coherence.ps1) | 结构一致性与供应链版本固定门禁 |
 | [skills/ops/](skills/ops/) | Scope / 证据链 / 角色 / 时间线 / skill 供应链安全 |
 | [skills/references/community-security-skills.md](skills/references/community-security-skills.md) | 社区安全 skill 生态对照（借鉴不并库） |
@@ -223,7 +224,7 @@ git clone https://github.com/zhaoxuya520/reverse-skill.git
 ### 修改后验证
 
 ```powershell
-# 路由回归（173 条）
+# 路由回归（175 条）
 powershell -NoProfile -ExecutionPolicy Bypass -File skills/scripts/test-routing.ps1
 # 结构一致性 + 供应链版本固定门禁
 powershell -NoProfile -ExecutionPolicy Bypass -File skills/scripts/verify-routing-coherence.ps1
@@ -233,6 +234,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File skills/scripts/extract-summa
 ```
 
 GitHub Actions 会在 Windows 与 Ubuntu 上执行同一套核心检查。
+
+### 可选 Codex 插件入口
+
+仓库提供可选 Codex 适配插件 [`plugins/reverse-skill/`](plugins/reverse-skill/)。它委托给仓库现有路由核心，不改变客户端中立架构，也不会自动注册外部 MCP 服务。
 
 ### 仓库结构
 
@@ -319,7 +324,7 @@ GitHub Actions 会在 Windows 与 Ubuntu 上执行同一套核心检查。
 
 ## 安裝與下載安全
 
-請參閱[安裝與下載安全指引](docs/UV-AND-DOWNLOAD-SECURITY_zh.md)。
+請參閱[安全政策](SECURITY.md)、[安裝與下載安全指引](docs/UV-AND-DOWNLOAD-SECURITY_zh.md)與[2026-09-03 倉庫安全復審](docs/SECURITY-REVIEW-2026-09-03.md)。
 
 ## 社群問題、快速開始與分類
 
