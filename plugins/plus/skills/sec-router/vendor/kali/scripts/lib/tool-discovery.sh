@@ -39,6 +39,7 @@ declare -a TOOL_CATALOG=(
     "reqable-mcp|pentest-tools|通过 npx 启动 Reqable 桌面客户端 MCP||npx"
     "xquik-mcp|threat-intelligence|远程公开 X 威胁情报 MCP||"
     "jeb-pro|apk-reverse|商业 Android/ARM 反编译器（手动许可安装）|--version|jeb,${HOME}/tools/JEB/jeb,${HOME}/JEB/jeb,/opt/jeb/jeb"
+    "binaryninja|binary-ninja-reverse|Binary Ninja 商业逆向平台（手动许可安装）|--version|binaryninja,binaryninja-headless,${HOME}/BinaryNinja/binaryninja,${HOME}/tools/BinaryNinja/binaryninja,/opt/binaryninja/binaryninja"
     "agent-browser|browser-automation|浏览器自动化（Playwright）|--version|agent-browser"
     "analyzeHeadless|reverse-engineering|Ghidra 无头分析||analyzeHeadless,${HOME}/tools/ghidra/support/analyzeHeadless,/opt/ghidra/support/analyzeHeadless,/usr/share/ghidra/support/analyzeHeadless"
     "playwright|browser-automation|Playwright 浏览器引擎|--version|playwright,npx playwright"
@@ -52,7 +53,9 @@ declare -a TOOL_CATALOG=(
     "msfconsole|pentest-tools|Metasploit 框架|--version|msfconsole"
     "nikto|pentest-tools|Web 漏洞扫描|-Version|nikto"
     "binwalk|reverse-engineering|固件分析与提取|--help|binwalk"
+    "pwntools|reverse-engineering|CTF pwn 利用开发框架|version|pwn"
     "bkcrack|reverse-engineering|CTF ZIP/PKZIP ZipCrypto 已知明文攻击|--version|bkcrack"
+    "yara|malware-analysis|恶意软件规则匹配引擎|--version|yara"
     "gdb|reverse-engineering|调试器|--version|gdb"
     "objdump|reverse-engineering|反汇编|--version|objdump"
     "strings|reverse-engineering|字符串提取|--version|strings"
@@ -108,6 +111,7 @@ declare -A SCRIPT_REFS=(
     ["reqable-mcp"]="pentest-tools/MOD.md"
     ["xquik-mcp"]="threat-intelligence/MOD.md"
     ["jeb-pro"]="apk-reverse/MOD.md"
+    ["binaryninja"]="binary-ninja-reverse/MOD.md"
     ["agent-browser"]="browser-automation/MOD.md"
     ["playwright"]="browser-automation/MOD.md"
     ["nmap"]="pentest-tools/MOD.md"
@@ -157,7 +161,11 @@ get_tool_version() {
     fi
 
     local output
-    output=$("$cmd" $version_args 2>&1 | head -n1) || true
+    if [[ "${cmd##*/}" == "pwn" && "$version_args" == "version" ]]; then
+        output=$(PWNLIB_NOTERM=1 "$cmd" version 2>&1 | head -n1) || true
+    else
+        output=$("$cmd" $version_args 2>&1 | head -n1) || true
+    fi
     echo "$output"
 }
 

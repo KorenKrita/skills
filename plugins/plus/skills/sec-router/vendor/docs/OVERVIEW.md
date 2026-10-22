@@ -95,7 +95,7 @@ The repository is not tied to one client. Its core assets are `RULES.md`, `skill
 | Scenario | Main entry |
 |---|---|
 | APK / Android analysis | `skills/apk-reverse/`, `skills/mobile-reverse/` |
-| Binary reverse engineering | `skills/ida-reverse/`, `skills/radare2/`, `skills/reverse-engineering/` |
+| Binary reverse engineering | `skills/ida-reverse/`, `skills/binary-ninja-reverse/`, `skills/radare2/`, `skills/reverse-engineering/` |
 | Frontend JS signing / parameter analysis | `skills/js-reverse/` |
 | HTTP traffic / request replay | BurpSuite MCP, anything-analyzer, browser automation |
 | CTF / security competitions | `CTF-Sandbox-Orchestrator/` |
@@ -212,4 +212,3 @@ Keywords: AI Agent, Skill Router, Tool Orchestration, MCP, Workflow Automation, 
 ## License
 
 MIT License. See [LICENSE](../LICENSE).
-

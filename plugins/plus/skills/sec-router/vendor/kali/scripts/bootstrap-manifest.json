@@ -107,6 +107,15 @@
       "kaliNote": "JEB Pro Linux edition requires a user-provided license and manual installation."
     },
     {
+      "name": "binaryninja",
+      "bootstrapKind": "manual",
+      "docsUrl": "https://binary.ninja/",
+      "canAutoInstall": false,
+      "verifyCommand": "binaryninja",
+      "manualInstallHint": "Binary Ninja is commercial software. Obtain a valid Vector 35 license and install it manually. Optional community MCP plugins require supply-chain review and loopback binding.",
+      "kaliNote": "Binary Ninja Linux requires a user-provided license and manual installation."
+    },
+    {
       "name": "reqable-mcp",
       "bootstrapKind": "npm-mcp",
       "npmPackage": "reqable-mcp-server@1.0.1",
@@ -562,7 +571,7 @@
       "pinnedVersion": "4.15.0",
       "docsUrl": "https://github.com/Gallopsled/pwntools",
       "canAutoInstall": true,
-      "verifyCommand": "pwntools",
+      "verifyCommand": "pwn",
       "kaliNote": "CTF pwn 利用开发框架。Kali 预装，pip 可更新。"
     },
     {
