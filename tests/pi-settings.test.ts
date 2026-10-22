@@ -1,5 +1,18 @@
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs"
+import { tmpdir } from "node:os"
+import { homedir } from "node:os"
+import { join } from "node:path"
 import { describe, expect, it } from "vitest"
-import { DEFAULT_CONFIG, parseConfig, resolveEnabled, skillPathsFor } from "../pi/settings.js"
+import {
+  DEFAULT_CONFIG,
+  agentDirFromEnv,
+  mergeConfig,
+  parseConfig,
+  parsePartialConfig,
+  readEffectiveConfig,
+  resolveEnabled,
+  skillPathsFor,
+} from "../pi/settings.js"
 
 describe("parseConfig", () => {
   it("falls back to both sets on and no command for a missing or empty document", () => {
@@ -57,5 +70,50 @@ describe("skillPathsFor", () => {
     ])
     expect(skillPathsFor("/repo", { base: true, plus: false })).toEqual(["/repo/plugins/base/skills"])
     expect(skillPathsFor("/repo", { base: false, plus: false })).toEqual([])
+  })
+})
+
+describe("user override", () => {
+  it("merges only the keys the user file sets", () => {
+    const base = parseConfig({ defaults: { base: true, plus: true }, mattCommand: false })
+    expect(mergeConfig(base, { defaults: { base: false } })).toEqual({
+      defaults: { base: false, plus: true },
+      mattCommand: false,
+    })
+    expect(mergeConfig(base, { mattCommand: true })).toEqual({
+      defaults: { base: true, plus: true },
+      mattCommand: true,
+    })
+  })
+
+  it("ignores keys with bad types and documents that set nothing", () => {
+    expect(parsePartialConfig({ defaults: { base: "no", plus: true } })).toEqual({
+      defaults: { plus: true },
+    })
+    expect(parsePartialConfig({})).toBeUndefined()
+    expect(parsePartialConfig(null)).toBeUndefined()
+    expect(parsePartialConfig({ defaults: { base: 1 } })).toBeUndefined()
+  })
+
+  it("lays the user file over the package file", () => {
+    const root = mkdtempSync(join(tmpdir(), "skills-cfg-"))
+    const agentDir = join(root, "agent")
+    mkdirSync(agentDir)
+    writeFileSync(join(root, "pi.config.json"), JSON.stringify({ defaults: { base: true, plus: true } }))
+    expect(readEffectiveConfig(root, agentDir).defaults).toEqual({ base: true, plus: true })
+
+    writeFileSync(
+      join(agentDir, "skills-injection.json"),
+      JSON.stringify({ defaults: { base: false }, mattCommand: true }),
+    )
+    expect(readEffectiveConfig(root, agentDir)).toEqual({
+      defaults: { base: false, plus: true },
+      mattCommand: true,
+    })
+  })
+
+  it("falls back to the agent dir environment variable", () => {
+    expect(agentDirFromEnv({ PI_CODING_AGENT_DIR: "/tmp/custom" } as NodeJS.ProcessEnv)).toBe("/tmp/custom")
+    expect(agentDirFromEnv({} as NodeJS.ProcessEnv)).toBe(join(homedir(), ".pi", "agent"))
   })
 })

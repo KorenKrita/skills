@@ -10,6 +10,7 @@ plugins/plus/skills/<skill>/SKILL.md      ADHD 输出、需求剃刀与安全/�
 pi/index.ts                               Pi 扩展：按 pi.config.json 决定注入哪些 Skill 集
 pi/settings.ts                            配置解析与 Skill 路径计算（纯函数，tests/ 覆盖）
 pi.config.json                            Pi 注入配置：defaults.base / defaults.plus / mattCommand
+                                          （用户可用 ~/.pi/agent/skills-injection.json 覆盖，只需写要改的键）
 overrides.yaml                            Skill 归属：上游来源、改名、排除、patch，本地自有声明
 marketplace.yaml                          两个 plugin 的 Marketplace 元数据
 .claude-plugin/marketplace.json           生成产物（Claude Code）

@@ -1,7 +1,7 @@
 import { existsSync, readdirSync } from "node:fs"
 import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
-import { SETS, readConfig, resolveEnabled, skillPathsFor, type SkillSet } from "./settings.js"
+import { SETS, readEffectiveConfig, resolveEnabled, skillPathsFor, type SkillSet } from "./settings.js"
 
 const packageRoot = join(dirname(fileURLToPath(import.meta.url)), "..")
 const STATE_ENTRY = "skills-injection-state"
@@ -55,17 +55,17 @@ function notify(ctx: Ctx, message: string): void {
 export default function (pi: PiApi): void {
   // Skills are not listed in package.json; the config decides which sets load.
   pi.on("resources_discover", (_event, ctx) => {
-    const enabled = resolveEnabled(readConfig(packageRoot), readSessionBase(ctx))
+    const enabled = resolveEnabled(readEffectiveConfig(packageRoot), readSessionBase(ctx))
     return { skillPaths: skillPathsFor(packageRoot, enabled) }
   })
 
-  if (!readConfig(packageRoot).mattCommand) return
+  if (!readEffectiveConfig(packageRoot).mattCommand) return
 
   pi.registerCommand("matt", {
     description: "把 mattpocock 的 base 技能注入本会话（/matt on），或查看当前注入状态（/matt status）",
     handler: async (arg, ctx) => {
       const sub = (arg ?? "").trim().toLowerCase()
-      const config = readConfig(packageRoot)
+      const config = readEffectiveConfig(packageRoot)
       const sessionBase = readSessionBase(ctx)
       const enabled = resolveEnabled(config, sessionBase)
 
@@ -74,7 +74,7 @@ export default function (pi: PiApi): void {
           ctx,
           [
             `技能注入（本会话）：base ${enabled.base ? "开" : "关"}｜plus ${enabled.plus ? "开" : "关"}`,
-            `配置默认值：base ${config.defaults.base ? "开" : "关"}｜plus ${config.defaults.plus ? "开" : "关"}（${join(packageRoot, "pi.config.json")}）`,
+            `配置默认值：base ${config.defaults.base ? "开" : "关"}｜plus ${config.defaults.plus ? "开" : "关"}（${join(packageRoot, "pi.config.json")} + 用户覆盖）`,
             `本会话覆盖：${sessionBase === undefined ? "无" : `base ${sessionBase ? "开" : "关"}`}`,
             `技能数：base ${skillCount("base")} 份｜plus ${skillCount("plus")} 份`,
           ].join("\n"),
