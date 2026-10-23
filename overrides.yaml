@@ -206,6 +206,12 @@ skills:
         field: description
         value: 'Shape output for a reader with ADHD: lead with the next action, number multi-step work, restate state across turns, suppress tangents, give specific time estimates, and make wins visible. Use when the user says they have ADHD, asks for ADHD-friendly formatting, or wants this mode enabled; it stays on until they say "stop adhd mode".'
 
+  # Written in this repository: the user's award-tier design prompt kept verbatim,
+  # with intake questions, measurable floors and a bounded screenshot loop around it.
+  award-tier-web-design:
+    ownership: local
+    plugin: plus
+
   # Vendored cybersecurity router (zhaoxuya520/reverse-skill). The entire
   # upstream tree ships under sec-router/vendor/ with SKILL.md renamed to
   # MOD.md (Pi discovers nested SKILL.md recursively); the top-level SKILL.md
