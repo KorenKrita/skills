@@ -33,7 +33,7 @@ npm run sync
 - 所有修改必须遵守根目录 `AGENTS.md` 的 plugin 版本递增规则。
 - 上游 Skill 的修改通过 `overrides.yaml` 声明，不直接维护漂移副本。
 - 本地自有 Skill 在 `overrides.yaml` 中用 `ownership: local` 声明并记录 fork provenance；同步流程跳过它们，inventory、布局和 Marketplace 校验照常生效。
-- 本地自有 Skill：`plus/sec-router`；`base` 全部为上游同步。
+- 本地自有 Skill：`plus/sec-router`、`plus/award-tier-web-design`；`base` 全部为上游同步。
 - Skill 目录名必须等于 `SKILL.md` frontmatter 的 `name`。
 - 同一个 Skill name 在整个仓库只出现一次，避免 Pi 递归发现 collision。
 - `.claude-plugin/marketplace.json`、`.cursor-plugin/marketplace.json`、`plugins/*/.cursor-plugin/plugin.json` 均由 `marketplace.yaml` 生成，不手改。

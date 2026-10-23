@@ -37,7 +37,7 @@ const EXPECTED_SKILLS = {
     "wizard",
     "writing-for-agents",
   ],
-  plus: ["i-have-adhd", "razor", "sec-router"],
+  plus: ["award-tier-web-design", "i-have-adhd", "razor", "sec-router"],
 } as const
 
 const EXPECTED_SKILL_COUNT = Object.values(EXPECTED_SKILLS).flat().length

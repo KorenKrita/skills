@@ -24,8 +24,8 @@
     {
       "name": "plus",
       "source": "plugins/plus",
-      "description": "ADHD 友好输出、需求剃刀与安全/逆向技能路由",
-      "version": "0.0.45",
+      "description": "ADHD 友好输出、需求剃刀、获奖级网页设计与安全/逆向技能路由",
+      "version": "0.0.46",
       "category": "productivity",
       "keywords": [
         "adhd",
@@ -33,7 +33,8 @@
         "security",
         "reverse-engineering",
         "pentest",
-        "ctf"
+        "ctf",
+        "web-design"
       ]
     }
   ]
