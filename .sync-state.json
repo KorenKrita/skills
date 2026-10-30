@@ -8,7 +8,7 @@
     ]
   },
   "code-review": {
-    "sha": "59db609eb1e18aaf59b63284d0e52255aff0c63c",
+    "sha": "a496f5513d4a4cf889bc48e189e579f4b0bdf6aa",
     "files": [
       "SKILL.md",
       "agents/openai.yaml"
