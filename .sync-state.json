@@ -32,7 +32,7 @@
     ]
   },
   "domain-modeling": {
-    "sha": "abeeaf95660ba9e8b7c753eb38f441ca707a8823",
+    "sha": "6f7f7831a625f040a8e06a0e7954826b87ce775a",
     "files": [
       "ADR-FORMAT.md",
       "GLOSSARY-FORMAT.md",
