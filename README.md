@@ -1,119 +1,65 @@
 # KorenKrita Skills
 
-个人 Agent Skills 订阅仓库，同时支持 Claude Code Marketplace、Cursor Marketplace 和 Pi Package。
+精选通用 AI Agent 技能集（单列表 `core` 插件，共 11 个技能），原生支持 **Claude Code**、**Cursor**、**Codex** 和 **Pi** 四个宿主，并保留自动上游同步与补丁引擎。
 
-## 订阅
+## 包含技能（11 个）
 
-### Claude Code
+| 技能 | 来源 | 用途 |
+|---|---|---|
+| `grill-me` | `mattpocock/skills` (`grilling` 改名) | 沿决策树逐轮深度追问，压测方案与边界 |
+| `writing-for-agents` | `mattpocock/skills` | 编写高质量 `AGENTS.md` 与 Skill 的结构化指南 |
+| `prototype` | `mattpocock/skills` | 写代码前制作复杂逻辑状态机沙盒或 UI 变体原型 |
+| `razor` | `hylarucoder/hai-stack` (去绑定补丁) | 奥卡姆剃刀审计需求、架构、状态机与抽象冗余 |
+| `mit-design` | 本仓自研 | MIT 公理设计矩阵（FR × DP）架构体检与可改度分级 |
+| `i-have-adhd` | `ayghri/i-have-adhd` | ADHD 友好输出格式：结论先行、分步编号、防跑偏 |
+| `award-tier-web-design` | 本仓自研 | 获奖级（Awwwards / FWA）落地页视觉设计与截图自检 |
+| `frontend-design` | Anthropic (`Apache-2.0`) | 高辨识度通用前端界面与排版设计规范 |
+| `gemini-frontend-design` | Google Gemini (`Apache-2.0`) | 通用网站与 Web 应用的视觉、配色、动效设计指南 |
+| `typesafe-ai` | TypeSafe (`MIT`) | TypeSafe System One (Jev) 接入与使用说明（手动调用） |
+| `sec-router` | `zhaoxuya520/reverse-skill` (vendored) | 授权安全与逆向工程方法论路由 |
 
-```bash
-/plugin marketplace add KorenKrita/skills
-```
-
-按需安装两个 plugin：
-
-```bash
-/plugin install base@korenkrita-skills
-/plugin install plus@korenkrita-skills
-```
-
-常用组合：
-
-```text
-base               核心工程与协作流程
-base + plus  全部 37 个 Skill（plus 含安全/逆向技能路由）
-```
-
-### Cursor
-
-Cursor → Customize → Plugins → 添加 marketplace，填入仓库地址：
-
-```text
-https://github.com/KorenKrita/skills
-```
-
-随后按需安装 `base` / `plus`。Cursor 读取 `.cursor-plugin/marketplace.json` 与 `plugins/*/.cursor-plugin/plugin.json`，Skill 目录与 Claude Code 共用。
+## 安装与订阅
 
 ### Pi
-
-全局安装仓库中的全部 Skill：
 
 ```bash
 pi install git:github.com/KorenKrita/skills
 ```
 
-Pi 根据 Skill 的 `description` 自动按需加载，也可以手动调用：
+通过 `package.json` 的 `pi.skills` 直接加载 `./plugins/core/skills` 下的全部技能，无需额外扩展或开关。
 
-```text
-/skill:diagnosing-bugs
-```
-
-管理、更新和卸载：
+### Claude Code
 
 ```bash
-pi config
-pi update --extensions
-pi remove git:github.com/KorenKrita/skills
+/plugin marketplace add KorenKrita/skills
+/plugin install core@korenkrita-skills
 ```
 
-仅在当前项目启用：
+### Cursor
+
+在 Cursor 插件市场中订阅仓库 `KorenKrita/skills`（读取 `.cursor-plugin/marketplace.json` 与 `plugins/core/.cursor-plugin/plugin.json`）并安装 `core`。
+
+### Codex
 
 ```bash
-pi install -l git:github.com/KorenKrita/skills
+codex plugin marketplace add https://github.com/KorenKrita/skills.git
 ```
 
-## Plugin
+或在 Codex 插件管理中添加本仓库（读取 `.agents/plugins/marketplace.json` 与 `plugins/core/.codex-plugin/plugin.json`），安装 `core`。
 
-| Plugin | 内容 | Skill 数量 |
-|---|---|---:|
-| **base** | [mattpocock/skills](https://github.com/mattpocock/skills) engineering + productivity 完整镜像：工程流程与效率工具 | 27 |
-| **plus** | ADHD 友好输出、需求剃刀与安全/逆向技能路由 | 3 |
+## 开发与维护
 
-Pi 加载两个 plugin 的 `skills/`。
-
-## Pi 包
-
-`package.json` 的 `pi` 键只声明 `pi/index.ts`。哪些 Skill 注入由 `pi.config.json` 决定：
-
-```json
-{
-  "defaults": { "base": true, "plus": true },
-  "mattCommand": false
-}
+```bash
+npm install
+npm run build:marketplace   # 从 marketplace.yaml 生成 Claude / Cursor / Codex 三端清单
+npm test                    # 运行结构、生成器、补丁与同步单元测试
+npm run sync                # 手动检查上游变更（日常由 GitHub Actions 定时同步）
 ```
 
-| 键 | 含义 |
-|---|---|
-| `defaults.base` | 默认注入 `plugins/base/skills`（27 个） |
-| `defaults.plus` | 默认注入 `plugins/plus/skills`（3 个） |
-| `mattCommand` | 注册 `/matt` 命令，默认关闭 |
+### 目录结构
 
-`mattCommand` 为 `true` 时可用：
-
-- `/matt on`：本会话注入 base 技能（覆盖 `defaults.base`），写入会话记录并重载。
-- `/matt status`：显示配置默认值、本会话覆盖、实际生效的技能数。
-
-用户级覆盖写在 `~/.pi/agent/skills-injection.json`（或 `$PI_CODING_AGENT_DIR` 下的同名文件），只需写要覆盖的键，优先级高于仓库配置，`pi update` 覆盖安装副本时不受影响：
-
-```json
-{ "defaults": { "base": false, "plus": true }, "mattCommand": true }
-```
-
-改完配置执行 `/reload` 生效。`/matt on` 只影响当前会话，fork 与 resume 沿分支继承，新会话回到配置默认值。
-
-## 上游同步
-
-`overrides.yaml` 记录每个 Skill 的归属：上游 Skill 声明来源、改名和兼容 patch，本地自有 Skill 用 `ownership: local` 声明并保留 fork provenance。GitHub Actions 每天按上游文件内容审计上游 Skill 并通过 PR 提交更新，本地自有 Skill 不受同步覆盖。
-
-`base` 是 [mattpocock/skills](https://github.com/mattpocock/skills) `skills/engineering` + `skills/productivity` 的完整镜像：27 个 Skill 零 patch、零 fork，与上游一字不差（决策记录见 `docs/adr/0009-base-matt-upstream-mirror.md`）。
-
-主要来源：
-
-- [mattpocock/skills](https://github.com/mattpocock/skills)
-- [hylarucoder/hai-stack](https://github.com/hylarucoder/hai-stack)
-- [ayghri/i-have-adhd](https://github.com/ayghri/i-have-adhd)
-- [zhaoxuya520/reverse-skill](https://github.com/zhaoxuya520/reverse-skill)
-
-## 许可证
-
-各 Skill 保留原始许可证。仓库同步与生成工具代码为个人使用。
+- `plugins/core/skills/` — 全部 11 个技能目录
+- `marketplace.yaml` — 单一市场元数据真源
+- `sources.yaml` / `overrides.yaml` / `.sync-state.json` — 上游同步源、声明式补丁与状态锁定
+- `scripts/` — 同步引擎（`sync.ts`、`patch-engine.ts`）与多宿主清单生成器（`build-marketplace.ts`、`marketplace-generator.ts`）
+- `.claude-plugin/`、`.cursor-plugin/`、`.agents/plugins/`、`plugins/core/.{cursor,codex}-plugin/` — 自动生成清单（勿手改）

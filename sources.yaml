@@ -1,0 +1,15 @@
+sources:
+  - repo: mattpocock/skills
+    url: https://github.com/mattpocock/skills
+    license: MIT
+    description: Matt Pocock's agent skills (grill-me, writing-for-agents, prototype)
+
+  - repo: hylarucoder/hai-stack
+    url: https://github.com/hylarucoder/hai-stack
+    license: MIT
+    description: HAI Stack engineering skills (hai-razor -> razor)
+
+  - repo: ayghri/i-have-adhd
+    url: https://github.com/ayghri/i-have-adhd
+    license: MIT
+    description: ADHD-friendly output formatting skill

@@ -1,0 +1,28 @@
+{
+  "name": "core",
+  "version": "1.0.0",
+  "description": "精选通用 Agent 技能：深度追问、公理设计体检、奥卡姆剃刀、交互原型、面向 Agent 写作、ADHD 友好输出、前端视觉设计与安全逆向路由",
+  "author": {
+    "name": "KorenKrita",
+    "url": "https://github.com/KorenKrita"
+  },
+  "repository": "https://github.com/KorenKrita/skills",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "architecture",
+    "design",
+    "frontend",
+    "prototyping",
+    "adhd",
+    "security",
+    "reverse-engineering"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "KorenKrita Core Skills",
+    "shortDescription": "精选通用 Agent 技能：深度追问、公理设计体检、奥卡姆剃刀、交互原型、面向 Agent 写作、ADHD 友好输出、前端视觉设计与安全逆向路由",
+    "developerName": "KorenKrita",
+    "category": "Productivity"
+  }
+}

@@ -1,13 +1,19 @@
 {
-  "name": "korenkrita-skills",
+  "name": "@korenkrita/skills",
+  "version": "1.0.0",
+  "description": "Curated general-purpose AI Agent skills for Claude Code, Cursor, Codex, and Pi",
   "private": true,
   "type": "module",
   "keywords": [
-    "pi-package"
+    "pi-package",
+    "skills",
+    "claude-code",
+    "cursor",
+    "codex"
   ],
   "pi": {
-    "extensions": [
-      "./pi/index.ts"
+    "skills": [
+      "./plugins/core/skills"
     ]
   },
   "scripts": {

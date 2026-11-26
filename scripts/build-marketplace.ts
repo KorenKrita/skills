@@ -1,62 +1,61 @@
-import { Effect } from "effect"
-import { readFileSync, writeFileSync, readdirSync, mkdirSync, statSync } from "node:fs"
-import { join } from "node:path"
+/**
+ * Generate Claude Code, Cursor, and Codex marketplace & plugin manifests from marketplace.yaml.
+ * Usage: npx tsx scripts/build-marketplace.ts
+ */
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs"
+import { dirname, join } from "node:path"
 import { parse as parseYaml } from "yaml"
 import {
-  generateCursorManifests,
-  generateMarketplace,
+  generateClaudeMarketplace,
+  generateCodexMarketplace,
+  generateCodexPluginManifest,
+  generateCursorMarketplace,
+  generateCursorPluginManifest,
   type MarketplaceConfig,
-  type PluginDir,
 } from "./marketplace-generator.js"
 
 const ROOT = new URL("../", import.meta.url).pathname.replace(/\/$/, "")
-const REPOSITORY = "https://github.com/KorenKrita/skills"
 
-const readConfig = (): MarketplaceConfig => {
-  const raw = readFileSync(join(ROOT, "marketplace.yaml"), "utf-8")
-  return parseYaml(raw) as MarketplaceConfig
+function writeJson(filePath: string, data: unknown): void {
+  mkdirSync(dirname(filePath), { recursive: true })
+  writeFileSync(filePath, `${JSON.stringify(data, null, 2)}\n`)
 }
 
-const scanPlugins = (): PluginDir[] => {
-  const pluginsDir = join(ROOT, "plugins")
-  const entries = readdirSync(pluginsDir)
-  return entries
-    .filter((name) => statSync(join(pluginsDir, name)).isDirectory())
-    .map((name) => {
-      const skillsDir = join(pluginsDir, name, "skills")
-      let skills: string[] = []
-      try {
-        skills = readdirSync(skillsDir).filter((s) =>
-          statSync(join(skillsDir, s)).isDirectory(),
-        )
-      } catch {}
-      return { name, skills }
-    })
+const config = parseYaml(
+  readFileSync(join(ROOT, "marketplace.yaml"), "utf-8"),
+) as MarketplaceConfig
+
+// 1. Claude Code: .claude-plugin/marketplace.json
+const claudeOut = join(ROOT, ".claude-plugin", "marketplace.json")
+writeJson(claudeOut, generateClaudeMarketplace(config))
+
+// 2. Cursor: .cursor-plugin/marketplace.json + plugins/<name>/.cursor-plugin/plugin.json
+const cursorOut = join(ROOT, ".cursor-plugin", "marketplace.json")
+writeJson(cursorOut, generateCursorMarketplace(config))
+
+// 3. Codex: .agents/plugins/marketplace.json + plugins/<name>/.codex-plugin/plugin.json
+const codexOut = join(ROOT, ".agents", "plugins", "marketplace.json")
+writeJson(codexOut, generateCodexMarketplace(config))
+
+const pluginManifests: string[] = []
+for (const plugin of config.plugins) {
+  const pluginDir = join(ROOT, plugin.source)
+
+  const cursorManifestOut = join(pluginDir, ".cursor-plugin", "plugin.json")
+  writeJson(cursorManifestOut, generateCursorPluginManifest(config, plugin))
+  pluginManifests.push(`${plugin.source}/.cursor-plugin/plugin.json`)
+
+  const codexManifestOut = join(pluginDir, ".codex-plugin", "plugin.json")
+  writeJson(codexManifestOut, generateCodexPluginManifest(config, plugin))
+  pluginManifests.push(`${plugin.source}/.codex-plugin/plugin.json`)
 }
 
-const writeJson = (path: string, value: unknown): void => {
-  mkdirSync(join(path, ".."), { recursive: true })
-  writeFileSync(path, JSON.stringify(value, null, 2) + "\n")
-}
-
-const program = Effect.gen(function* () {
-  const config = readConfig()
-  const dirs = scanPlugins()
-
-  // Claude Code
-  const marketplace = yield* generateMarketplace(config, dirs)
-  writeJson(join(ROOT, ".claude-plugin", "marketplace.json"), marketplace)
-  console.log(`✅ 生成 .claude-plugin/marketplace.json（${marketplace.plugins.length} 个 plugin）`)
-
-  // Cursor
-  const cursor = yield* generateCursorManifests(config, dirs, REPOSITORY)
-  writeJson(join(ROOT, ".cursor-plugin", "marketplace.json"), cursor.marketplace)
-  for (const [name, manifest] of Object.entries(cursor.plugins)) {
-    writeJson(join(ROOT, "plugins", name, ".cursor-plugin", "plugin.json"), manifest)
-  }
-  console.log(
-    `✅ 生成 .cursor-plugin/marketplace.json + ${Object.keys(cursor.plugins).length} 个 plugins/*/.cursor-plugin/plugin.json`,
-  )
-})
-
-Effect.runPromise(program)
+console.log(
+  `✅ Generated manifests (${config.plugins.length} plugin(s)): ` +
+    [
+      ".claude-plugin/marketplace.json",
+      ".cursor-plugin/marketplace.json",
+      ".agents/plugins/marketplace.json",
+      ...pluginManifests,
+    ].join(", "),
+)

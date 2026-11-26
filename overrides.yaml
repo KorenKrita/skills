@@ -1,151 +1,34 @@
+# Upstream sync & local ownership configuration for all skills in plugins/core/skills/.
+#
+# - Upstream-synced skills specify `source`, `plugin: core`, and optional `patches` / `target_patches` / `exclude_files`.
+# - Locally owned or vendored skills specify `ownership: local` and `plugin: core` (not synced by scripts/sync.ts).
+
 skills:
-  # ─── base: Matt Pocock upstream mirror (engineering + productivity) ──────
-  # plugins/base mirrors mattpocock/skills' engineering and productivity
-  # buckets verbatim: zero patches, zero local forks. Decision record:
-  # docs/adr/0009-base-matt-upstream-mirror.md
+  # ─── Upstream-synced skills (5) ───────────────────────────────────────────
 
-  ask-matt:
-    source: { repo: mattpocock/skills, path: skills/engineering/ask-matt, ref: main }
-    plugin: base
-    patches: []
+  grill-me:
+    source: { repo: mattpocock/skills, path: skills/productivity/grilling, ref: main }
+    plugin: core
+    patches:
+      - { type: set_frontmatter, field: name, value: grill-me }
+    target_patches:
+      - target: agents/openai.yaml
+        patches:
+          - { type: replace, pattern: 'display_name: "Grilling"', with: 'display_name: "Grill Me"' }
 
-  code-review:
-    source: { repo: mattpocock/skills, path: skills/engineering/code-review, ref: main }
-    plugin: base
-    patches: []
-
-  codebase-design:
-    source: { repo: mattpocock/skills, path: skills/engineering/codebase-design, ref: main }
-    plugin: base
-    patches: []
-
-  diagnosing-bugs:
-    source: { repo: mattpocock/skills, path: skills/engineering/diagnosing-bugs, ref: main }
-    plugin: base
-    patches: []
-
-  domain-modeling:
-    source: { repo: mattpocock/skills, path: skills/engineering/domain-modeling, ref: main }
-    plugin: base
-    patches: []
-
-  grill-with-docs:
-    source: { repo: mattpocock/skills, path: skills/engineering/grill-with-docs, ref: main }
-    plugin: base
-    patches: []
-
-  implement:
-    source: { repo: mattpocock/skills, path: skills/engineering/implement, ref: main }
-    plugin: base
-    patches: []
-
-  implement-spec:
-    source: { repo: mattpocock/skills, path: skills/engineering/implement-spec, ref: main }
-    plugin: base
-    patches: []
-
-  improve-codebase-architecture:
-    source: { repo: mattpocock/skills, path: skills/engineering/improve-codebase-architecture, ref: main }
-    plugin: base
-    patches: []
-
-  pr:
-    source: { repo: mattpocock/skills, path: skills/engineering/pr, ref: main }
-    plugin: base
+  writing-for-agents:
+    source: { repo: mattpocock/skills, path: skills/productivity/writing-for-agents, ref: main }
+    plugin: core
     patches: []
 
   prototype:
     source: { repo: mattpocock/skills, path: skills/engineering/prototype, ref: main }
-    plugin: base
+    plugin: core
     patches: []
 
-  research:
-    source: { repo: mattpocock/skills, path: skills/engineering/research, ref: main }
-    plugin: base
-    patches: []
-
-  retro:
-    source: { repo: mattpocock/skills, path: skills/engineering/retro, ref: main }
-    plugin: base
-    patches: []
-
-  setup-matt-pocock-skills:
-    source: { repo: mattpocock/skills, path: skills/engineering/setup-matt-pocock-skills, ref: main }
-    plugin: base
-    patches: []
-
-  tdd:
-    source: { repo: mattpocock/skills, path: skills/engineering/tdd, ref: main }
-    plugin: base
-    patches: []
-
-  to-spec:
-    source: { repo: mattpocock/skills, path: skills/engineering/to-spec, ref: main }
-    plugin: base
-    patches: []
-
-  to-tickets:
-    source: { repo: mattpocock/skills, path: skills/engineering/to-tickets, ref: main }
-    plugin: base
-    patches: []
-
-  triage:
-    source: { repo: mattpocock/skills, path: skills/engineering/triage, ref: main }
-    plugin: base
-    patches: []
-
-  wayfinder:
-    source: { repo: mattpocock/skills, path: skills/engineering/wayfinder, ref: main }
-    plugin: base
-    patches: []
-
-  wizard:
-    source: { repo: mattpocock/skills, path: skills/engineering/wizard, ref: main }
-    plugin: base
-    patches: []
-
-  grill-me:
-    source: { repo: mattpocock/skills, path: skills/productivity/grill-me, ref: main }
-    plugin: base
-    patches: []
-
-  grilling:
-    source: { repo: mattpocock/skills, path: skills/productivity/grilling, ref: main }
-    plugin: base
-    patches: []
-
-  handoff:
-    source: { repo: mattpocock/skills, path: skills/productivity/handoff, ref: main }
-    plugin: base
-    patches: []
-
-  teach:
-    source: { repo: mattpocock/skills, path: skills/productivity/teach, ref: main }
-    plugin: base
-    patches: []
-
-  to-questionnaire:
-    source: { repo: mattpocock/skills, path: skills/productivity/to-questionnaire, ref: main }
-    plugin: base
-    patches: []
-
-  wait-what:
-    source: { repo: mattpocock/skills, path: skills/productivity/wait-what, ref: main }
-    plugin: base
-    patches: []
-
-  writing-for-agents:
-    source: { repo: mattpocock/skills, path: skills/productivity/writing-for-agents, ref: main }
-    plugin: base
-    patches: []
-  # ─── plus: engineering, thinking, tools, and writing ───────────────────────
-
-  # dmmulroy's original plain-language restatement Skill, kept verbatim.
-  # The wait-what context-aware re-pitch behavior moved back to base's
-  # official wait-what when base became the full Matt mirror (ADR-0009).
   razor:
     source: { repo: hylarucoder/hai-stack, path: skills/hai-razor, ref: main }
-    plugin: plus
+    plugin: core
     patches:
       - { type: set_frontmatter, field: name, value: razor }
       # Upstream 9b1f8c8 shortened the description and embedded hai-prd/hai-architecture routes in it;
@@ -196,21 +79,48 @@ skills:
             with: ""
     exclude_files:
       - SKILL.zh_CN.md
+
   # Upstream packages only SKILL.md; LICENSE is retained locally from the repository root.
   i-have-adhd:
     source: { repo: ayghri/i-have-adhd, path: skills/i-have-adhd, ref: main }
-    plugin: plus
+    plugin: core
     patches:
       - { type: remove_frontmatter, field: disable-model-invocation }
       - type: set_frontmatter
         field: description
         value: 'Shape output for a reader with ADHD: lead with the next action, number multi-step work, restate state across turns, suppress tangents, give specific time estimates, and make wins visible. Use when the user says they have ADHD, asks for ADHD-friendly formatting, or wants this mode enabled; it stays on until they say "stop adhd mode".'
 
-  # Written in this repository: the user's award-tier design prompt kept verbatim,
-  # with intake questions, measurable floors and a bounded screenshot loop around it.
+  # ─── Locally maintained / vendored skills (6) ─────────────────────────────
+
+  mit-design:
+    ownership: local
+    plugin: core
+
   award-tier-web-design:
     ownership: local
-    plugin: plus
+    plugin: core
+
+  frontend-design:
+    ownership: local
+    plugin: core
+    provenance:
+      repo: anthropics/skills
+      path: skills/frontend-design
+      license: Apache-2.0; LICENSE.txt retained alongside SKILL.md
+
+  gemini-frontend-design:
+    ownership: local
+    plugin: core
+    provenance:
+      origin: Google Gemini frontend-design guide
+      license: Apache-2.0
+
+  typesafe-ai:
+    ownership: local
+    plugin: core
+    provenance:
+      origin: TypeSafe System One (Jev) official skill
+      license: MIT; LICENSE retained alongside SKILL.md
 
   # Vendored cybersecurity router (zhaoxuya520/reverse-skill). The entire
   # upstream tree ships under sec-router/vendor/ with SKILL.md renamed to
@@ -219,7 +129,7 @@ skills:
   # sec-router/update-vendor.sh; provenance and deviations in sec-router/VENDOR.md.
   sec-router:
     ownership: local
-    plugin: plus
+    plugin: core
     provenance:
       repo: zhaoxuya520/reverse-skill
       path: .

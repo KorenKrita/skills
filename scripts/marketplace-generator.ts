@@ -1,169 +1,213 @@
-import { Effect } from "effect"
+export interface MarketplaceOwner {
+  readonly name: string
+  readonly url?: string
+}
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+export interface MarketplacePluginConfig {
+  readonly name: string
+  readonly displayName?: string
+  readonly version: string
+  readonly source: string
+  readonly description: string
+  readonly strict?: boolean
+  readonly category?: string
+  readonly keywords?: readonly string[]
+}
 
 export interface MarketplaceConfig {
-  readonly marketplace: {
-    readonly name: string
-    readonly owner: { readonly name: string }
-    readonly description: string
+  readonly name: string
+  readonly displayName?: string
+  readonly owner: MarketplaceOwner
+  readonly repository?: string
+  readonly license?: string
+  readonly metadata?: {
+    readonly description?: string
+    readonly version?: string
   }
-  readonly plugins: Record<string, PluginConfig>
-  readonly external_plugins?: Record<string, ExternalPluginConfig>
+  readonly plugins: readonly MarketplacePluginConfig[]
 }
 
-export interface PluginConfig {
-  readonly version: string
-  readonly description: string
-  readonly category?: string
-  readonly keywords?: readonly string[]
-}
-
-export interface ExternalPluginConfig {
-  readonly source: { readonly type: string; readonly repo: string }
-  readonly description: string
-  readonly category?: string
-  readonly strict?: boolean
-  readonly keywords?: readonly string[]
-}
-
-export interface PluginDir {
+export interface ClaudeMarketplace {
   readonly name: string
-  readonly skills: readonly string[]
+  readonly owner: MarketplaceOwner
+  readonly metadata?: {
+    readonly description?: string
+    readonly version?: string
+  }
+  readonly plugins: readonly MarketplacePluginConfig[]
 }
 
-export interface MarketplaceJson {
-  readonly name: string
-  readonly owner: { readonly name: string }
-  readonly description: string
-  readonly plugins: MarketplacePluginEntry[]
-}
-
-export interface MarketplacePluginEntry {
-  readonly name: string
-  readonly version?: string
-  readonly source: string | { readonly source: string; readonly repo: string }
-  readonly description: string
-  readonly strict: false
-  readonly category?: string
-  readonly keywords?: readonly string[]
-}
-
-// ─── Generator ───────────────────────────────────────────────────────────────
-
-export const generateMarketplace = (
-  config: MarketplaceConfig,
-  dirs: readonly PluginDir[],
-): Effect.Effect<MarketplaceJson> =>
-  Effect.gen(function* () {
-    const existingPluginNames = new Set(dirs.map((d) => d.name))
-
-    const plugins: MarketplacePluginEntry[] = Object.entries(config.plugins)
-      .filter(([name]) => existingPluginNames.has(name))
-      .map(([name, pluginConfig]) => ({
-        name,
-        version: pluginConfig.version,
-        source: `./plugins/${name}`,
-        description: pluginConfig.description,
-        strict: false as const,
-        ...(pluginConfig.category && { category: pluginConfig.category }),
-        ...(pluginConfig.keywords && { keywords: pluginConfig.keywords }),
-      }))
-
-    const externalPlugins = Object.entries(config.external_plugins ?? {})
-      .map(([name, ext]) => ({
-        name,
-        source: { source: ext.source.type, repo: ext.source.repo },
-        description: ext.description,
-        ...(ext.strict === false && { strict: false as const }),
-        ...(ext.category && { category: ext.category }),
-        ...(ext.keywords && { keywords: ext.keywords }),
-      })) as MarketplacePluginEntry[]
-
-    return {
-      name: config.marketplace.name,
-      owner: config.marketplace.owner,
-      description: config.marketplace.description,
-      plugins: [...plugins, ...externalPlugins],
-    }
-  })
-
-// ─── Cursor ──────────────────────────────────────────────────────────────────
-// Cursor 只读 `.cursor-plugin/marketplace.json` 与 `<source>/.cursor-plugin/plugin.json`，
-// 不识别 `.claude-plugin/`。见 https://cursor.com/docs/reference/plugins
-
-export interface CursorMarketplaceJson {
-  readonly name: string
-  readonly owner: { readonly name: string }
-  readonly metadata: { readonly description: string }
-  readonly plugins: CursorMarketplacePluginEntry[]
-}
-
-export interface CursorMarketplacePluginEntry {
+export interface CursorMarketplacePlugin {
   readonly name: string
   readonly source: string
   readonly description: string
-  readonly version?: string
+  readonly version: string
+  readonly author: MarketplaceOwner
   readonly category?: string
-  readonly keywords?: readonly string[]
+  readonly tags?: readonly string[]
 }
 
-export interface CursorPluginJson {
+export interface CursorMarketplace {
+  readonly name: string
+  readonly owner: MarketplaceOwner
+  readonly metadata?: {
+    readonly description?: string
+    readonly version?: string
+  }
+  readonly plugins: readonly CursorMarketplacePlugin[]
+}
+
+export interface CursorPluginManifest {
   readonly name: string
   readonly version: string
   readonly description: string
-  readonly author: { readonly name: string }
-  readonly repository: string
+  readonly author: MarketplaceOwner
+  readonly repository?: string
+  readonly license?: string
   readonly keywords?: readonly string[]
+  readonly skills: string
 }
 
-export interface CursorManifests {
-  readonly marketplace: CursorMarketplaceJson
-  /** key = plugin 目录名（plugins/<name>），value = 该目录下 .cursor-plugin/plugin.json 内容 */
-  readonly plugins: Record<string, CursorPluginJson>
+export interface CodexMarketplacePlugin {
+  readonly name: string
+  readonly source: {
+    readonly source: "local"
+    readonly path: string
+  }
+  readonly policy: {
+    readonly installation: "AVAILABLE"
+    readonly authentication: "ON_INSTALL"
+  }
+  readonly category: string
 }
 
-export const generateCursorManifests = (
+export interface CodexMarketplace {
+  readonly name: string
+  readonly interface: {
+    readonly displayName: string
+  }
+  readonly plugins: readonly CodexMarketplacePlugin[]
+}
+
+export interface CodexPluginManifest {
+  readonly name: string
+  readonly version: string
+  readonly description: string
+  readonly author: MarketplaceOwner
+  readonly repository?: string
+  readonly license?: string
+  readonly keywords?: readonly string[]
+  readonly skills: string
+  readonly interface: {
+    readonly displayName: string
+    readonly shortDescription: string
+    readonly developerName: string
+    readonly category: string
+  }
+}
+
+function stripLeadingDotSlash(path: string): string {
+  return path.replace(/^\.\//, "")
+}
+
+function ensureLeadingDotSlash(path: string): string {
+  return path.startsWith("./") ? path : `./${path}`
+}
+
+function toTitleCategory(category?: string): string {
+  if (!category) return "Productivity"
+  return category.charAt(0).toUpperCase() + category.slice(1)
+}
+
+export function generateClaudeMarketplace(config: MarketplaceConfig): ClaudeMarketplace {
+  return {
+    name: config.name,
+    owner: config.owner,
+    ...(config.metadata ? { metadata: config.metadata } : {}),
+    plugins: config.plugins.map((plugin) => ({
+      name: plugin.name,
+      version: plugin.version,
+      source: plugin.source,
+      description: plugin.description,
+      ...(plugin.strict !== undefined ? { strict: plugin.strict } : {}),
+      ...(plugin.category ? { category: plugin.category } : {}),
+      ...(plugin.keywords ? { keywords: plugin.keywords } : {}),
+    })),
+  }
+}
+
+export function generateCursorMarketplace(config: MarketplaceConfig): CursorMarketplace {
+  return {
+    name: config.name,
+    owner: config.owner,
+    ...(config.metadata ? { metadata: config.metadata } : {}),
+    plugins: config.plugins.map((plugin) => ({
+      name: plugin.name,
+      source: stripLeadingDotSlash(plugin.source),
+      description: plugin.description,
+      version: plugin.version,
+      author: config.owner,
+      ...(plugin.category ? { category: plugin.category } : {}),
+      ...(plugin.keywords ? { tags: plugin.keywords } : {}),
+    })),
+  }
+}
+
+export function generateCursorPluginManifest(
   config: MarketplaceConfig,
-  dirs: readonly PluginDir[],
-  repository: string,
-): Effect.Effect<CursorManifests> =>
-  Effect.gen(function* () {
-    const existingPluginNames = new Set(dirs.map((d) => d.name))
-    const localPlugins = Object.entries(config.plugins).filter(([name]) =>
-      existingPluginNames.has(name),
-    )
+  plugin: MarketplacePluginConfig,
+): CursorPluginManifest {
+  return {
+    name: plugin.name,
+    version: plugin.version,
+    description: plugin.description,
+    author: config.owner,
+    ...(config.repository ? { repository: config.repository } : {}),
+    ...(config.license ? { license: config.license } : {}),
+    ...(plugin.keywords ? { keywords: plugin.keywords } : {}),
+    skills: "./skills/",
+  }
+}
 
-    const entries: CursorMarketplacePluginEntry[] = localPlugins.map(([name, p]) => ({
-      name,
-      source: `plugins/${name}`,
-      description: p.description,
-      version: p.version,
-      ...(p.category && { category: p.category }),
-      ...(p.keywords && { keywords: p.keywords }),
-    }))
-
-    const plugins: Record<string, CursorPluginJson> = Object.fromEntries(
-      localPlugins.map(([name, p]) => [
-        name,
-        {
-          name,
-          version: p.version,
-          description: p.description,
-          author: config.marketplace.owner,
-          repository,
-          ...(p.keywords && { keywords: p.keywords }),
-        },
-      ]),
-    )
-
-    return {
-      marketplace: {
-        name: config.marketplace.name,
-        owner: config.marketplace.owner,
-        metadata: { description: config.marketplace.description },
-        plugins: entries,
+export function generateCodexMarketplace(config: MarketplaceConfig): CodexMarketplace {
+  return {
+    name: config.name,
+    interface: {
+      displayName: config.displayName ?? config.name,
+    },
+    plugins: config.plugins.map((plugin) => ({
+      name: plugin.name,
+      source: {
+        source: "local",
+        path: ensureLeadingDotSlash(plugin.source),
       },
-      plugins,
-    }
-  })
+      policy: {
+        installation: "AVAILABLE",
+        authentication: "ON_INSTALL",
+      },
+      category: toTitleCategory(plugin.category),
+    })),
+  }
+}
+
+export function generateCodexPluginManifest(
+  config: MarketplaceConfig,
+  plugin: MarketplacePluginConfig,
+): CodexPluginManifest {
+  return {
+    name: plugin.name,
+    version: plugin.version,
+    description: plugin.description,
+    author: config.owner,
+    ...(config.repository ? { repository: config.repository } : {}),
+    ...(config.license ? { license: config.license } : {}),
+    ...(plugin.keywords ? { keywords: plugin.keywords } : {}),
+    skills: "./skills/",
+    interface: {
+      displayName: plugin.displayName ?? plugin.name,
+      shortDescription: plugin.description,
+      developerName: config.owner.name,
+      category: toTitleCategory(plugin.category),
+    },
+  }
+}

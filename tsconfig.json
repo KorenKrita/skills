@@ -12,6 +12,6 @@
     "rootDir": ".",
     "declaration": true
   },
-  "include": ["scripts/**/*.ts", "tests/**/*.ts", "pi/**/*.ts"],
+  "include": ["scripts/**/*.ts", "tests/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

@@ -72,11 +72,13 @@ const SYNC_STATE_PATH = join(ROOT, ".sync-state.json")
 const OVERRIDES_PATH = join(ROOT, "overrides.yaml")
 const MARKETPLACE_CONFIG_PATH = join(ROOT, "marketplace.yaml")
 const MARKETPLACE_JSON_PATH = join(ROOT, ".claude-plugin", "marketplace.json")
-/** build-marketplace.ts 生成的全部清单（Claude Code + Cursor），版本递增后需一起入库。 */
+/** build-marketplace.ts 生成的全部清单（Claude Code + Cursor + Codex），版本递增后需一起入库。 */
 const GENERATED_MANIFEST_PATHS = [
   MARKETPLACE_JSON_PATH,
   join(ROOT, ".cursor-plugin", "marketplace.json"),
+  join(ROOT, ".agents", "plugins", "marketplace.json"),
   join(ROOT, "plugins", "*", ".cursor-plugin", "plugin.json"),
+  join(ROOT, "plugins", "*", ".codex-plugin", "plugin.json"),
 ]
 const FORCE_SYNC = process.argv.includes("--force")
 
