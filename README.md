@@ -1,8 +1,8 @@
 # KorenKrita Skills
 
-精选通用 AI Agent 技能集（单列表 `core` 插件，共 11 个技能），原生支持 **Claude Code**、**Cursor**、**Codex** 和 **Pi** 四个宿主，并保留自动上游同步与补丁引擎。
+精选通用 AI Agent 技能集（单列表 `core` 插件，共 10 个技能），原生支持 **Claude Code**、**Cursor**、**Codex** 和 **Pi** 四个宿主，并保留自动上游同步与补丁引擎。
 
-## 包含技能（11 个）
+## 包含技能（10 个）
 
 | 技能 | 来源 | 用途 |
 |---|---|---|
@@ -16,7 +16,6 @@
 | `frontend-design` | Anthropic (`Apache-2.0`) | 高辨识度通用前端界面与排版设计规范 |
 | `gemini-frontend-design` | Google Gemini (`Apache-2.0`) | 通用网站与 Web 应用的视觉、配色、动效设计指南 |
 | `typesafe-ai` | TypeSafe (`MIT`) | TypeSafe System One (Jev) 接入与使用说明（手动调用） |
-| `sec-router` | `zhaoxuya520/reverse-skill` (vendored) | 授权安全与逆向工程方法论路由 |
 
 ## 安装与订阅
 
@@ -58,7 +57,7 @@ npm run sync                # 手动检查上游变更（日常由 GitHub Action
 
 ### 目录结构
 
-- `plugins/core/skills/` — 全部 11 个技能目录
+- `plugins/core/skills/` — 全部 10 个技能目录
 - `marketplace.yaml` — 单一市场元数据真源
 - `sources.yaml` / `overrides.yaml` / `.sync-state.json` — 上游同步源、声明式补丁与状态锁定
 - `scripts/` — 同步引擎（`sync.ts`、`patch-engine.ts`）与多宿主清单生成器（`build-marketplace.ts`、`marketplace-generator.ts`）

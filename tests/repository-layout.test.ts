@@ -49,7 +49,7 @@ describe("repository layout", () => {
     const diskSkills = listSkillDirs("core")
     const declaredSkills = Object.keys(overrides.skills).sort()
     expect(diskSkills).toEqual(declaredSkills)
-    expect(diskSkills.length).toBe(11)
+    expect(diskSkills.length).toBe(10)
 
     for (const [name, cfg] of Object.entries(overrides.skills)) {
       expect(cfg.plugin).toBe("core")

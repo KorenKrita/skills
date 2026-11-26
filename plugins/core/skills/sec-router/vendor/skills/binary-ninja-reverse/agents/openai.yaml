@@ -1,3 +1,0 @@
-interface:
-  display_name: "Binary Ninja Reverse"
-  short_description: "Analyze binaries with Binary Ninja and optional MCP"
