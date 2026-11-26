@@ -1,6 +1,6 @@
 {
   "name": "core",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "精选通用 Agent 技能：深度追问、公理设计体检、奥卡姆剃刀、交互原型、面向 Agent 写作、ADHD 友好输出与前端视觉设计",
   "author": {
     "name": "KorenKrita",
