@@ -1,6 +1,9 @@
-import { Effect } from "effect"
+/**
+ * Upstream sync script: check upstream repos -> pull files -> apply patches -> open PR per updated skill.
+ * Usage: npx tsx scripts/sync.ts [--force]
+ */
 import { execSync } from "node:child_process"
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync, rmSync } from "node:fs"
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { parse as parseYaml } from "yaml"
 import { applyPatches, type Patch } from "./patch-engine.js"
@@ -8,143 +11,111 @@ import { bumpPluginVersion } from "./plugin-version.js"
 import {
   copyFilePreservingMode,
   findNewFileConflicts,
+  findOpenSyncBranch,
   findOrphanedStateKeys,
   findRemovedFiles,
-  isExcludedFile,
-  planSparseCheckout,
   planSync,
   syncStateAfterPr,
   syncStateForPrBranch,
-  findOpenSyncBranch,
   type SyncState,
   type SyncStateEntry,
 } from "./sync-utils.js"
-
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-interface OverridesConfig {
-  skills: Record<string, SkillEntry>
-}
-
-/**
- * A locally owned Skill lives in the repository like an upstream one, but the
- * sync job never fetches or overwrites it. `provenance` records where the fork
- * came from so the origin and its license stay auditable.
- */
-interface LocalSkill {
-  ownership: "local"
-  plugin: string
-  provenance?: Record<string, string>
-}
-
-type SkillEntry = SkillOverride | LocalSkill
-
-interface ExtraMapping {
-  from: string
-  to: string
-  patches?: Patch[]
-}
 
 interface TargetPatchSet {
   target: string
   patches: Patch[]
 }
 
-interface SkillOverride {
+interface SkillSource {
+  repo: string
+  path: string
+  ref: string
+}
+
+interface UpstreamSkillConfig {
   ownership?: "upstream"
-  source: {
-    repo: string
-    path: string
-    ref: string
-  }
+  source: SkillSource
   plugin: string
   patches: Patch[]
-  patch_targets?: string[]
   target_patches?: TargetPatchSet[]
-  extra_mappings?: ExtraMapping[]
   exclude_files?: string[]
 }
 
-// ─── Constants ───────────────────────────────────────────────────────────────
+interface LocalSkillConfig {
+  ownership: "local"
+  plugin: string
+}
+
+type SkillConfig = UpstreamSkillConfig | LocalSkillConfig
+
+interface Overrides {
+  skills: Record<string, SkillConfig>
+}
 
 const ROOT = new URL("../", import.meta.url).pathname.replace(/\/$/, "")
 const SYNC_STATE_PATH = join(ROOT, ".sync-state.json")
 const OVERRIDES_PATH = join(ROOT, "overrides.yaml")
 const MARKETPLACE_CONFIG_PATH = join(ROOT, "marketplace.yaml")
-const MARKETPLACE_JSON_PATH = join(ROOT, ".claude-plugin", "marketplace.json")
-/** build-marketplace.ts 生成的全部清单（Claude Code + Cursor + Codex），版本递增后需一起入库。 */
 const GENERATED_MANIFEST_PATHS = [
-  MARKETPLACE_JSON_PATH,
+  join(ROOT, ".claude-plugin", "marketplace.json"),
   join(ROOT, ".cursor-plugin", "marketplace.json"),
   join(ROOT, ".agents", "plugins", "marketplace.json"),
   join(ROOT, "plugins", "*", ".cursor-plugin", "plugin.json"),
   join(ROOT, "plugins", "*", ".codex-plugin", "plugin.json"),
 ]
 const FORCE_SYNC = process.argv.includes("--force")
+const SKIP_DIRS = new Set([".git", "node_modules"])
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+function exec(cmd: string, cwd = ROOT): string {
+  return execSync(cmd, { cwd, encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"] }).trim()
+}
 
-function exec(cmd: string): string {
-  return execSync(cmd, { encoding: "utf-8", cwd: ROOT }).trim()
+function shellQuote(arg: string): string {
+  return `'${arg.replace(/'/g, "'\\''")}'`
 }
 
 function readSyncState(): Record<string, SyncStateEntry> {
   if (!existsSync(SYNC_STATE_PATH)) return {}
-  return JSON.parse(readFileSync(SYNC_STATE_PATH, "utf-8"))
+  return JSON.parse(readFileSync(SYNC_STATE_PATH, "utf-8")) as Record<string, SyncStateEntry>
 }
 
 function writeSyncState(state: SyncState): void {
-  writeFileSync(SYNC_STATE_PATH, JSON.stringify(state, null, 2) + "\n")
+  writeFileSync(SYNC_STATE_PATH, `${JSON.stringify(state, null, 2)}\n`)
 }
 
-function readOverrides(): OverridesConfig {
-  return parseYaml(readFileSync(OVERRIDES_PATH, "utf-8")) as OverridesConfig
+function readOverrides(): Overrides {
+  return parseYaml(readFileSync(OVERRIDES_PATH, "utf-8")) as Overrides
 }
 
 function getUpstreamLatestSha(repo: string, ref: string): string | null {
   try {
-    const result = exec(
-      `git ls-remote https://github.com/${repo}.git refs/heads/${ref}`,
-    )
-    const sha = result.split("\t")[0]
-    return sha || null
+    return exec(`gh api repos/${repo}/commits/${ref} --jq .sha`)
   } catch {
     return null
   }
 }
 
-function shellQuote(value: string): string {
-  return `'${value.replace(/'/g, `'\\''`)}'`
-}
+function copyTreeToDir(srcDir: string, destDir: string, excludeFiles?: string[]): string[] {
+  const files: string[] = []
+  const excluded = new Set(excludeFiles ?? [])
+  if (!existsSync(srcDir)) return files
 
-function cloneUpstream(repo: string, ref: string, paths: string[]): string {
-  const tempDir = join(ROOT, ".tmp-upstream")
-  if (existsSync(tempDir)) rmSync(tempDir, { recursive: true })
-
-  const plan = planSparseCheckout(paths)
-  exec(`git clone --depth 1 --branch ${shellQuote(ref)} --filter=blob:none --sparse https://github.com/${repo}.git ${shellQuote(tempDir)}`)
-  if (plan.checkoutWholeRepo) {
-    exec(`git -C ${shellQuote(tempDir)} sparse-checkout disable`)
-  } else {
-    const directories = plan.directories.map(shellQuote).join(" ")
-    exec(`git -C ${shellQuote(tempDir)} sparse-checkout set -- ${directories}`)
-  }
-  exec(`git -C ${shellQuote(tempDir)} checkout`)
-
-  return tempDir
-}
-
-function copyTreeToDir(srcDir: string, destDir: string, excludeFiles: readonly string[] = []): string[] {
-  if (!existsSync(srcDir)) return []
-
-  const files = collectFiles(srcDir).filter((file) => !isExcludedFile(file, excludeFiles))
-  mkdirSync(destDir, { recursive: true })
-
-  for (const file of files) {
-    copyFilePreservingMode(join(srcDir, file), join(destDir, file))
+  function walk(dir: string, relPrefix: string): void {
+    for (const entry of readdirSync(dir)) {
+      const full = join(dir, entry)
+      const rel = relPrefix ? `${relPrefix}/${entry}` : entry
+      if (excluded.has(rel)) continue
+      if (statSync(full).isDirectory()) {
+        walk(full, rel)
+      } else {
+        copyFilePreservingMode(full, join(destDir, rel))
+        files.push(rel)
+      }
+    }
   }
 
-  return files
+  walk(srcDir, "")
+  return files.sort()
 }
 
 function fetchUpstreamFiles(
@@ -152,31 +123,18 @@ function fetchUpstreamFiles(
   ref: string,
   path: string,
   destDir: string,
-  extraMappings?: ExtraMapping[],
   excludeFiles?: string[],
 ): string[] {
-  const allPaths = [path, ...(extraMappings ?? []).map(m => m.from)]
-  const tempDir = cloneUpstream(repo, ref, allPaths)
-
-  const srcDir = join(tempDir, path)
-  const files = copyTreeToDir(srcDir, destDir, excludeFiles)
-
-  if (extraMappings) {
-    for (const mapping of extraMappings) {
-      const src = join(tempDir, mapping.from)
-      if (!existsSync(src)) {
-        throw new Error(`上游额外映射不存在: ${mapping.from}`)
-      }
-      const dest = join(ROOT, mapping.to)
-      copyFilePreservingMode(src, dest)
-    }
+  const tempDir = join(ROOT, `.tmp-sync-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`)
+  mkdirSync(tempDir, { recursive: true })
+  try {
+    exec(`git clone --depth 1 --branch ${shellQuote(ref)} --filter=blob:none --sparse https://github.com/${repo}.git .`, tempDir)
+    exec(`git sparse-checkout set ${shellQuote(path)}`, tempDir)
+    return copyTreeToDir(join(tempDir, path), destDir, excludeFiles)
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true })
   }
-
-  rmSync(tempDir, { recursive: true })
-  return files
 }
-
-const SKIP_DIRS = new Set([".git", "node_modules"])
 
 function collectFiles(dir: string, prefix = ""): string[] {
   const result: string[] = []
@@ -194,8 +152,7 @@ function collectFiles(dir: string, prefix = ""): string[] {
 }
 
 function getExistingFiles(dir: string): string[] {
-  if (!existsSync(dir)) return []
-  return collectFiles(dir)
+  return existsSync(dir) ? collectFiles(dir) : []
 }
 
 function removeDeletedUpstreamFiles(
@@ -204,47 +161,24 @@ function removeDeletedUpstreamFiles(
   currentUpstreamFiles: readonly string[],
 ): string[] {
   if (!previousUpstreamFiles) return []
-
-  const removedFiles = findRemovedFiles(previousUpstreamFiles, currentUpstreamFiles)
-  for (const file of removedFiles) {
-    const target = join(destDir, file)
-    rmSync(target, { force: true })
-  }
-  return removedFiles
+  const removed = findRemovedFiles(previousUpstreamFiles, currentUpstreamFiles)
+  for (const file of removed) rmSync(join(destDir, file), { force: true })
+  return removed
 }
 
 function cleanPaths(stagePaths: string[], forceAddPaths: string[] = []): void {
   for (const path of stagePaths) {
-    try {
-      exec(`git restore --staged --worktree -- ${shellQuote(path)}`)
-    } catch {
-      // The path may only contain newly created, untracked files.
-    }
-    try {
-      exec(`git clean -fd -- ${shellQuote(path)}`)
-    } catch {
-      // Best-effort cleanup; exact ignored files are handled below.
-    }
+    try { exec(`git restore --staged --worktree -- ${shellQuote(path)}`) } catch {}
+    try { exec(`git clean -fd -- ${shellQuote(path)}`) } catch {}
   }
-
   for (const path of forceAddPaths) {
-    try {
-      exec(`git clean -fdx -- ${shellQuote(path)}`)
-    } catch {
-      // The file may be tracked on main or may already have been removed.
-    }
+    try { exec(`git clean -fdx -- ${shellQuote(path)}`) } catch {}
   }
 }
 
-// ─── PR Creation ─────────────────────────────────────────────────────────────
-
 function ensureLabels(labels: string[]): void {
   for (const label of labels) {
-    try {
-      exec(`gh label create "${label}" --force 2>/dev/null || true`)
-    } catch {
-      // already exists
-    }
+    try { exec(`gh label create "${label}" --force 2>/dev/null || true`) } catch {}
   }
 }
 
@@ -265,18 +199,11 @@ function listOpenPrHeads(): string[] {
 }
 
 function deleteLocalBranch(branch: string): void {
-  try {
-    exec(`git branch -D ${shellQuote(branch)}`)
-  } catch {
-    // The branch may not exist locally.
-  }
+  try { exec(`git branch -D ${shellQuote(branch)}`) } catch {}
 }
 
 function stageSyncChanges(stagePaths: string[], forceAddPaths: string[]): void {
-  for (const path of stagePaths) {
-    exec(`git add -A -- ${shellQuote(path)}`)
-  }
-
+  for (const path of stagePaths) exec(`git add -A -- ${shellQuote(path)}`)
   const chunkSize = 100
   for (let i = 0; i < forceAddPaths.length; i += chunkSize) {
     const chunk = forceAddPaths.slice(i, i + chunkSize).map(shellQuote).join(" ")
@@ -307,10 +234,8 @@ function createPr(
   const title = isDraft
     ? `同步：更新 ${skillName}（来自 ${repo}）[补丁失败]`
     : `同步：更新 ${skillName}（来自 ${repo}）`
-
   const labelList = isDraft ? ["自动同步", "补丁失败"] : ["自动同步"]
 
-  // Any open sync PR for this Skill, even for an older upstream SHA, is still pending review.
   if (findOpenSyncBranch(listOpenPrHeads(), skillName)) return "branch-exists"
 
   if (remoteBranchExists(branch)) {
@@ -328,13 +253,9 @@ function createPr(
     return "no-changes"
   }
 
-  const versionBump = bumpPluginVersion(
-    readFileSync(MARKETPLACE_CONFIG_PATH, "utf-8"),
-    pluginName,
-  )
+  const versionBump = bumpPluginVersion(readFileSync(MARKETPLACE_CONFIG_PATH, "utf-8"), pluginName)
   writeFileSync(MARKETPLACE_CONFIG_PATH, versionBump.content)
   exec("npx tsx scripts/build-marketplace.ts")
-  // The accepted manifest must land with the files it describes, at merge time.
   writeSyncState(branchSyncState)
   stageSyncChanges([MARKETPLACE_CONFIG_PATH, SYNC_STATE_PATH, ...GENERATED_MANIFEST_PATHS], [])
 
@@ -342,13 +263,14 @@ function createPr(
   exec(`git push -u origin ${shellQuote(branch)}`)
 
   const bodyFile = join(ROOT, ".tmp-pr-body.md")
-  const versionBody = `${body}\n## Plugin 版本\n\n- \`${pluginName}\`: \`${versionBump.previousVersion}\` → \`${versionBump.nextVersion}\`\n`
-  writeFileSync(bodyFile, versionBody)
-
+  writeFileSync(
+    bodyFile,
+    `${body}\n## Plugin 版本\n\n- \`${pluginName}\`: \`${versionBump.previousVersion}\` → \`${versionBump.nextVersion}\`\n`,
+  )
   ensureLabels(labelList)
 
   const draftFlag = isDraft ? "--draft" : ""
-  const labelFlag = labelList.map(l => `--label "${l}"`).join(" ")
+  const labelFlag = labelList.map((l) => `--label "${l}"`).join(" ")
   exec(`gh pr create --title "${title}" --body-file "${bodyFile}" ${labelFlag} ${draftFlag}`)
 
   rmSync(bodyFile, { force: true })
@@ -357,22 +279,14 @@ function createPr(
   return "created"
 }
 
-// ─── Main Sync Logic ─────────────────────────────────────────────────────────
-
-const program = Effect.gen(function* () {
+function main(): void {
   const overrides = readOverrides()
   const syncState = readSyncState()
   let updated = false
 
   const plan = planSync(overrides.skills)
 
-  // Locally owned Skills are deliberately absent from the upstream state, so
-  // only upstream-owned names count as configured keys when pruning orphans.
-  const orphanedStateKeys = findOrphanedStateKeys(
-    Object.keys(syncState),
-    plan.sync.map(([skillName]) => skillName),
-  )
-  for (const skillName of orphanedStateKeys) {
+  for (const skillName of findOrphanedStateKeys(Object.keys(syncState), plan.sync.map(([name]) => name))) {
     console.log(`🧹 ${skillName}: 从同步状态中移除已删除的配置`)
     delete syncState[skillName]
     updated = true
@@ -382,16 +296,9 @@ const program = Effect.gen(function* () {
     console.log(`🔒 ${skillName}: 本地自有 Skill，跳过上游同步`)
   }
 
-  for (const [skillName, config] of plan.sync) {
-    const {
-      source,
-      plugin,
-      patches,
-      patch_targets,
-      target_patches,
-      extra_mappings,
-      exclude_files,
-    } = config
+  for (const [skillName, rawConfig] of plan.sync) {
+    const config = rawConfig as UpstreamSkillConfig
+    const { source, plugin, patches, target_patches, exclude_files } = config
     const latestSha = getUpstreamLatestSha(source.repo, source.ref)
 
     if (!latestSha) {
@@ -411,43 +318,20 @@ const program = Effect.gen(function* () {
 
     const destDir = join(ROOT, "plugins", plugin, "skills", skillName)
     const existingLocalFiles = getExistingFiles(destDir)
-    const upstreamFiles = fetchUpstreamFiles(
-      source.repo,
-      source.ref,
-      source.path,
-      destDir,
-      extra_mappings,
-      exclude_files,
-    )
+    const upstreamFiles = fetchUpstreamFiles(source.repo, source.ref, source.path, destDir, exclude_files)
 
     if (upstreamFiles.length === 0) {
       console.log(`⚠️  ${skillName}: 上游路径为空，跳过`)
       continue
     }
 
-    const removedFiles = removeDeletedUpstreamFiles(
-      destDir,
-      previousState?.files,
-      upstreamFiles,
-    )
+    const removedFiles = removeDeletedUpstreamFiles(destDir, previousState?.files, upstreamFiles)
+    const conflicts = findNewFileConflicts(existingLocalFiles, previousState?.files, upstreamFiles)
 
-    // A conflict only exists when a file was local-only in the previous manifest
-    // and is newly introduced by upstream. Existing upstream-managed files are
-    // expected to be overwritten on every sync.
-    const conflicts = findNewFileConflicts(
-      existingLocalFiles,
-      previousState?.files,
-      upstreamFiles,
-    )
-
-    // Apply patches to skill files and separately mapped plugin resources.
     let patchFailed = false
-    let patchReport = ""
     const reports: string[] = []
     const patchSets: TargetPatchSet[] = [
-      ...(patches.length > 0
-        ? (patch_targets ?? ["SKILL.md"]).map((target) => ({ target, patches }))
-        : []),
+      ...(patches.length > 0 ? [{ target: "SKILL.md", patches }] : []),
       ...(target_patches ?? []),
     ]
 
@@ -460,76 +344,32 @@ const program = Effect.gen(function* () {
       }
 
       const content = readFileSync(patchPath, "utf-8")
-      const { final, results } = yield* applyPatches(content, patchSet.patches)
+      const { final, results } = applyPatches(content, patchSet.patches)
       writeFileSync(patchPath, final)
 
       for (const result of results) {
         if (!result.ok) patchFailed = true
-        reports.push(
-          `- ${result.ok ? "✅" : "❌"} [${patchSet.target} / ${result.patch.type}] ${result.msg}`,
-        )
+        reports.push(`- ${result.ok ? "✅" : "❌"} [${patchSet.target} / ${result.patch.type}] ${result.msg}`)
       }
     }
 
-    for (const mapping of extra_mappings ?? []) {
-      if (!mapping.patches || mapping.patches.length === 0) continue
-
-      const patchPath = join(ROOT, mapping.to)
-      if (!existsSync(patchPath)) {
-        patchFailed = true
-        reports.push(`- ❌ [${mapping.to}] 补丁目标不存在`)
-        continue
-      }
-
-      const content = readFileSync(patchPath, "utf-8")
-      const { final, results } = yield* applyPatches(content, mapping.patches)
-      writeFileSync(patchPath, final)
-
-      for (const result of results) {
-        if (!result.ok) patchFailed = true
-        reports.push(
-          `- ${result.ok ? "✅" : "❌"} [${mapping.to} / ${result.patch.type}] ${result.msg}`,
-        )
-      }
-    }
-
-    patchReport = reports.join("\n")
-
-    // Build PR body
     let body = `## 上游变更\n\n`
     body += `- 来源: \`${source.repo}\` / \`${source.path}\`\n`
     body += `- 分支: \`${source.ref}\`\n`
     body += `- SHA: \`${latestSha.slice(0, 12)}\`\n`
     body += `- 文件: ${upstreamFiles.join(", ")}\n`
-    if (removedFiles.length > 0) {
-      body += `- 上游已删除: ${removedFiles.join(", ")}\n`
-    }
-
-    if (patchReport) {
-      body += `\n## 补丁结果\n\n${patchReport}\n`
-    }
-
+    if (removedFiles.length > 0) body += `- 上游已删除: ${removedFiles.join(", ")}\n`
+    if (reports.length > 0) body += `\n## 补丁结果\n\n${reports.join("\n")}\n`
     if (conflicts.length > 0) {
-      body += `\n## ⚠️ 文件名冲突\n\n`
-      body += `以下上游新增文件与本地文件同名，需手动处理：\n`
+      body += `\n## ⚠️ 文件名冲突\n\n以下上游新增文件与本地文件同名，需手动处理：\n`
       body += conflicts.map((f) => `- \`${f}\``).join("\n") + "\n"
       patchFailed = true
     }
 
-    // Create PR
     const candidateState: SyncStateEntry = { sha: latestSha, files: upstreamFiles }
     const branch = `sync/${skillName}-${latestSha.slice(0, 7)}`
-    const extraMappingPaths = (extra_mappings ?? []).map(m => join(ROOT, m.to))
-    const stagePaths = [
-      destDir,
-      ...extraMappingPaths,
-      MARKETPLACE_CONFIG_PATH,
-      ...GENERATED_MANIFEST_PATHS,
-    ]
-    const forceAddPaths = [
-      ...upstreamFiles.map(file => join(destDir, file)),
-      ...extraMappingPaths,
-    ]
+    const stagePaths = [destDir, MARKETPLACE_CONFIG_PATH, ...GENERATED_MANIFEST_PATHS]
+    const forceAddPaths = upstreamFiles.map((file) => join(destDir, file))
 
     try {
       const result = createPr(
@@ -541,7 +381,6 @@ const program = Effect.gen(function* () {
         body,
         stagePaths,
         forceAddPaths,
-        // Base on main's committed state so the PR carries only this Skill's entry.
         syncStateForPrBranch(readSyncState(), skillName, candidateState),
       )
       if (result === "created") {
@@ -559,26 +398,20 @@ const program = Effect.gen(function* () {
         updated = true
       }
     } catch (e) {
-      try {
-        exec("git checkout main")
-      } catch {
-        // Already on main or checkout is blocked by an unexpected failure.
-      }
+      try { exec("git checkout main") } catch {}
       cleanPaths([...stagePaths, SYNC_STATE_PATH], forceAddPaths)
       console.log(`  ❌ PR 创建失败: ${e}`)
     }
   }
 
-  if (updated) {
-    writeSyncState(syncState)
-  }
-
-  // Rebuild marketplace.json
-  exec(`npx tsx scripts/build-marketplace.ts`)
+  if (updated) writeSyncState(syncState)
+  exec("npx tsx scripts/build-marketplace.ts")
   console.log("\n✅ 同步完成")
-})
+}
 
-Effect.runPromise(program).catch((e) => {
+try {
+  main()
+} catch (e) {
   console.error("同步失败:", e)
   process.exit(1)
-})
+}

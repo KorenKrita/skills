@@ -1,11 +1,6 @@
-import { Data, Effect } from "effect"
-
-// ─── Domain Types ────────────────────────────────────────────────────────────
-
 export type Patch =
   | { readonly type: "remove_frontmatter"; readonly field: string }
   | { readonly type: "set_frontmatter"; readonly field: string; readonly value: string | boolean | number }
-  | { readonly type: "append_to_frontmatter"; readonly field: string; readonly text: string }
   | { readonly type: "replace"; readonly pattern: string; readonly with: string }
   | { readonly type: "replace_all"; readonly pattern: string; readonly with: string }
   | { readonly type: "append_content"; readonly text: string }
@@ -16,10 +11,10 @@ export interface PatchResult {
   readonly msg: string
 }
 
-export class PatchFailure extends Data.TaggedError("PatchFailure")<{
-  readonly patch: Patch
-  readonly msg: string
-}> {}
+export interface ApplyPatchesResult {
+  readonly final: string
+  readonly results: readonly PatchResult[]
+}
 
 interface FrontmatterField {
   readonly key: string
@@ -27,44 +22,33 @@ interface FrontmatterField {
 }
 
 interface ParsedSkill {
+  readonly hasFrontmatter: boolean
   readonly fields: FrontmatterField[]
   readonly body: string
 }
 
-// ─── Frontmatter Parsing ─────────────────────────────────────────────────────
-
 function parseFrontmatter(content: string): ParsedSkill {
-  const match = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/)
-  if (!match) return { fields: [], body: content }
-  const rawLines = match[1]!.split("\n")
-  const fields: FrontmatterField[] = []
-  for (const line of rawLines) {
-    const colonIdx = line.indexOf(":")
-    if (colonIdx === -1) {
-      if (fields.length > 0) {
-        fields[fields.length - 1] = {
-          ...fields[fields.length - 1]!,
-          raw: fields[fields.length - 1]!.raw + "\n" + line,
-        }
-      }
-      continue
-    }
-    fields.push({ key: line.slice(0, colonIdx).trim(), raw: line })
-  }
-  return { fields, body: match[2]! }
-}
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/)
+  if (!match) return { hasFrontmatter: false, fields: [], body: content }
 
-function getFieldValue(field: FrontmatterField): string {
-  const colonIdx = field.raw.indexOf(":")
-  const valuePart = field.raw.slice(colonIdx + 1).trim()
-  if (valuePart.startsWith('"') && valuePart.endsWith('"')) return valuePart.slice(1, -1)
-  return valuePart
+  const fields: FrontmatterField[] = []
+  for (const line of match[1]!.split(/\r?\n/)) {
+    const keyMatch = line.match(/^([a-zA-Z0-9_-]+):\s*(.*)$/)
+    if (keyMatch) {
+      fields.push({ key: keyMatch[1]!, raw: line })
+    } else if (fields.length > 0) {
+      const prev = fields[fields.length - 1]!
+      fields[fields.length - 1] = { key: prev.key, raw: `${prev.raw}\n${line}` }
+    }
+  }
+
+  return { hasFrontmatter: true, fields, body: match[2]! }
 }
 
 function formatValue(value: string | boolean | number): string {
-  if (typeof value === "boolean" || typeof value === "number") return String(value)
-  if (value.includes(":") || value.includes('"') || value.includes("\n")) {
-    return `"${value.replace(/"/g, '\\"')}"`
+  if (typeof value !== "string") return String(value)
+  if (/[:#\n"'[\]{},&*?|<>=!%@`]/.test(value)) {
+    return JSON.stringify(value)
   }
   return value
 }
@@ -74,114 +58,77 @@ function reassemble(fields: FrontmatterField[], body: string): string {
   return `---\n${fm}\n---\n${body}`
 }
 
-// ─── Patch Application (single) ─────────────────────────────────────────────
+function describePatch(patch: Patch): string {
+  switch (patch.type) {
+    case "remove_frontmatter":
+      return `已移除字段 ${patch.field}`
+    case "set_frontmatter":
+      return `已设置 ${patch.field} = ${patch.value}`
+    case "replace":
+      return "已替换匹配内容"
+    case "replace_all":
+      return "已全部替换匹配内容"
+    case "append_content":
+      return "已追加内容"
+  }
+}
 
-function applySingle(content: string, patch: Patch): Effect.Effect<string, PatchFailure> {
+function applySingle(content: string, patch: Patch): { ok: true; output: string } | { ok: false; msg: string } {
   const { fields, body } = parseFrontmatter(content)
 
   switch (patch.type) {
     case "remove_frontmatter": {
-      const idx = fields.findIndex((f) => f.key === patch.field)
-      if (idx === -1) {
-        return new PatchFailure({ patch, msg: `字段 "${patch.field}" 不存在` })
+      const next = fields.filter((f) => f.key !== patch.field)
+      if (next.length === fields.length) {
+        return { ok: false, msg: `frontmatter 字段 "${patch.field}" 不存在` }
       }
-      const newFields = [...fields.slice(0, idx), ...fields.slice(idx + 1)]
-      return Effect.succeed(reassemble(newFields, body))
+      return { ok: true, output: reassemble(next, body) }
     }
 
     case "set_frontmatter": {
+      const newRaw = `${patch.field}: ${formatValue(patch.value)}`
       const idx = fields.findIndex((f) => f.key === patch.field)
-      const formatted = formatValue(patch.value)
-      const newRaw = `${patch.field}: ${formatted}`
-      if (idx === -1) {
-        return Effect.succeed(reassemble([...fields, { key: patch.field, raw: newRaw }], body))
-      }
-      const newFields = fields.map((f, i) => (i === idx ? { key: patch.field, raw: newRaw } : f))
-      return Effect.succeed(reassemble(newFields, body))
-    }
-
-    case "append_to_frontmatter": {
-      const idx = fields.findIndex((f) => f.key === patch.field)
-      if (idx === -1) {
-        return new PatchFailure({ patch, msg: `字段 "${patch.field}" 不存在` })
-      }
-      const current = getFieldValue(fields[idx]!)
-      const newValue = current + patch.text
-      const formatted = formatValue(newValue)
-      const newRaw = `${patch.field}: ${formatted}`
-      const newFields = fields.map((f, i) => (i === idx ? { key: patch.field, raw: newRaw } : f))
-      return Effect.succeed(reassemble(newFields, body))
+      const next =
+        idx === -1
+          ? [...fields, { key: patch.field, raw: newRaw }]
+          : fields.map((f, i) => (i === idx ? { key: patch.field, raw: newRaw } : f))
+      return { ok: true, output: reassemble(next, body) }
     }
 
     case "replace": {
       if (!body.includes(patch.pattern)) {
-        return new PatchFailure({ patch, msg: `未找到匹配: "${patch.pattern.slice(0, 50)}"` })
+        return { ok: false, msg: `未找到匹配文本 "${patch.pattern.slice(0, 60)}"` }
       }
-      const newBody = body.replace(patch.pattern, patch.with)
-      return Effect.succeed(reassemble(fields, newBody))
+      return { ok: true, output: reassemble(fields, body.replace(patch.pattern, patch.with)) }
     }
 
     case "replace_all": {
       if (!content.includes(patch.pattern)) {
-        return new PatchFailure({ patch, msg: `未找到匹配: "${patch.pattern.slice(0, 50)}"` })
+        return { ok: false, msg: `未找到匹配文本 "${patch.pattern.slice(0, 60)}"` }
       }
-      return Effect.succeed(content.split(patch.pattern).join(patch.with))
+      return { ok: true, output: content.split(patch.pattern).join(patch.with) }
     }
 
     case "append_content": {
-      const newBody = body.trimEnd() + "\n\n" + patch.text.trimEnd() + "\n"
-      return Effect.succeed(reassemble(fields, newBody))
+      const normalized = patch.text.replace(/\n+$/, "")
+      return { ok: true, output: reassemble(fields, `${body.trimEnd()}\n\n${normalized}\n`) }
     }
   }
 }
 
-// ─── Public API ──────────────────────────────────────────────────────────────
+export function applyPatches(content: string, patches: readonly Patch[]): ApplyPatchesResult {
+  const results: PatchResult[] = []
+  let current = content
 
-export interface ApplyPatchesResult {
-  readonly final: string
-  readonly results: PatchResult[]
-}
-
-export const applyPatches = (
-  content: string,
-  patches: readonly Patch[],
-): Effect.Effect<ApplyPatchesResult> =>
-  Effect.gen(function* () {
-    let current = content
-    const results: PatchResult[] = []
-
-    for (const patch of patches) {
-      const result = yield* applySingle(current, patch).pipe(
-        Effect.map((output): PatchResult & { output: string } => ({
-          patch,
-          ok: true,
-          msg: patchMsg(patch),
-          output,
-        })),
-        Effect.catchTag("PatchFailure", (err) =>
-          Effect.succeed({ patch, ok: false, msg: err.msg, output: current }),
-        ),
-      )
-      current = result.output
-      results.push({ patch: result.patch, ok: result.ok, msg: result.msg })
+  for (const patch of patches) {
+    const res = applySingle(current, patch)
+    if (res.ok) {
+      current = res.output
+      results.push({ patch, ok: true, msg: describePatch(patch) })
+    } else {
+      results.push({ patch, ok: false, msg: res.msg })
     }
-
-    return { final: current, results }
-  })
-
-function patchMsg(patch: Patch): string {
-  switch (patch.type) {
-    case "remove_frontmatter":
-      return `删除字段 ${patch.field}`
-    case "set_frontmatter":
-      return `设置 ${patch.field} = ${patch.value}`
-    case "append_to_frontmatter":
-      return `追加到 ${patch.field}`
-    case "replace":
-      return `替换成功`
-    case "replace_all":
-      return `全部替换成功`
-    case "append_content":
-      return `正文末尾追加 ${patch.text.length} 字符`
   }
+
+  return { final: current, results }
 }
